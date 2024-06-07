@@ -9,17 +9,12 @@
     </span>
     <template #dropdown>
       <el-dropdown-menu>
-        <el-dropdown-item :command="2">
-          <el-icon><Edit /></el-icon>修改密码</el-dropdown-item
-        >
         <el-dropdown-item :command="1" divided>
           <el-icon><SwitchButton /></el-icon>退出登录</el-dropdown-item
         >
       </el-dropdown-menu>
     </template>
   </el-dropdown>
-
-  <PersonalDialog ref="person" />
 </template>
 
 <script lang="ts" setup>
@@ -30,7 +25,6 @@
   import AvatarLogo from '@/assets/image/avatar.png'
   import { useUserStore } from '@/store/modules/user'
   import { useTagsViewStore } from '@/store/modules/tagsView'
-  import PersonalDialog from './PersonalDialog.vue'
 
   const router = useRouter()
   const UserStore = useUserStore()
@@ -38,7 +32,6 @@
 
   // 用户信息
   const userInfo = computed(() => UserStore.userInfo)
-  const person = ref()
 
   const logOut = async () => {
     ElMessageBox.confirm('您是否确认退出登录?', '温馨提示', {
@@ -61,9 +54,6 @@
     switch (key) {
       case 1:
         logOut()
-        break
-      case 2:
-        person.value.show()
         break
     }
   }

@@ -17,6 +17,11 @@ import nestedRouter from './modules/nested'
 import externalLink from './modules/externalLink'
 import formRouter from './modules/from'
 import functionPageRouter from './modules/functionPage'
+import StuPersonalInformation from './modules/Stu-personal-information'
+import StuInwardTransfer from './modules/Stu-inward-transfer'
+import StuTicketManagement from './modules/Stu-ticket-management'
+import CopyFileDownload from './modules/Copy-file-download'
+import CopyFileUpload from './modules/Copy-file-upload'
 
 // 异步组件
 export const asyncRoutes = [
@@ -26,6 +31,11 @@ export const asyncRoutes = [
   ...nestedRouter,
   ...errorRouter,
   ...externalLink,
+  ...StuTicketManagement,
+  ...StuInwardTransfer,
+  ...StuPersonalInformation,
+  ...CopyFileDownload,
+  ...CopyFileUpload,
   {
     path: '/:pathMatch(.*)',
     redirect: '/404',
