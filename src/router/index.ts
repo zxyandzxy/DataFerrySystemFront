@@ -17,6 +17,12 @@ import nestedRouter from './modules/nested'
 import externalLink from './modules/externalLink'
 import formRouter from './modules/from'
 import functionPageRouter from './modules/functionPage'
+import manageStudentRouter from './modules/Admin-studentManage'
+import manageTeacherRouter from './modules/Admin-teacherManage'
+import adminSelfInfoRouter from './modules/Admin-selfInformation'
+import manageTicketRouter from './modules/Admin-ticketManage'
+import systemConfigRouter from './modules/Admin-systemConfig'
+import manageDiskRouter from './modules/Admin-diskManage'
 
 // 异步组件
 export const asyncRoutes = [
@@ -26,6 +32,12 @@ export const asyncRoutes = [
   ...nestedRouter,
   ...errorRouter,
   ...externalLink,
+  ...manageStudentRouter,
+  ...manageTeacherRouter,
+  ...adminSelfInfoRouter,
+  ...manageTicketRouter,
+  ...systemConfigRouter,
+  ...manageDiskRouter,
   {
     path: '/:pathMatch(.*)',
     redirect: '/404',
