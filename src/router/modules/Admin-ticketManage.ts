@@ -5,7 +5,6 @@ const manageTicketRouter = [
     path: '/manageTicket',
     component: Layout,
     name: 'manageTicket',
-    alwaysShow: true,
     meta: {
       title: '管理工单',
       icon: 'Grape',
@@ -15,6 +14,7 @@ const manageTicketRouter = [
         path: '',
         component: () => import('@/views/admin-ticketmanage/index.vue'),
         name: 'manage-ticket',
+        meta: { title: '管理工单', keepAlive: true, icon: 'Grape' },
       },
     ],
   },

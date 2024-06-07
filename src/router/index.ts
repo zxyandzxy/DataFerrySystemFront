@@ -17,23 +17,21 @@ import nestedRouter from './modules/nested'
 import externalLink from './modules/externalLink'
 import formRouter from './modules/from'
 import functionPageRouter from './modules/functionPage'
-import manageStudentRouter from './modules/Admin-studentManage'
-import manageTeacherRouter from './modules/Admin-teacherManage'
 import adminSelfInfoRouter from './modules/Admin-selfInformation'
 import manageTicketRouter from './modules/Admin-ticketManage'
 import systemConfigRouter from './modules/Admin-systemConfig'
 import manageDiskRouter from './modules/Admin-diskManage'
+import manageRouter from './modules/Admin-manage'
 
 // 异步组件
 export const asyncRoutes = [
   ...tableRouter,
-  ...formRouter,
-  ...functionPageRouter,
-  ...nestedRouter,
-  ...errorRouter,
-  ...externalLink,
-  ...manageStudentRouter,
-  ...manageTeacherRouter,
+  // ...formRouter,
+  // ...functionPageRouter,
+  // ...nestedRouter,
+  // ...errorRouter,
+  // ...externalLink,
+  ...manageRouter,
   ...adminSelfInfoRouter,
   ...manageTicketRouter,
   ...systemConfigRouter,
@@ -71,15 +69,15 @@ export const constantRoutes: Array<RouteRecordRaw & extendRoute> = [
     path: '/',
     name: 'layout',
     component: Layout,
-    redirect: '/home',
-    children: [
-      {
-        path: '/home',
-        component: () => import('@/views/home/index.vue'),
-        name: 'home',
-        meta: { title: '首页', icon: 'House', affix: true, role: ['other'] },
-      },
-    ],
+    redirect: '/manage',
+  //   children: [
+  //     {
+  //       path: '/home',
+  //       component: () => import('@/views/home/index.vue'),
+  //       name: 'home',
+  //       meta: { title: '首页', icon: 'House', affix: true, role: ['other'] },
+  //     },
+  //   ],
   },
 ]
 

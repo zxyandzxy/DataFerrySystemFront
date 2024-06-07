@@ -5,7 +5,6 @@ const adminSelfInfoRouter = [
     path: '/adminInfo',
     component: Layout,
     name: 'admin-self-information',
-    alwaysShow: true,
     meta: {
       title: '个人信息',
       icon: 'Grape',
@@ -15,6 +14,7 @@ const adminSelfInfoRouter = [
         path: '',
         component: () => import('@/views/admin-selfInformation/index.vue'),
         name: 'admin-self-information',
+        meta: { title: '个人信息', keepAlive: true, icon: 'MenuIcon' },
       },
     ],
   },
