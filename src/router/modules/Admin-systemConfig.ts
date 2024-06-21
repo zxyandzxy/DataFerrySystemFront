@@ -12,7 +12,7 @@ const systemConfigRouter = [
     children: [
       {
         path: '',
-        component: () => import('@/views/admin-systemConfig/index.vue'),
+        component: () => import('@/views/Admin-systemConfig/index.vue'),
         name: 'system-config',
         meta: { title: '系统配置', keepAlive: true, icon: 'Grape' },
       },

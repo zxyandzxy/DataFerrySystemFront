@@ -12,11 +12,11 @@ interface extendRoute {
 }
 //
 import tableRouter from './modules/table'
-import errorRouter from './modules/error'
-import nestedRouter from './modules/nested'
-import externalLink from './modules/externalLink'
-import formRouter from './modules/from'
-import functionPageRouter from './modules/functionPage'
+// import errorRouter from './modules/error'
+// import nestedRouter from './modules/nested'
+// import externalLink from './modules/externalLink'
+// import formRouter from './modules/from'
+// import functionPageRouter from './modules/functionPage'
 import adminSelfInfoRouter from './modules/Admin-selfInformation'
 import manageTicketRouter from './modules/Admin-ticketManage'
 import systemConfigRouter from './modules/Admin-systemConfig'
@@ -70,14 +70,14 @@ export const constantRoutes: Array<RouteRecordRaw & extendRoute> = [
     name: 'layout',
     component: Layout,
     redirect: '/manage',
-  //   children: [
-  //     {
-  //       path: '/home',
-  //       component: () => import('@/views/home/index.vue'),
-  //       name: 'home',
-  //       meta: { title: '首页', icon: 'House', affix: true, role: ['other'] },
-  //     },
-  //   ],
+    //   children: [
+    //     {
+    //       path: '/home',
+    //       component: () => import('@/views/home/index.vue'),
+    //       name: 'home',
+    //       meta: { title: '首页', icon: 'House', affix: true, role: ['other'] },
+    //     },
+    //   ],
   },
 ]
 
