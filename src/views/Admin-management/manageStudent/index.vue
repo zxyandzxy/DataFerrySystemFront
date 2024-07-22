@@ -139,7 +139,7 @@
       )
       if (confirm === 'confirm') {
         // 这里是删除账户的逻辑
-        showPasswordDialog.value = true
+        ElMessage.success('删除成功')
       }
     } catch (error) {
       console.log('删除账户取消')

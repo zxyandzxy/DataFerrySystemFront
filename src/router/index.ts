@@ -25,7 +25,7 @@ import manageRouter from './modules/Admin-manage'
 
 // 异步组件
 export const asyncRoutes = [
-  ...tableRouter,
+  // ...tableRouter,
   // ...formRouter,
   // ...functionPageRouter,
   // ...nestedRouter,

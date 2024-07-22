@@ -12,7 +12,7 @@ const manageTicketRouter = [
     children: [
       {
         path: '',
-        component: () => import('@/views/admin-ticketmanage/index.vue'),
+        component: () => import('@/views/Admin-ticketManage/index.vue'),
         name: 'manage-ticket',
         meta: { title: '管理工单', keepAlive: true, icon: 'Grape' },
       },

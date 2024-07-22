@@ -66,4 +66,60 @@ export default [
       }
     },
   },
+  {
+    url: '/systemConfig',
+    method: 'get',
+    response: ({ query }) => {
+      return {
+        code: 0,
+        message: 'success',
+        data: {
+          approvalMode: '定期审批',
+          advancedApproval: false,
+          salt: '',
+        },
+      }
+    },
+  },
+  {
+    url: '/getTickets',
+    method: 'get',
+    response: ({ query }) => {
+      return {
+        code: 0,
+        message: 'success',
+        data: [
+          {
+            id: '001',
+            student_id: 123,
+            admin_id: 456,
+            title: 'Test1 Ticket',
+            abstract: 'This is a test1 ticket.',
+            reason: 'Test1 reason',
+            unzip_password: 'password123',
+            status: 3,
+            type: 0,
+            is_ahead: false,
+            create_time: new Date(),
+            modify_time: new Date(),
+          },
+          {
+            id: '002',
+            student_id: 123,
+            admin_id: 456,
+            title: 'Test2 Ticket',
+            abstract: 'This is a test2 ticket.',
+            reason: 'Test2 reason',
+            unzip_password: 'password123',
+            status: 21,
+            type: 0,
+            is_ahead: false,
+            create_time: new Date(),
+            modify_time: new Date(),
+          },
+          // 添加更多工单
+        ],
+      }
+    },
+  },
 ] as MockMethod[]
