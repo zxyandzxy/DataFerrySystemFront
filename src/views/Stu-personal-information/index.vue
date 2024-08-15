@@ -25,7 +25,7 @@
           <el-form-item label="微信号">
             <el-input disabled v-model="studentForm.wechat" />
           </el-form-item>
-          <el-form-item label="微信号">
+          <el-form-item label="">
             <el-button style="color: blue" text bg @click="changeLink"> 编辑 </el-button>
           </el-form-item>
         </el-form>
