@@ -36,7 +36,7 @@ export const usePermissionStore = defineStore({
         resolve(accessedRoutes)
       })
     },
-    // 清楚路由
+    // 清除路由
     clearRoutes() {
       this.routes = []
       this.addRoutes = []

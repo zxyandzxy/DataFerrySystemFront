@@ -1,8 +1,14 @@
 <template>
-  <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" label-width="0">
+  <el-form
+    v-if="systemChoose == '学生端' || systemChoose == '管理员端'"
+    ref="ruleFormRef"
+    :model="ruleForm"
+    :rules="rules"
+    label-width="0"
+  >
     <el-form-item label="" prop="username">
       <el-input
-        placeholder="请输入用户名"
+        placeholder="请输入账号"
         autoComplete="on"
         style="position: relative"
         v-model="ruleForm.username"
@@ -31,6 +37,36 @@
         </template>
       </el-input>
     </el-form-item>
+    <el-form-item label="" prop="username">
+      <el-input
+        placeholder="请输入验证码"
+        autoComplete="on"
+        style="position: relative"
+        v-model="ruleForm.verificationCode"
+        @keyup.enter.native="submitForm(ruleFormRef)"
+      >
+        <template #prefix>
+          <el-icon class="el-input__icon"><Stamp /></el-icon>
+        </template>
+      </el-input>
+    </el-form-item>
+    <el-form-item style="width: 100%">
+      <el-button
+        :loading="loading"
+        class="login-btn"
+        type="primary"
+        @click="submitForm(ruleFormRef)"
+        >登录</el-button
+      >
+    </el-form-item>
+  </el-form>
+  <el-form
+    v-if="systemChoose == '拷贝机端'"
+    ref="ruleFormRef"
+    :model="ruleForm"
+    :rules="rules"
+    label-width="0"
+  >
     <el-form-item style="width: 100%">
       <el-button
         :loading="loading"
@@ -43,26 +79,30 @@
   </el-form>
 </template>
 <script lang="ts" setup>
-  import { ref, reactive } from 'vue'
+  import { ref, reactive, defineProps } from 'vue'
   import type { FormInstance } from 'element-plus'
   import { ElNotification } from 'element-plus'
   import { useRouter } from 'vue-router'
-  import { useUserStore } from '@/store/modules/user'
+  import { useStuStore } from '@/store/modules/student'
+  import { useCopyMachineStore } from '@/store/modules/copyMachine'
   import { getTimeState } from '@/utils/index'
   const ruleFormRef = ref<FormInstance>()
   const router = useRouter()
-  const UserStore = useUserStore()
+  const stuStore = useStuStore()
+  const copyMachineStore = useCopyMachineStore()
 
   const passwordType = ref('password')
   const loading = ref(false)
   const rules = reactive({
-    password: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-    username: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+    verificationCode: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
+    password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+    username: [{ required: true, message: '请输入账号', trigger: 'blur' }],
   })
   // 表单数据
   const ruleForm = reactive({
-    username: 'admin',
-    password: '123456',
+    username: '',
+    password: '',
+    verificationCode: '',
   })
 
   const showPwd = () => {
@@ -72,6 +112,13 @@
       passwordType.value = 'password'
     }
   }
+
+  const props = defineProps({
+    systemChoose: {
+      type: String,
+      default: '',
+    },
+  })
   const submitForm = (formEl: FormInstance | undefined) => {
     loading.value = true
     if (!formEl) return
@@ -79,17 +126,23 @@
       if (valid) {
         // 登录
         setTimeout(async () => {
-          await UserStore.login(ruleForm)
+          if (props.systemChoose === '学生端') {
+            await stuStore.login(ruleForm, props.systemChoose)
+          } else if (props.systemChoose === '拷贝机端') {
+            await copyMachineStore.login(props.systemChoose)
+          } else if (props.systemChoose === '管理员端') {
+            await stuStore.login(ruleForm, props.systemChoose)
+          }
+          // 登录成功后跳转
           await router.push({
             path: '/',
           })
           ElNotification({
             title: getTimeState(),
-            message: '欢迎登录 Vue Admin Perfect',
+            message: '欢迎登录 数据摆渡系统',
             type: 'success',
             duration: 3000,
           })
-          loading.value = true
         }, 1000)
       } else {
         console.log('error submit!')

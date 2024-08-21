@@ -1,22 +1,12 @@
-import {
-  createRouter,
-  createWebHistory,
-  RouteRecordRaw,
-  createWebHashHistory,
-  Router,
-} from 'vue-router'
+import { createRouter, RouteRecordRaw, createWebHashHistory } from 'vue-router'
 import Layout from '@/layout/index.vue'
 // 扩展继承属性
 interface extendRoute {
   hidden?: boolean
 }
 //
-import tableRouter from './modules/table'
+
 import errorRouter from './modules/error'
-import nestedRouter from './modules/nested'
-import externalLink from './modules/externalLink'
-import formRouter from './modules/from'
-import functionPageRouter from './modules/functionPage'
 import StuPersonalInformation from './modules/Stu-personal-information'
 import StuInwardTransfer from './modules/Stu-inward-transfer'
 import StuTicketManagement from './modules/Stu-ticket-management'
@@ -25,12 +15,7 @@ import CopyFileUpload from './modules/Copy-file-upload'
 
 // 异步组件
 export const asyncRoutes = [
-  ...tableRouter,
-  ...formRouter,
-  ...functionPageRouter,
-  ...nestedRouter,
   ...errorRouter,
-  ...externalLink,
   ...StuTicketManagement,
   ...StuInwardTransfer,
   ...StuPersonalInformation,

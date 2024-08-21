@@ -268,10 +268,12 @@
                 <el-input disabled v-model="workOrderForm.unzipPassword" />
               </el-form-item>
               <el-form-item label="审批失败原因">
-                <el-input disabled v-model="remark" />
-                <el-button type="primary" @click="changeToAdvancedReview"
-                  >点此进入超前审批</el-button
-                >
+                <div style="display: flex; align-items: center">
+                  <el-input disabled v-model="remark" />
+                  <el-button style="margin-left: 5%" type="primary" @click="changeToAdvancedReview"
+                    >点此进入超前审批</el-button
+                  >
+                </div>
               </el-form-item>
             </el-form>
           </div>
@@ -395,7 +397,7 @@
   // 查看工单
   const active = ref(1)
   const viewWorkOrderVisible = ref(false)
-  const workOrderStatus = ref(11) // 1 创建中，2 处理中，3 审批中， 11 可拷贝， 21 审批通过，22 审批驳回
+  const workOrderStatus = ref(3) // 1 创建中，2 处理中，3 审批中， 11 可拷贝， 21 审批通过，22 审批驳回
   const remark = ref('工单仍在审批中')
   const changeToAdvancedReview = () => {
     advancedReviewVisible.value = true

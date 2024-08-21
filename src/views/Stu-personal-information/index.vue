@@ -47,14 +47,14 @@
           </el-form-item>
           <el-form-item label="新密码" prop="password">
             <el-input
-              v-model="ruleForm.password"
+              v-model="ruleForm.newpassword"
               type="password"
               placeholder="请输入新密码"
             ></el-input>
           </el-form-item>
           <el-form-item label="确认新密码" prop="confirmPassword">
             <el-input
-              v-model="ruleForm.confirmPassword"
+              v-model="ruleForm.newVerPassword"
               type="password"
               placeholder="请确认新的密码"
             ></el-input>
@@ -97,15 +97,18 @@
   </div>
 </template>
 <script setup lang="ts">
-  import { ref, reactive } from 'vue'
-  import type { ElForm } from 'element-plus'
+  import { ref, reactive, onMounted } from 'vue'
+  import { ElForm, ElNotification } from 'element-plus'
+  import { stuUpdateContactInfoAPI, stuUpdatePasswordAPI } from '@/api/stuAccountManagement'
+  import { useStuStore } from '@/store/modules/student'
+  const stuStore = useStuStore()
   const changePwdDialogVisible = ref(false)
   const changeLinkDialogVisible = ref(false)
 
   const ruleForm = reactive({
     curPassword: '',
-    password: '',
-    confirmPassword: '',
+    newpassword: '',
+    newVerPassword: '',
   })
 
   const linkForm = reactive({
@@ -121,22 +124,22 @@
         trigger: 'blur',
       },
     ],
-    password: [
+    newpassword: [
       {
         required: true,
         message: '请输入新密码',
         trigger: 'blur',
       },
     ],
-    confirmPassword: [
+    newVerPassword: [
       {
         required: true,
         message: '请确认新的密码',
         trigger: 'blur',
       },
       {
-        validator: (rule: any, value: any, callback: any) => {
-          if (value !== ruleForm.password) {
+        validator: (rule, value, callback) => {
+          if (value !== ruleForm.newpassword) {
             callback(new Error('两次输入的密码不一致'))
           } else {
             callback()
@@ -165,22 +168,59 @@
   })
 
   const studentForm = reactive({
-    student_id: 'test',
-    student_name: 'test',
-    telephone: 'test',
-    wechat: 'test',
+    student_id: '',
+    student_name: '',
+    telephone: '',
+    wechat: '',
   })
 
   const submitChangePwd = () => {
     // 执行API接口，判断修改密码逻辑
-    alert('修改密码成功')
-    changePwdDialogVisible.value = false
+    const data = {
+      studentId: '',
+      curPassword: ruleForm.curPassword,
+      newPassword: ruleForm.newpassword,
+      newVerPassword: ruleForm.newVerPassword,
+    }
+    const res = stuUpdatePasswordAPI(data)
+    if (res.code == 200) {
+      ElNotification({
+        message: res.msg,
+        type: 'success',
+        duration: 2000,
+      })
+      changePwdDialogVisible.value = false
+    } else {
+      ElNotification({
+        message: res.msg,
+        type: 'error',
+        duration: 2000,
+      })
+    }
   }
 
   const submitChangeLink = () => {
     // 执行API接口，判断修改联系方式逻辑
-    alert('修改联系方式成功')
-    changeLinkDialogVisible.value = false
+    const data = {
+      studentId: '',
+      telephone: linkForm.telephone,
+      wechat: linkForm.wechat,
+    }
+    const res = stuUpdateContactInfoAPI(data)
+    if (res.code == 200) {
+      ElNotification({
+        message: res.msg,
+        type: 'success',
+        duration: 2000,
+      })
+      changeLinkDialogVisible.value = false
+    } else {
+      ElNotification({
+        message: res.msg,
+        type: 'error',
+        duration: 2000,
+      })
+    }
   }
 
   const changePwd = () => {
@@ -190,6 +230,25 @@
   const changeLink = () => {
     changeLinkDialogVisible.value = true
   }
+
+  onMounted(async () => {
+    // 执行API接口，获取学生信息
+    const res = await stuStore.getStuInfo
+    if (res.code == 200) {
+      studentForm.student_id = stuStore.stuId
+      studentForm.student_name = stuStore.userInfo.studentName
+      studentForm.telephone = stuStore.userInfo.telephone
+      studentForm.wechat = stuStore.userInfo.wechat
+      linkForm.telephone = stuStore.userInfo.telephone
+      linkForm.wechat = stuStore.userInfo.wechat
+    } else {
+      ElNotification({
+        message: res.msg,
+        type: 'error',
+        duration: 2000,
+      })
+    }
+  })
 </script>
 
 <style scoped lang="scss">
