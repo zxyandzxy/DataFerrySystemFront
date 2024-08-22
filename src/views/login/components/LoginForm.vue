@@ -139,13 +139,19 @@
           })
           ElNotification({
             title: getTimeState(),
-            message: '欢迎登录 数据摆渡系统',
+            message: '欢迎登录数据摆渡系统',
             type: 'success',
             duration: 3000,
           })
+          loading.value = false
         }, 1000)
       } else {
-        console.log('error submit!')
+        ElNotification({
+          message: '账号/密码错误，请重试',
+          type: 'error',
+          duration: 3000,
+        })
+        loading.value = false
         return false
       }
     })
