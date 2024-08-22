@@ -1,12 +1,12 @@
 import request from './request'
 
 // 文件查看
-export function viewFileAPI(studentId) {
+export function viewFileAPI(student_id) {
   return request({
     url: '/student/view_files',
     method: 'GET',
     params: {
-      studentId,
+      student_id,
     },
   })
 }
@@ -16,6 +16,9 @@ export function uploadFileAPI(data) {
     url: '/student/upload_files',
     method: 'POST',
     data,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
   })
 }
 /*

@@ -9,14 +9,14 @@
               <el-form :model="ticketForm" label-width="auto" style="margin-left: 20%">
                 <el-form-item label="工单ID">
                   <el-input
-                    v-model="ticketForm.id"
+                    v-model="ticketForm.workOrderId"
                     style="width: 500px"
                     placeholder="请输入工单ID"
                     clearable
                   />
                 </el-form-item>
                 <el-form-item label="学生学号">
-                  <el-input v-model="ticketForm.student_id" placeholder="请输入学号" clearable />
+                  <el-input v-model="ticketForm.studentId" placeholder="请输入学号" clearable />
                 </el-form-item>
                 <el-form-item label="登录密码">
                   <el-input
@@ -79,22 +79,23 @@
 <script setup lang="ts">
   import { reactive, ref } from 'vue'
   import { ElMessage } from 'element-plus'
+  import { copyFileAPI } from '@/api/stuWorkOrderApproval'
   import useClipboard from 'vue-clipboard3'
   const { toClipboard } = useClipboard()
   const ticketForm = reactive({
-    id: '',
-    student_id: '',
+    workOrderId: '',
+    studentId: '',
     password: '',
   })
   const fileForm = reactive({
-    path: 'http://127.0.0.1:8000/download/123456789',
-    validCode: '123456789',
-    deCodePassword: '123456789',
+    fileDownloadLink: '',
+    checkCode: '',
+    unzipPassword: '',
   })
 
   const copyFileDownPath = async () => {
     try {
-      await toClipboard(fileForm.path)
+      await toClipboard(fileForm.fileDownloadLink)
       ElMessage({
         message: '复制文件校验码成功.',
         type: 'success',
@@ -110,7 +111,7 @@
   }
   const copyFileValid = async () => {
     try {
-      await toClipboard(fileForm.validCode)
+      await toClipboard(fileForm.checkCode)
       ElMessage({
         message: '复制文件校验码成功.',
         type: 'success',
@@ -126,7 +127,7 @@
   }
   const copyFilePassword = async () => {
     try {
-      await toClipboard(fileForm.deCodePassword)
+      await toClipboard(fileForm.unzipPassword)
       ElMessage({
         message: '复制文件校验码成功.',
         type: 'success',
@@ -143,8 +144,20 @@
   const isValid = ref(false)
 
   const validate = () => {
-    console.log(ticketForm)
-    isValid.value = true
+    const res = copyFileAPI(ticketForm)
+    if (res.code == 200) {
+      isValid.value = true
+      fileForm.fileDownloadLink = res.data.fileDownloadLink
+      fileForm.checkCode = res.data.checkCode
+      fileForm.unzipPassword = res.data.unzipPassword
+    } else {
+      isValid.value = false
+      ElMessage({
+        message: res.msg,
+        type: 'error',
+        plain: true,
+      })
+    }
   }
 </script>
 
