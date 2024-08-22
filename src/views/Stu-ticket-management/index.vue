@@ -4,7 +4,7 @@
       <div style="display: flex; align-items: center">
         <h2 style="margin-left: 5%">工单列表</h2>
         <el-button
-          @click="createWorkOrder"
+          @click="showCreateWorkOrder"
           size="large"
           type="primary"
           link
@@ -19,21 +19,19 @@
         <el-table-column prop="workOrderTitle" label="工单标题" width="150" />
         <el-table-column prop="fileType" label="文件类型" width="150" />
         <el-table-column prop="workOrderStatus" label="当前工单状态" width="150" />
-        <el-table-column prop="unzipPassword" label="加密密码" width="300">
+        <el-table-column prop="checkCode" label="校验码" width="300">
           <template #default="scope">
             <div style="display: flex; align-items: center">
               <el-input
-                v-model="scope.row.unzipPassword"
+                v-model="scope.row.checkCode"
                 type="password"
                 disabled
                 style="margin-right: 5%"
               />
-              <el-icon @click="viewUnzipPassword(scope.row.unzipPassword)" style="margin-right: 5%"
+              <el-icon @click="viewCheckCode(scope.row.checkCode)" style="margin-right: 5%"
                 ><View></View
               ></el-icon>
-              <el-icon @click="copyUnzipPassword(scope.row.unzipPassword)"
-                ><CopyDocument
-              /></el-icon>
+              <el-icon @click="copyCheckCode(scope.row.checkCode)"><CopyDocument /></el-icon>
             </div>
           </template>
         </el-table-column>
@@ -67,8 +65,12 @@
             </el-form-item>
             <el-form-item label="文件类型" prop="fileType">
               <el-select v-model="workOrderForm.fileType" placeholder="选择要要上传文件的类型">
-                <el-option label="pdf" value="pdf" />
-                <el-option label="docx" value="docx" />
+                <el-option
+                  v-for="item in fileTypeOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
               </el-select>
             </el-form-item>
             <el-form-item label="文件概述" prop="fileAbstract">
@@ -77,9 +79,9 @@
             <el-form-item label="拷贝原因" prop="copyReason">
               <el-input v-model="workOrderForm.copyReason" type="textarea" />
             </el-form-item>
-            <el-form-item label="文件加密密码" prop="unzipPassword">
-              <el-input v-model="workOrderForm.unzipPassword" />
-              <el-button @click="createUnzipPassword" size="large" type="primary" link
+            <el-form-item label="文件校验码" prop="checkCode">
+              <el-input v-model="workOrderForm.checkCode" />
+              <el-button @click="createCheckCode" size="large" type="primary" link
                 >系统生成</el-button
               >
             </el-form-item>
@@ -99,18 +101,25 @@
               <el-button>退出</el-button>
             </template>
           </el-popconfirm>
-          <el-button type="success" @click="isCreateWorkOrder = true"> 保存 </el-button>
+          <el-button type="success" @click="createWorkOrder"> 保存 </el-button>
         </div>
         <div v-if="isCreateWorkOrder == true">
           <h3>文件上传</h3>
           <el-divider />
           <div>
-            <el-upload drag action="">
+            <el-upload
+              class="upload-demo"
+              drag
+              limit="1"
+              :on-change="changeFile"
+              :auto-upload="false"
+              :data="uploadForm"
+            >
               <el-icon class="el-icon--upload"><upload-filled /></el-icon>
               <div class="el-upload__text"> 拖拽文件 或 <em> 点击上传 </em> </div>
               <template #tip>
                 <div class="el-upload__tip">
-                  只有文件上传后才能成功创建工单，后台处理文件上传需要一定时间，同学无需等待，提交工单即可
+                  只有文件上传后才能成功创建工单，后台处理文件上传需要一定时间，同学无需等待，提交工单即可。如需更新文件需先删除原来的上传的文件
                 </div>
               </template>
             </el-upload>
@@ -129,7 +138,7 @@
                 <el-button>退出</el-button>
               </template>
             </el-popconfirm>
-            <el-button type="success" @click="createWorkOrderVisible = false"> 提交工单 </el-button>
+            <el-button type="success" @click="submitTicket"> 提交工单 </el-button>
           </div>
         </div>
       </el-dialog>
@@ -169,10 +178,10 @@
               <el-form-item label="拷贝原因" prop="copyReason">
                 <el-input v-model="workOrderForm.copyReason" type="textarea" />
               </el-form-item>
-              <el-form-item label="文件加密密码" prop="unzipPassword">
-                <el-input v-model="workOrderForm.unzipPassword" />
-                <el-button @click="createUnzipPassword" size="large" type="primary" link
-                  >系统生成</el-button
+              <el-form-item label="文件校验码" prop="checkCode">
+                <el-input v-model="workOrderForm.checkCode" />
+                <el-button @click="createCheckCode" size="large" type="primary" link
+                  >系统生成(建议使用)</el-button
                 >
               </el-form-item>
             </el-form>
@@ -264,8 +273,8 @@
               <el-form-item label="拷贝原因" prop="copyReason">
                 <el-input disabled v-model="workOrderForm.copyReason" type="textarea" />
               </el-form-item>
-              <el-form-item label="文件加密密码" prop="unzipPassword">
-                <el-input disabled v-model="workOrderForm.unzipPassword" />
+              <el-form-item label="文件校验码" prop="checkCode">
+                <el-input disabled v-model="workOrderForm.checkCode" />
               </el-form-item>
               <el-form-item label="审批失败原因">
                 <div style="display: flex; align-items: center">
@@ -302,8 +311,8 @@
               <el-form-item label="拷贝原因" prop="copyReason">
                 <el-input disabled v-model="workOrderForm.copyReason" type="textarea" />
               </el-form-item>
-              <el-form-item label="文件加密密码" prop="unzipPassword">
-                <el-input disabled v-model="workOrderForm.unzipPassword" />
+              <el-form-item label="文件校验码" prop="checkCode">
+                <el-input disabled v-model="workOrderForm.checkCode" />
               </el-form-item>
               <el-form-item label="审批失败原因">
                 <div style="display: flex; align-items: center">
@@ -324,8 +333,10 @@
           <el-form :model="workOrderForm" label-width="auto">
             <el-form-item label="解压密码" prop="checkCode">
               <div style="display: flex; align-items: center">
-                <el-input disabled v-model="checkCode" />
-                <el-icon style="margin-left: 5%" @click="copyCheckCode"><DocumentCopy /></el-icon>
+                <el-input disabled v-model="unzipPassword" />
+                <el-icon style="margin-left: 5%" @click="copyUnzipPassword"
+                  ><DocumentCopy
+                /></el-icon>
               </div>
             </el-form-item>
           </el-form>
@@ -341,7 +352,7 @@
             <el-form-item label="超前审批密钥" prop="advanceReviewPassword">
               <div style="display: flex; align-items: center">
                 <el-input disabled v-model="advancedReviewForm.advanceReviewPassword" />
-                <el-icon style="margin-left: 5%" @click="copyadvanceReviewPassword"
+                <el-icon style="margin-left: 5%" @click="copyAdvanceReviewPassword"
                   ><DocumentCopy
                 /></el-icon>
               </div>
@@ -354,7 +365,6 @@
 </template>
 <script setup lang="ts">
   import useClipboard from 'vue-clipboard3'
-  const { toClipboard } = useClipboard()
   import { ElMessage } from 'element-plus'
   import {
     DocumentAdd,
@@ -365,34 +375,156 @@
     SuccessFilled,
     Lock,
   } from '@element-plus/icons-vue'
-  import { ref } from 'vue'
+  import { ref, onMounted, reactive } from 'vue'
+  import {
+    getWorkOrderListAPI,
+    getAuditTypeAPI,
+    createWorkOrderAPI,
+    uploadFileAPI,
+  } from '@/api/stuWorkOrderApproval'
+  import { useStuStore } from '@/store/modules/student'
 
+  const { toClipboard } = useClipboard()
+  const stuStore = useStuStore()
+  const auditType = ref() // 当前审批类型
+  const fileTypeOptions = [
+    // Docx 0 pdf 1 pptx 2 else 3
+    {
+      value: 0,
+      label: 'docx',
+    },
+    {
+      value: 1,
+      label: 'pdf',
+    },
+    {
+      value: 2,
+      label: 'pptx',
+    },
+    {
+      value: 3,
+      label: '其他',
+    },
+  ]
+  const workOrderForm = ref({
+    workOrderId: '',
+    auditType: auditType.value == 0 ? '即时审批' : '定期审批', // 0 即时审批，1 定期审批
+    workOrderTitle: '',
+    fileType: fileTypeOptions[0].value,
+    fileAbstract: '',
+    copyReason: '',
+    checkCode: '',
+  })
   // 新建工单
   const createWorkOrderVisible = ref(false)
-  const createWorkOrder = () => {
+  const isCreateWorkOrder = ref(false) // isCreateWorkOrder 是 true 时，就显示文件上传
+  const showCreateWorkOrder = () => {
     isCreateWorkOrder.value = false
     createWorkOrderVisible.value = true
   }
-  const workOrderForm = ref({
-    auditType: '',
-    workOrderTitle: '',
-    fileType: '',
-    fileAbstract: '',
-    copyReason: '',
-    unzipPassword: '',
+  const createWorkOrder = async () => {
+    // 判断必填信息是否填写完成
+    const fileTypeChoose = [0, 1, 2, 3] // 文件类型
+    if (
+      workOrderForm.value.workOrderTitle == '' ||
+      !fileTypeChoose.includes(workOrderForm.value.fileType) ||
+      workOrderForm.value.fileAbstract == '' ||
+      workOrderForm.value.copyReason == '' ||
+      workOrderForm.value.checkCode == ''
+    ) {
+      ElMessage({
+        message: '请填写完整信息',
+        type: 'error',
+      })
+      return
+    }
+    // 后端创建工单
+    const data = {
+      studentId: stuStore.studentId,
+      auditType: auditType.value,
+      workOrderTitle: workOrderForm.value.workOrderTitle,
+      fileType: workOrderForm.value.fileType,
+      fileAbstract: workOrderForm.value.fileAbstract,
+      copyReason: workOrderForm.value.copyReason,
+      checkCode: workOrderForm.value.checkCode,
+    }
+    /*
+    const res = await createWorkOrderAPI(data)
+    if (res.code == 200) {
+      ElMessage({
+        message: '创建成功',
+        type: 'success',
+      })
+      workOrderForm.value.workOrderId = res.data.workOrderId
+      isCreateWorkOrder.value = true
+    } else {
+      ElMessage({
+        message: '创建失败',
+        type: 'error',
+      })
+    }
+      */
+    isCreateWorkOrder.value = true // 开发用，后面注释掉
+  }
+  // 文件上传
+  const file = ref()
+  const changeFile = (uploadFile) => {
+    file.value = uploadFile
+  }
+  const uploadForm = reactive({
+    workOrderId: workOrderForm.value.workOrderId,
+    studentId: stuStore.stuId,
   })
+  // 参考教程：https://blog.csdn.net/m0_51044974/article/details/131575698
+  // 参考教程：https://blog.csdn.net/qq_61402485/article/details/129317623
+  // 参考教程(此)：https://blog.csdn.net/qq_24787615/article/details/131477657
+  const submitTicket = async () => {
+    // 判断是否上传文件
+    const jsonStr = JSON.stringify(uploadForm)
+    const blob = new Blob([jsonStr], {
+      type: 'application/json',
+    })
+    let formData = new FormData()
+    formData.append('obj', blob)
+    // 这里很重要 file.value.raw才是真实的file文件，file.value只是一个Proxy代理对象
+    formData.append('file', file.value.raw)
+    const res = uploadFileAPI(formData)
+    if (res.code == 200) {
+      ElMessage({
+        message: res.msg,
+        type: 'success',
+      })
+      createWorkOrderVisible.value = false
+    } else {
+      ElMessage({
+        message: res.msg,
+        type: 'error',
+      })
+    }
+  }
+
   const workOrderRules = {
     workOrderTitle: [{ required: true, message: '请输入工单标题', trigger: 'blur' }],
     fileType: [{ required: true, message: '请选择文件类型', trigger: 'change' }],
     fileAbstract: [{ required: true, message: '请输入文件概述', trigger: 'blur' }],
     copyReason: [{ required: true, message: '请输入拷贝原因', trigger: 'blur' }],
-    unzipPassword: [{ required: true, message: '请输入解压密码', trigger: 'blur' }],
+    checkCode: [{ required: true, message: '请输入校验码', trigger: 'blur' }],
   }
-  const createUnzipPassword = () => {
-    workOrderForm.value.unzipPassword = Math.random().toString(36).substr(2, 8)
-  }
+  const createCheckCode = () => {
+    function generateVerificationCode(length) {
+      // 定义允许使用的字符集
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+      let verificationCode = ''
 
-  const isCreateWorkOrder = ref(false)
+      // 使用 Math.random() 生成随机索引并选择字符
+      for (let i = 0; i < length; i++) {
+        verificationCode += characters.charAt(Math.floor(Math.random() * characters.length))
+      }
+
+      return verificationCode
+    }
+    workOrderForm.value.checkCode = generateVerificationCode(8)
+  }
 
   // 查看工单
   const active = ref(1)
@@ -402,8 +534,8 @@
   const changeToAdvancedReview = () => {
     advancedReviewVisible.value = true
   }
-  const checkCode = '1'
-  const copyCheckCode = async () => {
+  const unzipPassword = '1'
+  const copyCheckCode = async (checkCode) => {
     try {
       await toClipboard(checkCode)
       ElMessage({
@@ -419,13 +551,14 @@
       })
     }
   }
+  // 超前审批
   const advancedReviewVisible = ref(false)
   const advancedReviewForm = ref({
     advancedWorkOrderId: '',
     advancedReviewStatus: '',
     advanceReviewPassword: '',
   })
-  const copyadvanceReviewPassword = async () => {
+  const copyAdvanceReviewPassword = async () => {
     try {
       await toClipboard(advancedReviewForm.value.advanceReviewPassword)
       ElMessage({
@@ -460,12 +593,12 @@
     }
   }
 
-  const viewUnzipPassword = async (unzipPassword) => {
+  const viewCheckCode = async (checkCode) => {
     try {
-      await toClipboard(unzipPassword)
+      await toClipboard(checkCode)
       ElMessage({
         showClose: true,
-        message: '解压密码为: ' + unzipPassword,
+        message: '解压密码为: ' + checkCode,
         type: 'success',
         plain: true,
       })
@@ -491,6 +624,7 @@
     }
   }
 
+  /*
   const tableData = [
     {
       workOrderId: '111',
@@ -507,6 +641,29 @@
       unzipPassword: '1123',
     },
   ]
+    */
+  const tableData = ref([])
+  const pageNum = ref(1)
+  const pageSize = ref(10)
+  const getWorkOrderList = async () => {
+    const res = await getWorkOrderListAPI(pageNum, pageSize, stuStore.stuId)
+    if (res.code === 200) {
+      tableData.value = res.data
+    } else {
+      ElMessage({
+        showClose: true,
+        message: res.msg,
+        type: 'success',
+        plain: true,
+      })
+    }
+  }
+
+  onMounted(async () => {
+    // 获取工单列表
+    await getWorkOrderList()
+    auditType.value = await getAuditTypeAPI()
+  })
 </script>
 
 <style scoped lang="scss">

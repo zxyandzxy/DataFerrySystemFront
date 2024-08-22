@@ -1,5 +1,13 @@
 import request from './request'
 
+// 获取当前审批类型
+export function getAuditTypeAPI() {
+  return request({
+    url: '/student/get_audit_type',
+    method: 'GET',
+  })
+}
+
 // 获取工单列表
 export function getWorkOrderListAPI(pageNum, pageSize, studentId) {
   return request({
@@ -67,6 +75,18 @@ export function copyFileAPI(data) {
     url: '/student/copy_ file',
     method: 'GET',
     data,
+  })
+}
+// 创建工单后上传文件
+export function uploadFileAPI(data) {
+  return request({
+    url: '/student/work_order_fileUpload',
+    method: 'POST',
+    data,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
   })
 }
 /*

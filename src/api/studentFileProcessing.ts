@@ -1,11 +1,13 @@
 import request from './request'
 
 // 文件查看
-export function viewFileAPI(student_id) {
+export function viewFileAPI(pageNum, pageSize, student_id) {
   return request({
     url: '/student/view_files',
     method: 'GET',
     params: {
+      pageNum,
+      pageSize,
       student_id,
     },
   })
