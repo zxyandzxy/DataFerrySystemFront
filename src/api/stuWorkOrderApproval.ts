@@ -59,14 +59,11 @@ export function getWorkOrderDetailAPI(workOrderId, studentId) {
   })
 }
 // 超前审批验证
-export function advanceApprovalVerificationAPI(workOrderId, studentId) {
+export function advanceApprovalVerificationAPI(data) {
   return request({
     url: '/student/advance_approval_verification',
     method: 'GET',
-    params: {
-      workOrderId,
-      studentId,
-    },
+    data,
   })
 }
 // 拷贝文件

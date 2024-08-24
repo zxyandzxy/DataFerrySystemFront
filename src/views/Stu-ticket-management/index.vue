@@ -151,11 +151,24 @@
         draggable
         overflow
       >
-        <el-steps class="mb-4" style="max-width: 600px" :space="200" :active="active" simple>
+        <el-steps
+          class="mb-4"
+          style="max-width: 600px"
+          :space="200"
+          :active="active"
+          simple
+          finish-status="success"
+          process-status="process"
+          align-center
+        >
           <el-step title="创建中" :icon="Postcard" />
           <el-step title="审核中" :icon="FolderChecked" />
           <el-step title="可拷贝" :icon="SuccessFilled" />
-          <el-step title="审核成功/失败" :icon="Lock" />
+          <el-step
+            :status="workOrderDetailForm.workOrderStatus == 21 ? 'success' : 'error'"
+            title="审核成功/失败"
+            :icon="Lock"
+          />
         </el-steps>
         <div v-if="workOrderDetailForm.workOrderStatus == 1">
           <h3>基本信息</h3>
@@ -339,46 +352,71 @@
               <el-form-item label="审批结果">
                 <div style="display: flex; align-items: center">
                   <el-input disabled v-model="workOrderDetailForm.remark" />
-                  <el-button
-                    style="margin-left: 5%"
-                    type="primary"
-                    link
-                    @click="changeToAdvancedReview"
-                    >点此进入超前审批</el-button
-                  >
                 </div>
               </el-form-item>
             </el-form>
           </div>
           <h3>可拷贝</h3>
           <el-divider />
-          <el-form :model="workOrderForm" label-width="auto">
-            <el-form-item label="解压密码" prop="checkCode">
-              <div style="display: flex; align-items: center">
-                <el-input disabled v-model="unzipPassword" />
-                <el-icon style="margin-left: 5%" @click="copyUnzipPassword"
-                  ><DocumentCopy
-                /></el-icon>
-              </div>
-            </el-form-item>
-          </el-form>
+          <h4>请在拷贝机上进行拷贝</h4>
+        </div>
+        <div
+          v-if="
+            workOrderDetailForm.workOrderStatus == 21 || workOrderDetailForm.workOrderStatus == 22
+          "
+        >
+          <h3>基本信息</h3>
+          <el-divider />
+          <div>
+            <el-form :model="workOrderDetailForm" label-width="auto">
+              <el-form-item label="工单标题" prop="workOrderTitle">
+                <el-input disabled v-model="workOrderDetailForm.workOrderTitle" />
+              </el-form-item>
+              <el-form-item label="文件类型" prop="fileType">
+                <el-select
+                  disabled
+                  v-model="workOrderDetailForm.fileType"
+                  placeholder="选择要要上传文件的类型"
+                >
+                  <el-option
+                    v-for="item in fileTypeOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="文件概述" prop="fileAbstract">
+                <el-input disabled v-model="workOrderDetailForm.fileAbstract" type="textarea" />
+              </el-form-item>
+              <el-form-item label="拷贝原因" prop="copyReason">
+                <el-input disabled v-model="workOrderDetailForm.copyReason" type="textarea" />
+              </el-form-item>
+              <el-form-item label="文件校验码" prop="checkCode">
+                <el-input disabled v-model="workOrderDetailForm.checkCode" />
+              </el-form-item>
+              <el-form-item label="审批结果">
+                <div style="display: flex; align-items: center">
+                  <el-input disabled v-model="workOrderDetailForm.remark" />
+                </div>
+              </el-form-item>
+            </el-form>
+          </div>
         </div>
         <el-dialog v-model="advancedReviewVisible" title="超前审批" append-to-body>
           <el-form :model="advancedReviewForm" label-width="auto">
             <el-form-item label="超前审批工单号" prop="advancedWorkOrderId">
               <el-input disabled v-model="advancedReviewForm.advancedWorkOrderId" />
             </el-form-item>
-            <el-form-item label="超前审批状态" prop="advancedReviewStatus">
-              <el-input disabled v-model="advancedReviewForm.advancedReviewStatus" />
+            <el-form-item label="学生学号" prop="studentId">
+              <el-input disabled v-model="advancedReviewForm.studentId" />
             </el-form-item>
-            <el-form-item label="超前审批密钥" prop="advanceReviewPassword">
-              <div style="display: flex; align-items: center">
-                <el-input disabled v-model="advancedReviewForm.advanceReviewPassword" />
-                <el-icon style="margin-left: 5%" @click="copyAdvanceReviewPassword"
-                  ><DocumentCopy
-                /></el-icon>
-              </div>
+            <el-form-item label="登录密码" prop="password">
+              <el-input v-model="advancedReviewForm.password" />
             </el-form-item>
+            <el-button style="margin-left: 40%" type="primary" @click="getAdvancedReviewResult"
+              >获取超前审批密钥</el-button
+            >
           </el-form>
         </el-dialog>
       </el-dialog>
@@ -387,7 +425,7 @@
 </template>
 <script setup lang="ts">
   import useClipboard from 'vue-clipboard3'
-  import { ElMessage } from 'element-plus'
+  import { ElMessage, ElNotification } from 'element-plus'
   import {
     DocumentAdd,
     InfoFilled,
@@ -406,6 +444,7 @@
     uploadFileAPI,
     deleteWorkOrderAPI,
     updateWorkOrderAPI,
+    advanceApprovalVerificationAPI,
   } from '@/api/stuWorkOrderApproval'
   import { useStuStore } from '@/store/modules/student'
 
@@ -579,12 +618,12 @@
   }
 
   // 查看工单
-  const active = ref(1) // 流程组件的控制
+  const active = ref(0) // 流程组件的控制
   const viewWorkOrderVisible = ref(false)
   const changeToAdvancedReview = () => {
+    advancedReviewForm.value.advancedWorkOrderId = workOrderDetailForm.value.workOrderId
     advancedReviewVisible.value = true
   }
-  const unzipPassword = '1'
   const copyCheckCode = async (checkCode) => {
     try {
       await toClipboard(checkCode)
@@ -605,20 +644,30 @@
   const advancedReviewVisible = ref(false)
   const advancedReviewForm = ref({
     advancedWorkOrderId: '',
-    advancedReviewStatus: '',
-    advanceReviewPassword: '',
+    studentId: stuStore.stuId,
+    password: '',
   })
-  const copyAdvanceReviewPassword = async () => {
-    try {
-      await toClipboard(advancedReviewForm.value.advanceReviewPassword)
+  const getAdvancedReviewResult = async () => {
+    if (advancedReviewForm.value.password == '') {
       ElMessage({
-        message: '复制超前审批密钥成功.',
-        type: 'success',
+        message: '请输入登录密码进行验证',
+        type: 'error',
         plain: true,
       })
-    } catch (e) {
+      return
+    }
+    const res = await advanceApprovalVerificationAPI(advancedReviewForm.value)
+    if (res.code == 200) {
+      await toClipboard(res.data.advancedReviewPassword)
+      ElNotification({
+        title: '超前审批密钥已复制到剪贴板',
+        message: '超前审批密钥为:' + res.data.advancedReviewPassword,
+        type: 'success',
+        duration: 0,
+      })
+    } else {
       ElMessage({
-        message: '复制超前审批密钥失败.',
+        message: res.msg,
         type: 'error',
         plain: true,
       })
@@ -626,23 +675,6 @@
   }
 
   // 主页
-  const copyUnzipPassword = async (unzipPassword) => {
-    try {
-      await toClipboard(unzipPassword)
-      ElMessage({
-        message: '复制解压密码成功.',
-        type: 'success',
-        plain: true,
-      })
-    } catch (e) {
-      ElMessage({
-        message: '复制解压密码失败.',
-        type: 'error',
-        plain: true,
-      })
-    }
-  }
-
   const viewCheckCode = async (checkCode) => {
     try {
       await toClipboard(checkCode)
@@ -660,13 +692,39 @@
       })
     }
   }
+  // 工单状态转步骤标签信息
+  const getProgressStatus = () => {
+    if (workOrderDetailForm.value.workOrderStatus == 21) {
+      return 'success'
+    } else if (workOrderDetailForm.value.workOrderStatus == 22) {
+      return 'error'
+    }
+    return 'process'
+  }
   // 进入工单详情页
   const viewWorkOrder = async (index) => {
     workOrderDetailForm.value.workOrderStatus = label2NumMap.get(
       tableData.value[index].workOrderStatus,
     )
     workOrderDetailForm.value.workOrderId = tableData.value[index].workOrderId
-    viewWorkOrderVisible.value = true // 测试用，后续删
+    // 测试用，后续删
+    viewWorkOrderVisible.value = true
+    if (workOrderDetailForm.value.workOrderStatus === 1) {
+      active.value = 0
+      // 创建表单页面
+    } else if (workOrderDetailForm.value.workOrderStatus === 3) {
+      active.value = 1
+      // 审批表单页面
+    } else if (workOrderDetailForm.value.workOrderStatus === 11) {
+      active.value = 2
+      // 可拷贝页面
+    } else if (
+      workOrderDetailForm.value.workOrderStatus === 21 ||
+      workOrderDetailForm.value.workOrderStatus === 22
+    ) {
+      active.value = 3
+      // 审批结果
+    }
     const res = await getWorkOrderDetailAPI(tableData.value[index].workOrderId, stuStore.stuId)
     if (res.code == 200) {
       workOrderDetailForm.value.auditType = res.data.auditType == 0 ? '即时审批' : '定期审批'
@@ -676,6 +734,13 @@
       workOrderDetailForm.value.copyReason = res.data.copyReason
       workOrderDetailForm.value.checkCode = res.data.checkCode
       workOrderDetailForm.value.remark = res.data.remark
+    } else {
+      ElMessage({
+        message: res.msg,
+        type: 'error',
+        plain: true,
+      })
+      return
     }
 
     viewWorkOrderVisible.value = true
@@ -812,6 +877,27 @@
       workOrderTitle: 'PPTx文件烤出',
       fileType: 'pptx',
       workOrderStatus: num2LabelMap.get(3),
+      checkCode: '1123',
+    },
+    {
+      workOrderId: '333',
+      workOrderTitle: 'docx文件烤出',
+      fileType: 'docx',
+      workOrderStatus: num2LabelMap.get(11),
+      checkCode: '1123',
+    },
+    {
+      workOrderId: '444',
+      workOrderTitle: 'docx文件烤出',
+      fileType: 'docx',
+      workOrderStatus: num2LabelMap.get(21),
+      checkCode: '1123',
+    },
+    {
+      workOrderId: '555',
+      workOrderTitle: 'docx文件烤出',
+      fileType: 'docx',
+      workOrderStatus: num2LabelMap.get(22),
       checkCode: '1123',
     },
   ])
