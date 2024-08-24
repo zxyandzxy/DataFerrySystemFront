@@ -23,10 +23,13 @@
         </el-form>
       </div>
       <el-upload
-        style="margin-top: 3%"
+        class="upload-demo"
         drag
-        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+        style="margin-top: 3%"
+        :http-request="httpRequest"
         multiple
+        :show-file-list="true"
+        list-type="text"
       >
         <el-icon class="el-icon--upload"><upload-filled /></el-icon>
         <div class="el-upload__text"> 将文件拖入此处 或者 <em>点击此处上传文件</em> </div>
@@ -34,7 +37,14 @@
           <div class="el-upload__tip"> 请注意自己的可用空间大小 </div>
         </template>
       </el-upload>
-      <el-button style="color: blue; margin-left: 40%" size="large" :type="primary" text bg>
+      <el-button
+        style="color: blue; margin-left: 40%"
+        size="large"
+        :type="success"
+        text
+        bg
+        @click="uploadFile"
+      >
         上传（可联系管理员扩容）
       </el-button>
     </div>
@@ -42,11 +52,45 @@
 </template>
 <script setup lang="ts">
   import { ref } from 'vue'
+  import { ElMessage } from 'element-plus'
   import { UploadFilled } from '@element-plus/icons-vue'
+  import { uploadFileAPI } from '@/api/studentFileProcessing'
   const studentForm = ref({
     student_id: '',
     password: '',
   })
+
+  //定义一个响应式数组用来接收文件
+  const fileList = ref([])
+
+  //自定义函数用来覆盖原有的XHR行为（默认提交行为）
+  function httpRequest(option) {
+    //将图片存到数组中
+    fileList.value.push(option)
+  }
+  // 参考教程：https://blog.csdn.net/m0_51044974/article/details/131575698
+  const uploadFile = async () => {
+    let dataForm = new FormData()
+    dataForm.append('studentId', studentForm.value.student_id)
+    dataForm.append('password', studentForm.value.password)
+    fileList.value.forEach((it, index) => {
+      dataForm.append('filename', it.file)
+    })
+    const res = await uploadFileAPI(dataForm)
+    if (res.code === 200) {
+      ElMessage({
+        message: res.msg,
+        type: 'success',
+        plain: true,
+      })
+    } else {
+      ElMessage({
+        message: res.msg,
+        type: 'error',
+        plain: true,
+      })
+    }
+  }
 </script>
 
 <style scoped lang="scss">
