@@ -1,6 +1,6 @@
 <template>
   <div class="footer-layout">
-    <span href="/" target="_blank"> 2022 © VUE-ADMIN-PERFECT By ZB Technology. </span>
+    <span href="/" target="_blank"> 2024 © 中山大学微电子学院 - 数据摆渡系统. </span>
   </div>
 </template>
 

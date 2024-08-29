@@ -1,41 +1,26 @@
-import {
-  createRouter,
-  createWebHistory,
-  RouteRecordRaw,
-  createWebHashHistory,
-  Router,
-} from 'vue-router'
+import { createRouter, RouteRecordRaw, createWebHashHistory } from 'vue-router'
 import Layout from '@/layout/index.vue'
 // 扩展继承属性
 interface extendRoute {
   hidden?: boolean
 }
 //
-import tableRouter from './modules/table'
+
 import errorRouter from './modules/error'
-import nestedRouter from './modules/nested'
-import externalLink from './modules/externalLink'
-import formRouter from './modules/from'
-import functionPageRouter from './modules/functionPage'
-import adminSelfInfoRouter from './modules/Admin-selfInformation'
-import manageTicketRouter from './modules/Admin-ticketManage'
-import systemConfigRouter from './modules/Admin-systemConfig'
-import manageDiskRouter from './modules/Admin-diskManage'
-import manageRouter from './modules/Admin-manage'
+import StuPersonalInformation from './modules/Stu-personal-information'
+import StuInwardTransfer from './modules/Stu-inward-transfer'
+import StuTicketManagement from './modules/Stu-ticket-management'
+import CopyFileDownload from './modules/Copy-file-download'
+import CopyFileUpload from './modules/Copy-file-upload'
 
 // 异步组件
 export const asyncRoutes = [
-  ...tableRouter,
-  // ...formRouter,
-  // ...functionPageRouter,
-  // ...nestedRouter,
-  // ...errorRouter,
-  // ...externalLink,
-  ...manageRouter,
-  ...adminSelfInfoRouter,
-  ...manageTicketRouter,
-  ...systemConfigRouter,
-  ...manageDiskRouter,
+  ...errorRouter,
+  ...StuTicketManagement,
+  ...StuInwardTransfer,
+  ...StuPersonalInformation,
+  ...CopyFileDownload,
+  ...CopyFileUpload,
   {
     path: '/:pathMatch(.*)',
     redirect: '/404',
@@ -70,14 +55,14 @@ export const constantRoutes: Array<RouteRecordRaw & extendRoute> = [
     name: 'layout',
     component: Layout,
     redirect: '/manage',
-  //   children: [
-  //     {
-  //       path: '/home',
-  //       component: () => import('@/views/home/index.vue'),
-  //       name: 'home',
-  //       meta: { title: '首页', icon: 'House', affix: true, role: ['other'] },
-  //     },
-  //   ],
+    //   children: [
+    //     {
+    //       path: '/home',
+    //       component: () => import('@/views/home/index.vue'),
+    //       name: 'home',
+    //       meta: { title: '首页', icon: 'House', affix: true, role: ['other'] },
+    //     },
+    //   ],
   },
 ]
 

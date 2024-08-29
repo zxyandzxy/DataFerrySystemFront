@@ -2,43 +2,35 @@
   <el-dropdown @command="commandAction">
     <span class="el-dropdown-link">
       <el-avatar :size="30" class="avatar" :src="AvatarLogo" />
-      {{ userInfo.username }}
       <el-icon class="el-icon--right">
         <arrow-down />
       </el-icon>
     </span>
     <template #dropdown>
       <el-dropdown-menu>
-        <el-dropdown-item :command="2">
-          <el-icon><Edit /></el-icon>修改密码</el-dropdown-item
-        >
         <el-dropdown-item :command="1" divided>
           <el-icon><SwitchButton /></el-icon>退出登录</el-dropdown-item
         >
       </el-dropdown-menu>
     </template>
   </el-dropdown>
-
-  <PersonalDialog ref="person" />
 </template>
 
 <script lang="ts" setup>
   import { useRouter } from 'vue-router'
   import { ElMessage, ElMessageBox } from 'element-plus'
-  import { computed, ref } from 'vue'
 
   import AvatarLogo from '@/assets/image/avatar.png'
-  import { useUserStore } from '@/store/modules/user'
+  import { useStuStore } from '@/store/modules/student'
+  import { useCopyMachineStore } from '@/store/modules/copyMachine'
+  import { useAdminStore } from '@/store/modules/admin'
   import { useTagsViewStore } from '@/store/modules/tagsView'
-  import PersonalDialog from './PersonalDialog.vue'
 
   const router = useRouter()
-  const UserStore = useUserStore()
+  const stuStore = useStuStore()
+  const copyMachineStore = useCopyMachineStore()
+  const adminStore = useAdminStore()
   const TagsViewStore = useTagsViewStore()
-
-  // 用户信息
-  const userInfo = computed(() => UserStore.userInfo)
-  const person = ref()
 
   const logOut = async () => {
     ElMessageBox.confirm('您是否确认退出登录?', '温馨提示', {
@@ -47,7 +39,13 @@
       type: 'warning',
     })
       .then(async () => {
-        await UserStore.logout()
+        if (stuStore.systemChoose != '') {
+          await stuStore.clearStuInfo()
+        } else if (copyMachineStore.systemChoose != '') {
+          await copyMachineStore.clearCopyMachineInfo()
+        } else if (adminStore.systemChoose != '') {
+          await adminStore.clearAdminInfo()
+        }
         await router.push({ path: '/login' })
         TagsViewStore.clearVisitedView()
         ElMessage({
@@ -61,9 +59,6 @@
     switch (key) {
       case 1:
         logOut()
-        break
-      case 2:
-        person.value.show()
         break
     }
   }

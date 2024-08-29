@@ -1,6 +1,8 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { ElMessage } from 'element-plus'
-import { useUserStore } from '@/store/modules/user'
+import { useStuStore } from '@/store/modules/student'
+import { useCopyMachineStore } from '@/store/modules/copyMachine'
+import { useAdminStore } from '@/store/modules/admin'
 // 创建axios实例 进行基本参数配置
 const service = axios.create({
   // 默认请求地址，根据环境的不同可在.env 文件中进行修改
@@ -18,7 +20,20 @@ service.interceptors.request.use(
      * 用户登录之后获取服务端返回的token,后面每次请求都在请求头中带上token进行JWT校验
      * token 存储在本地储存中（storage）、vuex、pinia
      */
-    const userStore = useUserStore()
+
+    const stuStore = useStuStore()
+    const copyMachineStore = useCopyMachineStore()
+    const adminStore = useAdminStore()
+    if (copyMachineStore.systemChoose == '拷贝机端') {
+      return config
+    }
+
+    let userStore
+    if (stuStore.systemChoose == '学生端') {
+      userStore = stuStore
+    } else if (adminStore.systemChoose == '管理员端') {
+      userStore = adminStore
+    }
     const token: string = userStore.token
     // 自定义请求头
     if (token) {
