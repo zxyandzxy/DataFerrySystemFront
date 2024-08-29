@@ -11,7 +11,7 @@ interface extendRoute {
   hidden?: boolean
 }
 //
-import tableRouter from './modules/table'
+// import tableRouter from './modules/table'
 // import errorRouter from './modules/error'
 // import nestedRouter from './modules/nested'
 // import externalLink from './modules/externalLink'

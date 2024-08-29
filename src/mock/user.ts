@@ -82,42 +82,28 @@ export default [
     },
   },
   {
-    url: '/getTickets',
+    url: '/manager/get_list',
     method: 'get',
     response: ({ query }) => {
       return {
-        code: 0,
-        message: 'success',
+        code: 0, // 状态码
+        msg: 'success', // 返回信息
         data: [
           {
-            id: '001',
-            student_id: 123,
-            admin_id: 456,
-            title: 'Test1 Ticket',
-            abstract: 'This is a test1 ticket.',
-            reason: 'Test1 reason',
-            unzip_password: 'password123',
-            status: 3,
-            type: 0,
-            is_ahead: false,
-            create_time: new Date(),
-            modify_time: new Date(),
+            workOrderId: 1, // 工单Id
+            workOrderTitle: 'Test1 Ticket', // 工单标题
+            studentId: 123, // 发起人Id
+            startTime: new Date().toISOString(), // 发起时间
+            approvalStatus: 'Approved', // 审核状态
           },
           {
-            id: '002',
-            student_id: 123,
-            admin_id: 456,
-            title: 'Test2 Ticket',
-            abstract: 'This is a test2 ticket.',
-            reason: 'Test2 reason',
-            unzip_password: 'password123',
-            status: 21,
-            type: 0,
-            is_ahead: false,
-            create_time: new Date(),
-            modify_time: new Date(),
+            workOrderId: 2, // 工单Id
+            workOrderTitle: 'Test2 Ticket', // 工单标题
+            studentId: 123, // 发起人Id
+            startTime: new Date().toISOString(), // 发起时间
+            approvalStatus: 'Pending', // 审核状态
           },
-          // 添加更多工单
+          // 继续添加更多工单
         ],
       }
     },

@@ -14,7 +14,7 @@ const systemConfigRouter = [
         path: '',
         component: () => import('@/views/Admin-systemConfig/index.vue'),
         name: 'system-config',
-        meta: { title: '系统配置', keepAlive: true, icon: 'Grape' },
+        meta: { title: '系统配置', keepAlive: true, icon: 'Setting' },
       },
     ],
   },

@@ -22,7 +22,7 @@
           <el-table-column prop="create_time" label="发起时间" width="180" align="center" />
           <el-table-column label="审批状态" width="180" align="center">
             <template #default="{ row }">
-              {{ statusMap[row.status] }}
+              {{ row.approvalStatus }}
             </template>
           </el-table-column>
           <el-table-column label="操作" align="center">

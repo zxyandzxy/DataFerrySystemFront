@@ -31,17 +31,50 @@
                 {{ editMode ? '保存' : '编辑' }}
               </el-button>
               <el-button v-if="editMode" @click="resetForm">取消</el-button>
+              <el-button type="warning" @click="openPasswordDialog">修改密码</el-button>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <el-dialog title="修改密码" v-model="passwordDialogVisible" @close="resetPasswordForm">
+      <el-form :model="passwordForm" label-width="100px">
+        <el-form-item label="旧密码">
+          <el-input
+            v-model="passwordForm.oldPassword"
+            type="password"
+            show-password
+            autocomplete="off"
+          />
+        </el-form-item>
+        <el-form-item label="新密码">
+          <el-input
+            v-model="passwordForm.newPassword"
+            type="password"
+            show-password
+            autocomplete="off"
+          />
+        </el-form-item>
+        <el-form-item label="确认新密码">
+          <el-input
+            v-model="passwordForm.confirmPassword"
+            type="password"
+            show-password
+            autocomplete="off"
+          />
+        </el-form-item>
+      </el-form>
+      <div class="dialog-footer" slot="footer">
+        <el-button @click="passwordDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="changePassword">确认</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
   import { reactive, ref } from 'vue'
-  import { ElForm, ElFormItem, ElInput, ElButton } from 'element-plus'
+  import { ElForm, ElFormItem, ElInput, ElButton, ElDialog } from 'element-plus'
 
   // 初始化数据
   const accountForm = reactive({
@@ -55,6 +88,12 @@
   })
 
   const editMode = ref(false)
+  const passwordDialogVisible = ref(false)
+  const passwordForm = reactive({
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  })
 
   // 切换编辑模式
   const toggleEditMode = () => {
@@ -64,13 +103,37 @@
     editMode.value = !editMode.value
   }
 
-  // 重置表单
+  // 重置联系方式表单
   const resetForm = () => {
     contactForm.value = {
       phone: '13812345678',
       wechat: 'wechat123',
     }
     editMode.value = false
+  }
+
+  // 打开修改密码弹窗
+  const openPasswordDialog = () => {
+    passwordDialogVisible.value = true
+  }
+
+  // 重置密码表单
+  const resetPasswordForm = () => {
+    passwordForm.oldPassword = ''
+    passwordForm.newPassword = ''
+    passwordForm.confirmPassword = ''
+  }
+
+  // 修改密码
+  const changePassword = () => {
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      // 提示新密码不一致
+      alert('新密码和确认密码不一致')
+      return
+    }
+    // 这里添加修改密码的逻辑
+    passwordDialogVisible.value = false
+    resetPasswordForm() // 成功修改密码后重置表单
   }
 </script>
 
@@ -97,5 +160,11 @@
 
   .edit-buttons {
     margin-top: 10px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .dialog-footer {
+    text-align: right;
   }
 </style>

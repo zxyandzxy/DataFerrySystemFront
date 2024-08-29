@@ -14,7 +14,7 @@ const manageDiskRouter = [
         path: '',
         component: () => import('@/views/Admin-diskManage/index.vue'),
         name: 'manage-teacher',
-        meta: { title: '管理学生磁盘', keepAlive: true, icon: 'MenuIcon' },
+        meta: { title: '管理学生磁盘', keepAlive: true, icon: 'Files' },
       },
     ],
   },
