@@ -7,14 +7,14 @@ const adminSelfInfoRouter = [
     name: 'admin-self-information',
     meta: {
       title: '个人信息',
-      icon: 'Grape',
+      icon: 'User',
     },
     children: [
       {
         path: '',
-        component: () => import('@/views/admin-selfInformation/index.vue'),
+        component: () => import('@/views/Admin-selfInformation/index.vue'),
         name: 'admin-self-information',
-        meta: { title: '个人信息', keepAlive: true, icon: 'MenuIcon' },
+        meta: { title: '个人信息', keepAlive: true, icon: 'User' },
       },
     ],
   },

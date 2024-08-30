@@ -12,6 +12,9 @@ import viteCompression from 'vite-plugin-compression'
 // import Components from 'unplugin-vue-components/vite'
 //import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
+// 导入mock
+import { viteMockServe } from 'vite-plugin-mock'
+
 function resolve(dir) {
   return path.join(__dirname, '.', dir)
 }
@@ -44,6 +47,24 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
           algorithm: 'gzip',
           ext: '.gz',
         }),
+      // 配置mock
+      viteMockServe({
+        // 是否启用mock
+        enable: mode === 'development',
+        // mock文件存储目录
+        mockPath: 'src/mock',
+        // 是否在控制台显示请求日志
+        logger: true,
+        // 是否在服务启动时生成mock文件
+        watchFiles: true,
+        // 支持热更新
+        localEnabled: mode === 'development',
+        prodEnabled: mode === 'production',
+        injectCode: `
+            import { setupProdMockServer } from './mockProdServer';
+            setupProdMockServer();
+          `,
+      }),
     ],
     css: {
       preprocessorOptions: {

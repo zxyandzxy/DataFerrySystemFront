@@ -1,25 +1,27 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { ElNotification } from 'element-plus'
-import { stuLoginAPI, stuGetInfoAPI } from '@/api/stuAccountManagement'
+import { adminLoginAPI, adminGetInfoAPI } from '@/api/admin-teacher'
+
 export const useAdminStore = defineStore(
   'admin',
   () => {
-    //定义数据state
-    const userInfo = ref({})
+    // 定义状态
+    const adminInfo = ref({})
     const token = ref('')
-    const systemChoose = ref('')
-    const stuId = ref('')
-    //定义获取接口数据的action函数
-    const login = async (data, Choose) => {
-      systemChoose.value = Choose
-      const studentId = data.username
+    const systemRole = ref('')
+    const adminId = ref('')
+
+    // 定义获取接口数据的 action 函数
+    const login = async (data, Role) => {
+      systemRole.value = Role
+      const adminIdValue = data.username
       const password = data.password
       const verification_code = data.verificationCode
-      const res = await stuLoginAPI({ studentId, password, verification_code })
+      const res = await adminLoginAPI({ adminId: adminIdValue, password, verification_code })
       if (res.code === 200) {
         token.value = res.data.token
-        stuId.value = studentId
+        adminId.value = adminIdValue
         return true
       } else {
         ElNotification({
@@ -29,29 +31,32 @@ export const useAdminStore = defineStore(
         })
       }
     }
-    const getStuInfo = async () => {
-      const res = await stuGetInfoAPI(stuId.value)
+
+    const getAdminInfo = async () => {
+      const res = await adminGetInfoAPI(adminId.value)
       if (res.code === 200) {
-        userInfo.value = res.data
+        adminInfo.value = res.data
       }
       return res
     }
-    //退出时清除用户信息
-    const clearStuInfo = () => {
-      userInfo.value = {}
+
+    // 退出时清除管理员信息
+    const clearAdminInfo = () => {
+      adminInfo.value = {}
       token.value = ''
-      stuId.value = ''
-      systemChoose.value = ''
+      adminId.value = ''
+      systemRole.value = ''
     }
-    //导出数据
+
+    // 导出数据
     return {
-      systemChoose,
+      systemRole,
       token,
-      userInfo,
-      stuId,
+      adminInfo,
+      adminId,
       login,
-      getStuInfo,
-      clearStuInfo,
+      getAdminInfo,
+      clearAdminInfo,
     }
   },
   {

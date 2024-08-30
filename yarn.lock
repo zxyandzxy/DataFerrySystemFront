@@ -240,6 +240,13 @@
   resolved "https://registry.npmmirror.com/@types/semver/-/semver-7.5.8.tgz#8268a8c57a3e4abd25c165ecd36237db7948a55e"
   integrity sha512-I8EUhyrgfLrcTkzV3TSsGyl1tSuPrEDzr0yd5m90UgNxQkyDXULk3b6MlQqTCpZpNtWe1K0hzclnZkTcLBe2UQ==
 
+"@types/resolve@1.17.1":
+  "integrity" "sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw=="
+  "resolved" "https://registry.npmjs.org/@types/resolve/-/resolve-1.17.1.tgz"
+  "version" "1.17.1"
+  dependencies:
+    "@types/node" "*"
+
 "@types/svgo@^2.6.1":
   version "2.6.4"
   resolved "https://registry.npmmirror.com/@types/svgo/-/svgo-2.6.4.tgz#b7298fc1dd687539fd63fc818b00146d96e68836"

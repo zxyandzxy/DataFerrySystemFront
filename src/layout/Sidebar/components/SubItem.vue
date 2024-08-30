@@ -4,6 +4,7 @@
       <app-link v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">
         <el-menu-item :index="resolvePath(onlyOneChild.path)">
           <el-icon :size="20">
+            <!-- {{ onlyOneChild?.meta.icon }} -->
             <component :is="onlyOneChild?.meta.icon"></component>
           </el-icon>
           <template #title>{{ onlyOneChild.meta && onlyOneChild.meta.title }}</template>

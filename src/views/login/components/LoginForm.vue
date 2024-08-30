@@ -84,11 +84,13 @@
   import { ElNotification } from 'element-plus'
   import { useRouter } from 'vue-router'
   import { useStuStore } from '@/store/modules/student'
+  import { useAdminStore } from '@/store/modules/admin'
   import { useCopyMachineStore } from '@/store/modules/copyMachine'
   import { getTimeState } from '@/utils/index'
   const ruleFormRef = ref<FormInstance>()
   const router = useRouter()
   const stuStore = useStuStore()
+  const adminStore = useAdminStore()
   const copyMachineStore = useCopyMachineStore()
 
   const passwordType = ref('password')
@@ -131,7 +133,7 @@
           } else if (props.systemChoose === '拷贝机端') {
             await copyMachineStore.login(props.systemChoose)
           } else if (props.systemChoose === '管理员端') {
-            await stuStore.login(ruleForm, props.systemChoose)
+            await adminStore.login(ruleForm, props.systemChoose)
           }
           // 登录成功后跳转
           await router.push({

@@ -7,6 +7,11 @@ interface extendRoute {
 //
 
 import errorRouter from './modules/error'
+import adminSelfInfoRouter from './modules/Admin-selfInformation'
+import manageTicketRouter from './modules/Admin-ticketManage'
+import systemConfigRouter from './modules/Admin-systemConfig'
+import manageDiskRouter from './modules/Admin-diskManage'
+import manageRouter from './modules/Admin-manage'
 import StuPersonalInformation from './modules/Stu-personal-information'
 import StuInwardTransfer from './modules/Stu-inward-transfer'
 import StuTicketManagement from './modules/Stu-ticket-management'
@@ -15,7 +20,13 @@ import CopyFileUpload from './modules/Copy-file-upload'
 
 // 异步组件
 export const asyncRoutes = [
-  ...errorRouter,
+  // ...errorRouter,
+  ...manageRouter,
+  ...adminSelfInfoRouter,
+  ...manageTicketRouter,
+  ...systemConfigRouter,
+  ...manageDiskRouter,
+
   ...StuTicketManagement,
   ...StuInwardTransfer,
   ...StuPersonalInformation,
@@ -54,15 +65,15 @@ export const constantRoutes: Array<RouteRecordRaw & extendRoute> = [
     path: '/',
     name: 'layout',
     component: Layout,
-    redirect: '/manage',
-    //   children: [
-    //     {
-    //       path: '/home',
-    //       component: () => import('@/views/home/index.vue'),
-    //       name: 'home',
-    //       meta: { title: '首页', icon: 'House', affix: true, role: ['other'] },
-    //     },
-    //   ],
+    redirect: '/home',
+    children: [
+      {
+        path: '/home',
+        component: () => import('@/views/home/index.vue'),
+        name: 'home',
+        meta: { title: '首页', icon: 'House', affix: true, role: ['other'] },
+      },
+    ],
   },
 ]
 

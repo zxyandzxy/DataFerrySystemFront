@@ -9,20 +9,20 @@ const manageRouter = [
     alwaysShow: true,
     meta: {
       title: '管理用户',
-      icon: 'Grape',
+      icon: 'School',
     },
     children: [
       {
         path: 'student',
         component: () => import('@/views/Admin-management/manageStudent/index.vue'),
         name: 'manage-student',
-        meta: { title: '管理学生',icon: 'MenuIcon' },
+        meta: { title: '管理学生', icon: 'UserFilled' },
       },
       {
         path: 'teacher',
         component: () => import('@/views/Admin-management/manageTeacher/index.vue'),
         name: 'manage_teacher',
-        meta: { title: '管理管理员',icon: 'MenuIcon' },
+        meta: { title: '管理管理员', icon: 'Avatar' },
       },
     ],
   },
