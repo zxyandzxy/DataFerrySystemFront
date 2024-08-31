@@ -19,19 +19,21 @@
         <el-table-column prop="workOrderTitle" label="工单标题" width="150" />
         <el-table-column prop="fileType" label="文件类型" width="150" />
         <el-table-column prop="workOrderStatus" label="当前工单状态" width="150" />
-        <el-table-column prop="checkCode" label="校验码" width="300">
+        <el-table-column prop="unzipPassword" label="解压密码" width="300">
           <template #default="scope">
             <div style="display: flex; align-items: center">
               <el-input
-                v-model="scope.row.checkCode"
+                v-model="scope.row.unzipPassword"
                 type="password"
                 disabled
                 style="margin-right: 5%"
               />
-              <el-icon @click="viewCheckCode(scope.row.checkCode)" style="margin-right: 5%"
+              <el-icon @click="viewUnzipPassword(scope.row.unzipPassword)" style="margin-right: 5%"
                 ><View></View
               ></el-icon>
-              <el-icon @click="copyCheckCode(scope.row.checkCode)"><CopyDocument /></el-icon>
+              <el-icon @click="copyUnzipPassword(scope.row.unzipPassword)"
+                ><CopyDocument
+              /></el-icon>
             </div>
           </template>
         </el-table-column>
@@ -81,9 +83,9 @@
             <el-form-item label="拷贝原因" prop="copyReason">
               <el-input v-model="workOrderForm.copyReason" type="textarea" />
             </el-form-item>
-            <el-form-item label="文件校验码" prop="checkCode">
-              <el-input v-model="workOrderForm.checkCode" />
-              <el-button @click="createCheckCode" size="large" type="primary" link
+            <el-form-item label="文件解压密码" prop="unzipPassword">
+              <el-input v-model="workOrderForm.unzipPassword" />
+              <el-button @click="createUnzipPassword" size="large" type="primary" link
                 >系统生成</el-button
               >
             </el-form-item>
@@ -200,9 +202,9 @@
               <el-form-item label="拷贝原因" prop="copyReason">
                 <el-input v-model="workOrderDetailForm.copyReason" type="textarea" />
               </el-form-item>
-              <el-form-item label="文件校验码" prop="checkCode">
-                <el-input v-model="workOrderDetailForm.checkCode" />
-                <el-button @click="createCheckCode" size="large" type="primary" link
+              <el-form-item label="文件解压密码" prop="unzipPassword">
+                <el-input v-model="workOrderDetailForm.unzipPassword" />
+                <el-button @click="createUnzipPassword" size="large" type="primary" link
                   >系统生成(建议使用)</el-button
                 >
               </el-form-item>
@@ -304,8 +306,8 @@
               <el-form-item label="拷贝原因" prop="copyReason">
                 <el-input disabled v-model="workOrderDetailForm.copyReason" type="textarea" />
               </el-form-item>
-              <el-form-item label="文件校验码" prop="checkCode">
-                <el-input disabled v-model="workOrderDetailForm.checkCode" />
+              <el-form-item label="文件解压密码" prop="unzipPassword">
+                <el-input disabled v-model="workOrderDetailForm.unzipPassword" />
               </el-form-item>
               <el-form-item label="审批结果">
                 <div style="display: flex; align-items: center">
@@ -346,8 +348,8 @@
               <el-form-item label="拷贝原因" prop="copyReason">
                 <el-input disabled v-model="workOrderDetailForm.copyReason" type="textarea" />
               </el-form-item>
-              <el-form-item label="文件校验码" prop="checkCode">
-                <el-input disabled v-model="workOrderDetailForm.checkCode" />
+              <el-form-item label="文件解压密码" prop="unzipPassword">
+                <el-input disabled v-model="workOrderDetailForm.unzipPassword" />
               </el-form-item>
               <el-form-item label="审批结果">
                 <div style="display: flex; align-items: center">
@@ -392,8 +394,8 @@
               <el-form-item label="拷贝原因" prop="copyReason">
                 <el-input disabled v-model="workOrderDetailForm.copyReason" type="textarea" />
               </el-form-item>
-              <el-form-item label="文件校验码" prop="checkCode">
-                <el-input disabled v-model="workOrderDetailForm.checkCode" />
+              <el-form-item label="文件解压密码" prop="unzipPassword">
+                <el-input disabled v-model="workOrderDetailForm.unzipPassword" />
               </el-form-item>
               <el-form-item label="审批结果">
                 <div style="display: flex; align-items: center">
@@ -452,7 +454,7 @@
   const stuStore = useStuStore()
   const auditType = ref() // 当前审批类型
   const fileTypeOptions = [
-    // Docx 0 pdf 1 pptx 2 else 3
+    // Docx 0 pdf 1 pptx 2 zip 3 else 4
     {
       value: 0,
       label: 'docx',
@@ -467,7 +469,11 @@
     },
     {
       value: 3,
-      label: '其他',
+      label: 'zip',
+    },
+    {
+      value: 4,
+      label: 'else',
     },
   ]
   const workOrderForm = ref({
@@ -477,7 +483,7 @@
     fileType: fileTypeOptions[0].value,
     fileAbstract: '',
     copyReason: '',
-    checkCode: '',
+    unzipPassword: '',
   })
   const workOrderDetailForm = ref({
     workOrderId: '',
@@ -486,7 +492,7 @@
     fileType: fileTypeOptions[0].value,
     fileAbstract: '',
     copyReason: '',
-    checkCode: '',
+    unzipPassword: '',
     remark: '',
     workOrderStatus: 1,
   })
@@ -515,13 +521,13 @@
   }
   const createWorkOrder = async () => {
     // 判断必填信息是否填写完成
-    const fileTypeChoose = [0, 1, 2, 3] // 文件类型
+    const fileTypeChoose = [0, 1, 2, 3, 4] // 文件类型
     if (
       workOrderForm.value.workOrderTitle == '' ||
       !fileTypeChoose.includes(workOrderForm.value.fileType) ||
       workOrderForm.value.fileAbstract == '' ||
       workOrderForm.value.copyReason == '' ||
-      workOrderForm.value.checkCode == ''
+      workOrderForm.value.unzipPassword == ''
     ) {
       ElMessage({
         message: '请填写完整信息',
@@ -537,7 +543,7 @@
       fileType: workOrderForm.value.fileType,
       fileAbstract: workOrderForm.value.fileAbstract,
       copyReason: workOrderForm.value.copyReason,
-      checkCode: workOrderForm.value.checkCode,
+      unzipPassword: workOrderForm.value.unzipPassword,
     }
     /*
     const res = await createWorkOrderAPI(data)
@@ -599,9 +605,9 @@
     fileType: [{ required: true, message: '请选择文件类型', trigger: 'change' }],
     fileAbstract: [{ required: true, message: '请输入文件概述', trigger: 'blur' }],
     copyReason: [{ required: true, message: '请输入拷贝原因', trigger: 'blur' }],
-    checkCode: [{ required: true, message: '请输入校验码', trigger: 'blur' }],
+    unzipPassword: [{ required: true, message: '请输入文件解压密码', trigger: 'blur' }],
   }
-  const createCheckCode = () => {
+  const createUnzipPassword = () => {
     function generateVerificationCode(length) {
       // 定义允许使用的字符集
       const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -614,7 +620,7 @@
 
       return verificationCode
     }
-    workOrderForm.value.checkCode = generateVerificationCode(8)
+    workOrderForm.value.unzipPassword = generateVerificationCode(8)
   }
 
   // 查看工单
@@ -624,9 +630,9 @@
     advancedReviewForm.value.advancedWorkOrderId = workOrderDetailForm.value.workOrderId
     advancedReviewVisible.value = true
   }
-  const copyCheckCode = async (checkCode) => {
+  const copyUnzipPassword = async (unzipPassword) => {
     try {
-      await toClipboard(checkCode)
+      await toClipboard(unzipPassword)
       ElMessage({
         message: '复制解压密码成功.',
         type: 'success',
@@ -675,12 +681,12 @@
   }
 
   // 主页
-  const viewCheckCode = async (checkCode) => {
+  const viewUnzipPassword = async (unzipPassword) => {
     try {
-      await toClipboard(checkCode)
+      await toClipboard(unzipPassword)
       ElMessage({
         showClose: true,
-        message: '解压密码为: ' + checkCode,
+        message: '解压密码为: ' + unzipPassword,
         type: 'success',
         plain: true,
       })
@@ -732,7 +738,7 @@
       workOrderDetailForm.value.fileType = res.data.fileType
       workOrderDetailForm.value.fileAbstract = res.data.fileAbstract
       workOrderDetailForm.value.copyReason = res.data.copyReason
-      workOrderDetailForm.value.checkCode = res.data.checkCode
+      workOrderDetailForm.value.unzipPassword = res.data.unzipPassword
       workOrderDetailForm.value.remark = res.data.remark
     } else {
       ElMessage({
@@ -788,13 +794,13 @@
   // 修改工单基本信息
   const updateWorkOrder = async () => {
     // 判断所有必填信息是否填写完成
-    const fileTypeChoose = [0, 1, 2, 3] // 文件类型
+    const fileTypeChoose = [0, 1, 2, 3, 4] // 文件类型
     if (
       workOrderDetailForm.value.workOrderTitle == '' ||
       !fileTypeChoose.includes(workOrderDetailForm.value.fileType) ||
       workOrderDetailForm.value.fileAbstract == '' ||
       workOrderDetailForm.value.copyReason == '' ||
-      workOrderDetailForm.value.checkCode == ''
+      workOrderDetailForm.value.unzipPassword == ''
     ) {
       ElMessage({
         showClose: true,
@@ -812,7 +818,7 @@
       fileType: workOrderDetailForm.value.fileType,
       fileAbstract: workOrderDetailForm.value.fileAbstract,
       copyReason: workOrderDetailForm.value.copyReason,
-      checkCode: workOrderDetailForm.value.checkCode,
+      unzipPassword: workOrderDetailForm.value.unzipPassword,
     }
     const res = await updateWorkOrderAPI(data)
     if (res.code == 200) {
@@ -870,35 +876,35 @@
       workOrderTitle: 'PDF文件烤出',
       fileType: 'PDF',
       workOrderStatus: num2LabelMap.get(1),
-      checkCode: '1132',
+      unzipPassword: '1132',
     },
     {
       workOrderId: '222',
       workOrderTitle: 'PPTx文件烤出',
       fileType: 'pptx',
       workOrderStatus: num2LabelMap.get(3),
-      checkCode: '1123',
+      unzipPassword: '1123',
     },
     {
       workOrderId: '333',
       workOrderTitle: 'docx文件烤出',
       fileType: 'docx',
       workOrderStatus: num2LabelMap.get(11),
-      checkCode: '1123',
+      unzipPassword: '1123',
     },
     {
       workOrderId: '444',
       workOrderTitle: 'docx文件烤出',
       fileType: 'docx',
       workOrderStatus: num2LabelMap.get(21),
-      checkCode: '1123',
+      unzipPassword: '1123',
     },
     {
       workOrderId: '555',
       workOrderTitle: 'docx文件烤出',
       fileType: 'docx',
       workOrderStatus: num2LabelMap.get(22),
-      checkCode: '1123',
+      unzipPassword: '1123',
     },
   ])
 

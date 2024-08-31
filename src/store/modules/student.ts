@@ -15,8 +15,9 @@ export const useStuStore = defineStore(
       systemChoose.value = Choose
       const studentId = data.username
       const password = data.password
-      const verification_code = data.verificationCode
-      const res = await stuLoginAPI({ studentId, password, verification_code })
+      const verificationCode = data.verificationCode
+      const verKey = data.verKey
+      const res = await stuLoginAPI({ studentId, password, verKey, verificationCode })
       if (res.code === 200) {
         token.value = res.data.token
         stuId.value = studentId
