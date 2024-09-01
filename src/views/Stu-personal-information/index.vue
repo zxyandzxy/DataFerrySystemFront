@@ -182,7 +182,8 @@
       newPassword: ruleForm.newpassword,
       newVerPassword: ruleForm.newVerPassword,
     }
-    const res = stuUpdatePasswordAPI(data)
+    let res = stuUpdatePasswordAPI(data)
+    res = res.data
     if (res.code == 200) {
       ElNotification({
         message: res.msg,
@@ -206,7 +207,8 @@
       telephone: linkForm.telephone,
       wechat: linkForm.wechat,
     }
-    const res = stuUpdateContactInfoAPI(data)
+    let res = stuUpdateContactInfoAPI(data)
+    res = res.data
     if (res.code == 200) {
       ElNotification({
         message: res.msg,
@@ -233,7 +235,8 @@
 
   onMounted(async () => {
     // 执行API接口，获取学生信息
-    const res = await stuStore.getStuInfo
+    let res = await stuStore.getStuInfo
+    res = res.data
     if (res.code == 200) {
       studentForm.student_id = stuStore.stuId
       studentForm.student_name = stuStore.userInfo.studentName

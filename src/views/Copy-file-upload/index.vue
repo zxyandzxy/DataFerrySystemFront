@@ -76,7 +76,8 @@
     fileList.value.forEach((it, index) => {
       dataForm.append('filename', it.file)
     })
-    const res = await uploadFileAPI(dataForm)
+    let res = await uploadFileAPI(dataForm)
+    res = res.data
     if (res.code === 200) {
       ElMessage({
         message: res.msg,

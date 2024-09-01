@@ -144,7 +144,8 @@
   const isValid = ref(false)
 
   const validate = () => {
-    const res = copyFileAPI(ticketForm)
+    let res = copyFileAPI(ticketForm)
+    res = res.data
     if (res.code == 200) {
       isValid.value = true
       fileForm.fileDownloadLink = res.data.fileDownloadLink

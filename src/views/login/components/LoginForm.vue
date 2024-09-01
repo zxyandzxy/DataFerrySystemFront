@@ -100,10 +100,12 @@
 
   const fetchVerificationImage = async () => {
     // 获取验证码
-    const res = await stuGetCaptchaAPI()
+    let res = await stuGetCaptchaAPI()
+    res = res.data
     if (res.code == 200) {
       ruleForm.verKey = res.data.key
       verImgSrc.value = res.data.image
+      console.log(verImgSrc.value)
     }
   }
 

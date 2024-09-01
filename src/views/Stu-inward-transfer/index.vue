@@ -39,7 +39,8 @@
   const pageNum = ref(1)
   const pageSize = ref(10)
   const getTableData = async () => {
-    const res = await viewFileAPI(pageNum, pageSize, stuStore.stuId)
+    let res = await viewFileAPI(pageNum, pageSize, stuStore.stuId)
+    res = res.data
     if (res.code == 200) {
       tableData.value = res.data
     } else {

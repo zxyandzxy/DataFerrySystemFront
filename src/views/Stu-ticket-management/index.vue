@@ -546,7 +546,8 @@
       unzipPassword: workOrderForm.value.unzipPassword,
     }
     /*
-    const res = await createWorkOrderAPI(data)
+    let res = await createWorkOrderAPI(data)
+    res = res.data
     if (res.code == 200) {
       ElMessage({
         message: '创建成功',
@@ -585,7 +586,8 @@
     formData.append('obj', blob)
     // 这里很重要 file.value.raw才是真实的file文件，file.value只是一个Proxy代理对象
     formData.append('file', file.value.raw)
-    const res = uploadFileAPI(formData)
+    let res = uploadFileAPI(formData)
+    res = res.data
     if (res.code == 200) {
       ElMessage({
         message: res.msg,
@@ -662,7 +664,8 @@
       })
       return
     }
-    const res = await advanceApprovalVerificationAPI(advancedReviewForm.value)
+    let res = await advanceApprovalVerificationAPI(advancedReviewForm.value)
+    res = res.data
     if (res.code == 200) {
       await toClipboard(res.data.advancedReviewPassword)
       ElNotification({
@@ -731,7 +734,8 @@
       active.value = 3
       // 审批结果
     }
-    const res = await getWorkOrderDetailAPI(tableData.value[index].workOrderId, stuStore.stuId)
+    let res = await getWorkOrderDetailAPI(tableData.value[index].workOrderId, stuStore.stuId)
+    res = res.data
     if (res.code == 200) {
       workOrderDetailForm.value.auditType = res.data.auditType == 0 ? '即时审批' : '定期审批'
       workOrderDetailForm.value.workOrderTitle = res.data.workOrderTitle
@@ -770,7 +774,8 @@
 
   // 撤销工单
   const deleteWorkOrder = async () => {
-    const res = await deleteWorkOrderAPI(workOrderDetailForm.value.workOrderId, stuStore.stuId)
+    let res = await deleteWorkOrderAPI(workOrderDetailForm.value.workOrderId, stuStore.stuId)
+    res = res.data
     if (res.code == 200) {
       ElMessage({
         showClose: true,
@@ -820,7 +825,8 @@
       copyReason: workOrderDetailForm.value.copyReason,
       unzipPassword: workOrderDetailForm.value.unzipPassword,
     }
-    const res = await updateWorkOrderAPI(data)
+    let res = await updateWorkOrderAPI(data)
+    res = res.data
     if (res.code == 200) {
       ElMessage({
         showClose: true,
@@ -855,7 +861,8 @@
     formData.append('obj', blob)
     // 这里很重要 file.value.raw才是真实的file文件，file.value只是一个Proxy代理对象
     formData.append('file', file.value.raw)
-    const res = uploadFileAPI(formData)
+    let res = uploadFileAPI(formData)
+    res = res.data
     if (res.code == 200) {
       ElMessage({
         message: res.msg,
@@ -912,7 +919,8 @@
   const pageNum = ref(1)
   const pageSize = ref(10)
   const getWorkOrderList = async () => {
-    const res = await getWorkOrderListAPI(pageNum, pageSize, stuStore.stuId)
+    let res = await getWorkOrderListAPI(pageNum, pageSize, stuStore.stuId)
+    res = res.data
     if (res.code === 200) {
       tableData.value = res.data
     } else {

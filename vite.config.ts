@@ -69,13 +69,13 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       open: true,
       https: false,
       cors: true,
-      // 代理跨域（模拟示例）
+      // 代理跨域（模拟示例） https://segmentfault.com/a/1190000043775780
       proxy: {
-        // "/api": {
-        //   target: "", // easymock
-        //   changeOrigin: true,
-        //   rewrite: path => path.replace(/^\/api/, "")
-        // }
+        '/api': {
+          target: 'http://localhost:8080',
+          changeOrigin: true,
+          rewrite: (path) => path.replace('', ''),
+        },
       },
     },
     // 生产环境打包配置
