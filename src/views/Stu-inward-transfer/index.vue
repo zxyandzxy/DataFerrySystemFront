@@ -3,11 +3,11 @@
     <div class="app-container-inner">
       <h2 style="margin-left: 5%">文件上传列表</h2>
       <el-table :data="tableData" style="width: 90%; margin-left: 3%">
-        <el-table-column prop="fileName" label="文件名称" width="250" />
+        <el-table-column prop="fileName" label="文件名称" width="400" />
         <el-table-column prop="fileType" label="文件类型" width="200" />
-        <el-table-column prop="fileSize" label="文件大小" width="200" />
+        <el-table-column prop="fileSize" label="文件大小(KB)" width="200" />
         <el-table-column prop="uploadTime" label="上传时间" width="300" />
-        <el-table-column label="Operations">
+        <el-table-column label="操作">
           <template v-slot="scope">
             <el-button link type="primary" size="small" @click="download(scope.$index)">
               下载
@@ -18,8 +18,11 @@
       <el-pagination
         style="margin-top: 3%; margin-left: 60%"
         background
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-size="pageSize"
+        :total="total"
         layout="prev, pager, next"
-        :total="1000"
       />
     </div>
   </div>
@@ -36,13 +39,54 @@
   })
 
   const tableData = ref([])
-  const pageNum = ref(1)
-  const pageSize = ref(10)
+  const currentPage = ref(1)
+  const total = ref(0)
+  const pageSize = ref(2)
+
+  const selectType = (type) => {
+    switch (type) {
+      case 0:
+        return 'Docx'
+      case 1:
+        return 'pdf'
+      case 2:
+        return 'pptx'
+      case 3:
+        return 'zip'
+      default:
+        return '其他'
+    }
+  }
+
+  const findSecondUnderscore = (str) => {
+    // 寻找第一个 '_' 的位置
+    const firstIndex = str.indexOf('_')
+
+    // 如果找不到第一个 '_'，直接返回 -1
+    if (firstIndex === -1) {
+      return -1
+    }
+
+    // 从第一个 '_' 之后开始寻找第二个 '_'
+    const secondIndex = str.indexOf('_', firstIndex + 1)
+
+    // 如果找不到第二个 '_'，返回 -1
+    return secondIndex
+  }
+
   const getTableData = async () => {
-    let res = await viewFileAPI(pageNum, pageSize, stuStore.stuId)
+    let res = await viewFileAPI(currentPage.value, pageSize.value, stuStore.stuId)
     res = res.data
     if (res.code == 200) {
-      tableData.value = res.data
+      for (let i = 0; i < res.data.array.length; i++) {
+        res.data.array[i].uploadTime = res.data.array[i].uploadTime.slice(0, 10)
+        res.data.array[i].fileSize = (res.data.array[i].fileSize / 1024).toFixed(2)
+        res.data.array[i].fileType = selectType(res.data.array[i].fileType)
+        const fileName = res.data.array[i].fileName
+        res.data.array[i].fileName = fileName.substring(findSecondUnderscore(fileName) + 1)
+      }
+      tableData.value = res.data.array
+      total.value = res.data.total
     } else {
       ElNotification({
         message: res.msg,
@@ -51,40 +95,12 @@
       })
     }
   }
-  /*
-  const tableData = [
-    {
-      uploadId: '1',
-      fileName: '1',
-      fileType: 'pdf',
-      fileSize: '10M',
-      uploadTime: '2024-05-02',
-      downPath: 'https://dl.acm.org/doi/pdf/10.1145/3663529.3663826',
-    },
-    {
-      uploadId: '2',
-      fileName: '2',
-      fileType: 'docx',
-      fileSize: '10M',
-      uploadTime: '2024-05-03',
-      downPath:
-        'https://ts1.cn.mm.bing.net/th/id/R-C.57384e4c2dd256a755578f00845e60af?rik=uy9%2bvT4%2b7Rur%2fA&riu=http%3a%2f%2fimg06file.tooopen.com%2fimages%2f20171224%2ftooopen_sy_231021357463.jpg&ehk=whpCWn%2byPBvtGi1%2boY1sEBq%2frEUaP6w2N5bnBQsLWdo%3d&risl=&pid=ImgRaw&r=0',
-    },
-    {
-      uploadId: '3',
-      fileName: '3',
-      fileType: 'ppt',
-      fileSize: '10M',
-      uploadTime: '2024-05-04',
-      downPath:
-        'https://tse2-mm.cn.bing.net/th/id/OIP-C.4SPZVrcvZ-Tunx4G4FFtRAAAAA?rs=1&pid=ImgDetMain',
-    },
-  ]
-*/
+  const handleCurrentChange = (val) => {
+    currentPage.value = val
+    getTableData()
+  }
   const download = (index) => {
-    console.log(index)
-    const url = tableData[index].downPath // 文件的下载 URL
-    console.log(url)
+    const url = tableData.value[index].downPath // 文件的下载 URL
     const link = document.createElement('a')
     link.href = url
     link.setAttribute('download', '')

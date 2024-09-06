@@ -39,7 +39,8 @@ export const useStuStore = defineStore(
       }
     }
     const getStuInfo = async () => {
-      const res = await stuGetInfoAPI(stuId.value)
+      let res = await stuGetInfoAPI(stuId.value)
+      res = res.data
       if (res.code === 200) {
         userInfo.value = res.data
       }

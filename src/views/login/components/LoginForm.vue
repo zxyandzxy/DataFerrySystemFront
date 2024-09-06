@@ -105,7 +105,6 @@
     if (res.code == 200) {
       ruleForm.verKey = res.data.key
       verImgSrc.value = res.data.image
-      console.log(verImgSrc.value)
     }
   }
 

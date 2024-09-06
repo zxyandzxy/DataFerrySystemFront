@@ -63,18 +63,12 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     },
     //启动服务配置
     server: {
-      // 服务器主机名，如果允许外部访问，可设置为 "0.0.0.0" 也可设置成你的ip地址
-      host: '0.0.0.0',
-      port: 5173,
-      open: true,
-      https: false,
-      cors: true,
       // 代理跨域（模拟示例） https://segmentfault.com/a/1190000043775780
       proxy: {
         '/api': {
           target: 'http://localhost:8080',
           changeOrigin: true,
-          rewrite: (path) => path.replace('', ''),
+          rewrite: (path) => path.replace(/^\/api/, ''),
         },
       },
     },

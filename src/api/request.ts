@@ -36,7 +36,7 @@ service.interceptors.request.use(
     }
     // 自定义请求头
     if (token) {
-      config.headers['Authorization'] = token
+      config.headers.Authorization = token
     }
     return config
   },
