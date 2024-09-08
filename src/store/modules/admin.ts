@@ -16,7 +16,8 @@ export const useAdminStore = defineStore(
       const studentId = data.username
       const password = data.password
       const verification_code = data.verificationCode
-      const res = await stuLoginAPI({ studentId, password, verification_code })
+      let res = await stuLoginAPI({ studentId, password, verification_code })
+      res = res.data
       if (res.code === 200) {
         token.value = res.data.token
         stuId.value = studentId

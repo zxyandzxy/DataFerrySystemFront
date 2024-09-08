@@ -37,18 +37,22 @@
         </template>
       </el-input>
     </el-form-item>
-    <el-form-item label="" prop="username">
-      <el-input
-        placeholder="请输入验证码"
-        autoComplete="on"
-        style="position: relative"
-        v-model="ruleForm.verificationCode"
-        @keyup.enter.native="submitForm(ruleFormRef)"
-      >
-        <template #prefix>
-          <el-icon class="el-input__icon"><Stamp /></el-icon>
-        </template>
-      </el-input>
+    <el-form-item label="" prop="verificationCode">
+      <div style="display: flex; justify-content: space-between">
+        <el-input
+          placeholder="请输入验证码"
+          autoComplete="on"
+          style="position: relative"
+          v-model="ruleForm.verificationCode"
+          @keyup.enter.native="submitForm(ruleFormRef)"
+        >
+          <template #prefix>
+            <el-icon class="el-input__icon"><Stamp /></el-icon>
+          </template>
+        </el-input>
+        <img :id="verImgId" :width="130" :height="48" :src="verImgSrc" alt="Verification Image" />
+        <el-button @click="fetchVerificationImage">刷新</el-button>
+      </div>
     </el-form-item>
     <el-form-item style="width: 100%">
       <el-button
@@ -79,17 +83,30 @@
   </el-form>
 </template>
 <script lang="ts" setup>
-  import { ref, reactive, defineProps } from 'vue'
+  import { ref, reactive, defineProps, onMounted } from 'vue'
   import type { FormInstance } from 'element-plus'
   import { ElNotification } from 'element-plus'
   import { useRouter } from 'vue-router'
   import { useStuStore } from '@/store/modules/student'
   import { useCopyMachineStore } from '@/store/modules/copyMachine'
   import { getTimeState } from '@/utils/index'
+  import { stuGetCaptchaAPI } from '@/api/stuAccountManagement'
   const ruleFormRef = ref<FormInstance>()
   const router = useRouter()
   const stuStore = useStuStore()
   const copyMachineStore = useCopyMachineStore()
+  const verImgSrc = ref('')
+  const verImgId = 'verImg'
+
+  const fetchVerificationImage = async () => {
+    // 获取验证码
+    let res = await stuGetCaptchaAPI()
+    res = res.data
+    if (res.code == 200) {
+      ruleForm.verKey = res.data.key
+      verImgSrc.value = res.data.image
+    }
+  }
 
   const passwordType = ref('password')
   const loading = ref(false)
@@ -103,6 +120,7 @@
     username: '',
     password: '',
     verificationCode: '',
+    verKey: '',
   })
 
   const showPwd = () => {
@@ -156,6 +174,9 @@
       }
     })
   }
+  onMounted(async () => {
+    await fetchVerificationImage()
+  })
 </script>
 
 <style lang="scss" scoped>

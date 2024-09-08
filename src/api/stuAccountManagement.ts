@@ -1,5 +1,13 @@
 import request from './request'
 
+// 学生获取登录验证码
+export function stuGetCaptchaAPI() {
+  return request({
+    url: 'student/captcha',
+    method: 'GET',
+  })
+}
+
 // 学生账号登录
 export function stuLoginAPI(data) {
   return request({

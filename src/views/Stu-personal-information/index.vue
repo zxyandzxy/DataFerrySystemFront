@@ -174,15 +174,16 @@
     wechat: '',
   })
 
-  const submitChangePwd = () => {
+  const submitChangePwd = async () => {
     // 执行API接口，判断修改密码逻辑
     const data = {
-      studentId: '',
+      studentId: stuStore.stuId,
       curPassword: ruleForm.curPassword,
       newPassword: ruleForm.newpassword,
       newVerPassword: ruleForm.newVerPassword,
     }
-    const res = stuUpdatePasswordAPI(data)
+    let res = await stuUpdatePasswordAPI(data)
+    res = res.data
     if (res.code == 200) {
       ElNotification({
         message: res.msg,
@@ -199,20 +200,22 @@
     }
   }
 
-  const submitChangeLink = () => {
+  const submitChangeLink = async () => {
     // 执行API接口，判断修改联系方式逻辑
     const data = {
-      studentId: '',
+      studentId: stuStore.stuId,
       telephone: linkForm.telephone,
       wechat: linkForm.wechat,
     }
-    const res = stuUpdateContactInfoAPI(data)
+    let res = await stuUpdateContactInfoAPI(data)
+    res = res.data
     if (res.code == 200) {
       ElNotification({
         message: res.msg,
         type: 'success',
         duration: 2000,
       })
+      await getStuInfo()
       changeLinkDialogVisible.value = false
     } else {
       ElNotification({
@@ -231,9 +234,8 @@
     changeLinkDialogVisible.value = true
   }
 
-  onMounted(async () => {
-    // 执行API接口，获取学生信息
-    const res = await stuStore.getStuInfo
+  const getStuInfo = async () => {
+    let res = await stuStore.getStuInfo()
     if (res.code == 200) {
       studentForm.student_id = stuStore.stuId
       studentForm.student_name = stuStore.userInfo.studentName
@@ -248,6 +250,11 @@
         duration: 2000,
       })
     }
+  }
+
+  onMounted(async () => {
+    // 执行API接口，获取学生信息
+    await getStuInfo()
   })
 </script>
 

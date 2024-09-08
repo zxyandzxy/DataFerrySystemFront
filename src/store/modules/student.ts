@@ -15,11 +15,20 @@ export const useStuStore = defineStore(
       systemChoose.value = Choose
       const studentId = data.username
       const password = data.password
-      const verification_code = data.verificationCode
-      const res = await stuLoginAPI({ studentId, password, verification_code })
+      const verificationCode = data.verificationCode
+      const verKey = data.verKey
+      let res = await stuLoginAPI({ studentId, password, verKey, verificationCode })
+      res = res.data
       if (res.code === 200) {
         token.value = res.data.token
         stuId.value = studentId
+        if (res.data.is_first_login) {
+          ElNotification({
+            message: '为保证您的账号安全，请尽快修改密码',
+            type: 'warning',
+            duration: 3000,
+          })
+        }
         return true
       } else {
         ElNotification({
@@ -30,7 +39,8 @@ export const useStuStore = defineStore(
       }
     }
     const getStuInfo = async () => {
-      const res = await stuGetInfoAPI(stuId.value)
+      let res = await stuGetInfoAPI(stuId.value)
+      res = res.data
       if (res.code === 200) {
         userInfo.value = res.data
       }

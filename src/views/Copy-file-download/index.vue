@@ -39,7 +39,7 @@
               <el-form-item label="文件下载链接">
                 <div style="display: flex; justify-content: center; align-items: center">
                   <el-input
-                    v-model="fileForm.path"
+                    v-model="fileForm.fileDownloadLink"
                     placeholder="文件下载链接"
                     disabled
                     style="margin-right: 5%"
@@ -50,7 +50,7 @@
               <el-form-item label="校验码">
                 <div style="display: flex; justify-content: center; align-items: center">
                   <el-input
-                    v-model="fileForm.validCode"
+                    v-model="fileForm.checkCode"
                     placeholder="校验码下载"
                     disabled
                     style="margin-right: 5%"
@@ -61,7 +61,7 @@
               <el-form-item label="文件解压密码">
                 <div style="display: flex; justify-content: center; align-items: center">
                   <el-input
-                    v-model="fileForm.deCodePassword"
+                    v-model="fileForm.unzipPassword"
                     placeholder="文件解压密码"
                     disabled
                     style="margin-right: 5%"
@@ -144,7 +144,8 @@
   const isValid = ref(false)
 
   const validate = () => {
-    const res = copyFileAPI(ticketForm)
+    let res = copyFileAPI(ticketForm)
+    res = res.data
     if (res.code == 200) {
       isValid.value = true
       fileForm.fileDownloadLink = res.data.fileDownloadLink

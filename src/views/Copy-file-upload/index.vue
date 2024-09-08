@@ -26,8 +26,10 @@
         class="upload-demo"
         drag
         style="margin-top: 3%"
-        :http-request="httpRequest"
-        multiple
+        v-model:file-list="fileList"
+        action="#"
+        :auto-upload="false"
+        :limit="1"
         :show-file-list="true"
         list-type="text"
       >
@@ -63,32 +65,31 @@
   //定义一个响应式数组用来接收文件
   const fileList = ref([])
 
-  //自定义函数用来覆盖原有的XHR行为（默认提交行为）
-  function httpRequest(option) {
-    //将图片存到数组中
-    fileList.value.push(option)
-  }
-  // 参考教程：https://blog.csdn.net/m0_51044974/article/details/131575698
+  // 参考教程：https://blog.csdn.net/2303_79263957/article/details/134972691
   const uploadFile = async () => {
-    let dataForm = new FormData()
-    dataForm.append('studentId', studentForm.value.student_id)
-    dataForm.append('password', studentForm.value.password)
-    fileList.value.forEach((it, index) => {
-      dataForm.append('filename', it.file)
-    })
-    const res = await uploadFileAPI(dataForm)
-    if (res.code === 200) {
-      ElMessage({
-        message: res.msg,
-        type: 'success',
-        plain: true,
+    if (fileList.value.length > 0) {
+      // 封装为FromData对象
+      const fromData = new FormData()
+      fileList.value.forEach((val) => {
+        fromData.append('file', val.raw)
       })
-    } else {
-      ElMessage({
-        message: res.msg,
-        type: 'error',
-        plain: true,
-      })
+      fromData.append('studentId', studentForm.value.student_id)
+      fromData.append('password', studentForm.value.password)
+      let res = await uploadFileAPI(fromData)
+      res = res.data
+      if (res.code === 200) {
+        ElMessage({
+          message: res.msg,
+          type: 'success',
+          plain: true,
+        })
+      } else {
+        ElMessage({
+          message: res.msg,
+          type: 'error',
+          plain: true,
+        })
+      }
     }
   }
 </script>
