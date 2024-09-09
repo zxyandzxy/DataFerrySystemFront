@@ -9,7 +9,7 @@ export default [
     response: ({ query }) => {
       return {
         code: 0,
-        message: 'success',
+        msg: 'success',
         data: [
           {
             id: '1',
@@ -34,7 +34,7 @@ export default [
     response: ({ query }) => {
       return {
         code: 0,
-        message: 'success',
+        msg: 'success',
         data: [
           {
             id: '1',
@@ -54,12 +54,82 @@ export default [
     },
   },
   {
+    url: '/manager/add_admin',
+    method: 'post',
+    response: ({ body }) => {
+      const { adminAccount, adminName } = body
+      return {
+        code: 0,
+        msg: 'success',
+        data: '123456',
+      }
+    },
+  },
+  {
+    url: '/manager/create_student_account',
+    method: 'post',
+    response: ({ body }) => {
+      const { studentAccount, studentName } = body
+      return {
+        code: 0,
+        msg: 'success',
+        data: '123456',
+      }
+    },
+  },
+  {
+    url: '/manager/reset_manager_password',
+    method: 'put',
+    response: ({ query }) => {
+      const { adminAccount } = query
+      return {
+        code: 0,
+        msg: 'success',
+        data: 'new_password',
+      }
+    },
+  },
+  {
+    url: '/manager/reset_student_password',
+    method: 'put',
+    response: ({ query }) => {
+      const { studentAccount } = query // 从 query 中获取 studentAccount
+      return {
+        code: 0,
+        msg: 'success',
+        data: 'new_password',
+      }
+    },
+  },
+  {
+    url: '/manager/delete_student_account',
+    method: 'delete',
+    response: ({ query }) => {
+      const { studentAccount } = query
+
+      // 模拟删除逻辑，检查 studentAccount 是否为数组
+      if (!studentAccount || !Array.isArray(studentAccount)) {
+        return {
+          code: 1,
+          msg: 'Invalid parameters',
+        }
+      }
+
+      return {
+        code: 0,
+        msg: 'success',
+        data: `Deleted accounts: ${studentAccount.join(', ')}`,
+      }
+    },
+  },
+
+  {
     url: '/api/postUser',
     method: 'post',
     response: ({ body }) => {
       return {
         code: 0,
-        message: 'success',
+        msg: 'success',
         data: {
           ...body,
         },
@@ -72,7 +142,7 @@ export default [
     response: ({ query }) => {
       return {
         code: 0,
-        message: 'success',
+        msg: 'success',
         data: {
           approvalMode: '定期审批',
           advancedApproval: false,

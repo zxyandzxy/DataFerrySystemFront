@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="app-container-inner">
       <div class="header">
-        <div class="title">学生磁盘管理</div>
+        <h2>学生空间管理</h2>
       </div>
       <div class="table">
         <el-table :data="students" border style="width: 100%">

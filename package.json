@@ -46,6 +46,7 @@
     "svg-sprite-loader": "^6.0.11",
     "vite-plugin-mock": "^2.9.6",
     "vue": "^3.2.39",
+    "vue-admin-perfect": "file:",
     "vue-clipboard3": "^2.0.0",
     "vue-cropper": "^1.0.3",
     "vue-cropperjs": "^5.0.0",

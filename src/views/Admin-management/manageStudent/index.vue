@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="app-container-inner">
       <div class="header">
-        <div class="title">学生列表</div>
+        <h2>学生列表</h2>
       </div>
       <div class="middle">
         <!-- 搜索 -->
@@ -31,9 +31,9 @@
           @selection-change="handleSelectionChange"
         >
           <el-table-column type="selection" width="55" align="center" />
-          <el-table-column prop="id" label="学号" width="180" />
-          <el-table-column prop="name" label="姓名" width="180" />
-          <el-table-column prop="phone" label="电话" />
+          <el-table-column prop="studentAcount" label="学号" width="180" />
+          <el-table-column prop="studentName" label="姓名" width="180" />
+          <el-table-column prop="telephone" label="电话" />
           <el-table-column prop="wechat" label="微信号" />
           <el-table-column label="操作">
             <template #default="{ row }">
@@ -59,6 +59,8 @@
       title="添加学生"
       field1-name="学号"
       field2-name="姓名"
+      field1="studentAccount"
+      field2="studentName"
       @update:show="showAddStudentDialog = $event"
       @submit="handleAddStudent"
     />
@@ -106,26 +108,21 @@
 
   const resetPassword = async (row) => {
     try {
-      const confirm = await ElMessageBox.confirm(
-        `确认重置学号为 ${row.id} 的学生的密码吗？`,
-        '重置密码',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
-        },
-      )
-      if (confirm === 'confirm') {
-        // 这里模拟生成新密码的逻辑
-        newPassword.value = Math.random().toString(36).slice(-8)
-        selectedStudent.value = row // 将选中的学生信息存储在 selectedStudent 中
-        showPasswordDialog.value = true
-      }
+      await ElMessageBox.confirm(`确认重置学号为 ${row.id} 的学生的密码吗？`, '重置密码', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+      // 这里模拟生成新密码的逻辑
+      newPassword.value = studentStore.resetStudentPassword(row.studentAccount)
+      selectedStudent.value = row // 将选中的学生信息存储在 selectedStudent 中
+      showPasswordDialog.value = true
     } catch (error) {
       console.log('重置密码取消')
     }
   }
 
+  // 删除学生
   const deleteStudent = async (row) => {
     try {
       const confirm = await ElMessageBox.confirm(
@@ -137,15 +134,14 @@
           type: 'warning',
         },
       )
-      if (confirm === 'confirm') {
-        // 这里是删除账户的逻辑
-        ElMessage.success('删除成功')
-      }
+      const studentArray = [row.studentAccount]
+      await studentStore.removeStudentFromList(studentArray)
     } catch (error) {
       console.log('删除账户取消')
     }
   }
 
+  // 批量删除
   const batchDeleteStudents = async () => {
     try {
       const confirm = await ElMessageBox.confirm(`确认删除所选学生的账户吗？`, '批量删除', {
@@ -155,9 +151,10 @@
       })
       if (confirm === 'confirm') {
         // 删除选中的学生账户的逻辑
-        const selectedIds = selection.value.map((row) => row.id)
-        console.log('选中的学生id：', selectedIds)
-        ElMessage.success('批量删除成功')
+        const selectedAccounts = selection.value.map((row) => row.studentAccount)
+        console.log('选中的学生学号：', selectedAccounts)
+        await studentStore.removeStudentFromList(selectedAccounts)
+        // ElMessage.success('批量删除成功')
       }
     } catch (error) {
       console.log('批量删除取消')
@@ -185,11 +182,18 @@
   const closeAddStudentDialog = () => {
     showAddStudentDialog.value = false
   }
-  const handleAddStudent = (form) => {
-    console.log('添加学生表单数据:', form)
-    // 处理添加学生的逻辑
-    addPassword.value = Math.random().toString(36).slice(-8)
-    showAddPasswordDialog.value = true
+  const handleAddStudent = async (form) => {
+    try {
+      // 调用 addAdminToList 函数，获取返回的密码
+      const password = await studentStore.addStudentToList(form.studentAccount, form.studentName)
+
+      // 在这里直接使用返回的密码进行操作，例如显示密码对话框
+      addPassword.value = password
+      showAddPasswordDialog.value = true
+    } catch (err) {
+      // 这里可以处理特定的逻辑错误，或者不需要处理具体错误情况
+      console.error('添加学生失败', err)
+    }
   }
 
   // 批量添加学生逻辑

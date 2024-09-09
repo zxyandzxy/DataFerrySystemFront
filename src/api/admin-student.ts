@@ -10,29 +10,53 @@ export function fetchStudents(): Promise<Student[]> {
   }
 }
 
-// 添加学生信息
-export function addStudent(student: Student): Promise<Student> {
+// 添加学生账户
+export function addStudent(
+  studentAccount: string,
+  studentName: string,
+): Promise<{ studentAccount: string; studentName: string }> {
   try {
-    return service.post('/admin/addStudent', student).then((response) => response.data)
+    return service
+      .post('/manager/create_student_account', { studentAccount, studentName })
+      .then((response) => response.data.password)
   } catch (error) {
     throw new Error(`Failed to add student: ${error.message}`)
   }
 }
 
-// 删除学生信息
-export function removeStudent(studentId: string): Promise<void> {
+// 删除学生账户信息
+export function removeStudent(studentAccounts: string[]): Promise<void> {
   try {
-    return service.delete(`/students/${studentId}`)
+    return service.delete(`/manager/delete_student_account`, {
+      params: {
+        studentAccount: studentAccounts, // 通过 query 参数传递字符串数组
+      },
+    })
   } catch (error) {
     throw new Error(`Failed to remove student: ${error.message}`)
   }
 }
 
-// 更新学生信息
-export function updateStudent(studentId: string, student: Student): Promise<Student> {
+// 重置学生密码
+export function resetStudentPasswordAPI(studentAccount: string): Promise<{ password: string }> {
   try {
-    return service.put(`/students/${studentId}`, student).then((response) => response.data)
+    return service
+      .put(`/manager/reset_student_password`, null, {
+        params: {
+          studentAccount,
+        },
+      })
+      .then((response) => response.data.password)
   } catch (error) {
-    throw new Error(`Failed to update student: ${error.message}`)
+    throw new Error(`Failed to reset student password: ${error.message}`)
+  }
+}
+
+// 下载批量添加模板文件
+export function downloadBatchFile(): Promise<string> {
+  try {
+    return service.get(`/manager/get_batch_file`).then((response) => response.data.file)
+  } catch (error) {
+    throw new Error(`Failed to download batch file: ${error.message}`)
   }
 }

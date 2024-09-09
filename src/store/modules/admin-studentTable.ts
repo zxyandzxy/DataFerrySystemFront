@@ -1,6 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, onMounted } from 'vue'
-import { fetchStudents, addStudent, removeStudent, updateStudent } from '@/api/admin-student'
+import {
+  fetchStudents,
+  addStudent,
+  removeStudent,
+  // updateStudent,
+  resetStudentPasswordAPI,
+} from '@/api/admin-student'
 import { Student } from '@/admin-interface/student'
 
 export const useStudentStore = defineStore('student', () => {
@@ -23,12 +29,13 @@ export const useStudentStore = defineStore('student', () => {
   }
 
   // 添加学生
-  const addStudentToList = async (student: Student) => {
+  const addStudentToList = async (studentAccount: string, studentName: string) => {
     loading.value = true
     error.value = null
     try {
-      const newStudent = await addStudent(student)
-      students.value.push(newStudent)
+      const password = await addStudent(studentAccount, studentName)
+      fetchStudents()
+      return password
     } catch (err) {
       error.value = err
     } finally {
@@ -42,7 +49,7 @@ export const useStudentStore = defineStore('student', () => {
     error.value = null
     try {
       await removeStudent(studentId)
-      students.value = students.value.filter((student) => student.id !== studentId)
+      fetchStudents()
     } catch (err) {
       error.value = err
     } finally {
@@ -51,18 +58,20 @@ export const useStudentStore = defineStore('student', () => {
   }
 
   // 更新学生
-  const updateStudentInList = async (studentId: string, student: Student) => {
+  const resetStudentPassword = async (studentAccount: string) => {
     loading.value = true
     error.value = null
     try {
-      const updatedStudent = await updateStudent(studentId, student)
-      const index = students.value.findIndex((s) => s.id === studentId)
-      if (index !== -1) {
-        students.value[index] = updatedStudent
-      }
+      // 调用 resetManagerPassword 函数，并等待返回结果
+      const password = await resetStudentPasswordAPI(studentAccount)
+      // 如果需要处理密码，可以在这里进行逻辑处理
+      fetchStudentsList() // 更新管理员列表
+      return password
     } catch (err) {
+      // 处理错误情况
       error.value = err
     } finally {
+      // 最终设置加载状态为 false
       loading.value = false
     }
   }
@@ -78,6 +87,6 @@ export const useStudentStore = defineStore('student', () => {
     fetchStudentsList,
     addStudentToList,
     removeStudentFromList,
-    updateStudentInList,
+    resetStudentPassword,
   }
 })

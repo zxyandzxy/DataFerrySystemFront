@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="app-container-inner">
       <div class="header">
-        <div class="title">管理工单</div>
+        <h2>管理工单</h2>
       </div>
       <div class="middle">
         <!-- 搜索 -->
