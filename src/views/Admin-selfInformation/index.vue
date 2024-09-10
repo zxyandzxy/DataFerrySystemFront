@@ -75,17 +75,25 @@
 <script setup lang="ts">
   import { ref, reactive, onMounted } from 'vue'
   import { useManageAdminStore } from '@/stores/manageAdmin'
+  import { adminGetInfoAPI } from '../../api/admin-teacher'
+  import { Admin } from '../../admin-interface/teacher'
 
-  // 初始化 Pinia Store
   const manageAdminStore = useManageAdminStore()
 
-  // 获取管理员信息
-  onMounted(() => {
-    manageAdminStore.fetchCurrentAdmin(manageAdminStore.currentAdmin.adminAccount)
-  })
-
   // 绑定当前管理员数据
-  const currentAdmin = ref(manageAdminStore.currentAdmin)
+  const currentAdmin = ref<Admin>(null)
+
+  // 获取管理员信息
+  const getAdminSelfInfo = async () => {
+    const data = adminGetInfoAPI(manageAdminStore.currentAdminAccount)
+    currentAdmin.value.adminName = (await data).adminName
+    currentAdmin.value.telephone = (await data).telephone
+    currentAdmin.value.wechat = (await data).wechat
+  }
+
+  onMounted(() => {
+    getAdminSelfInfo()
+  })
 
   // 绑定联系方式表单
   const contactForm = reactive({
@@ -106,11 +114,8 @@
   const toggleEditMode = async () => {
     if (editMode.value) {
       // 保存联系方式修改
-      await manageAdminStore.updateAdminSelfInfo(
-        currentAdmin.value.adminAccount,
-        contactForm.telephone,
-        contactForm.wechat,
-      )
+      await manageAdminStore.updateAdminSelfInfo(contactForm.telephone, contactForm.wechat)
+      getAdminSelfInfo()
     }
     editMode.value = !editMode.value
   }

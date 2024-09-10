@@ -8,9 +8,9 @@
         <!-- 搜索 -->
         <div class="search">
           <el-input v-model="searchInfo" class="search-input" placeholder="按照账号查找" />
-          <el-button type="primary" @click="onSubmit" :icon="Search" class="search-button"
-            >查询</el-button
-          >
+          <el-button type="primary" @click="onSubmit" :icon="Search" class="search-button">
+            查询
+          </el-button>
         </div>
         <!-- 添加管理员部分 -->
         <div class="edit">
@@ -19,7 +19,7 @@
       </div>
       <!-- 表格部分 -->
       <div class="table">
-        <el-table :data="manageAdminStore.admins" border style="width: 100%">
+        <el-table :data="adminList" border style="width: 100%">
           <el-table-column prop="adminAccount" label="账号" width="180" />
           <el-table-column prop="adminName" label="姓名" width="180" />
           <el-table-column prop="telephone" label="电话" />
@@ -36,8 +36,10 @@
         <el-pagination
           background
           layout="prev, pager, next"
-          :total="manageAdminStore.admins.length"
+          :total="total"
+          :current-page="pageNum"
           :page-size="pageSize"
+          @current-change="handlePageChange"
           @size-change="handlePageSizeChange"
         />
       </div>
@@ -73,15 +75,23 @@
 
 <script setup lang="ts">
   import { Search } from '@element-plus/icons-vue'
-  import { ref } from 'vue'
-  import { useManageAdminStore } from '@/store/modules/admin-teacherTable'
+  import { onMounted, ref } from 'vue'
   import { ElMessageBox, ElMessage } from 'element-plus'
   import PasswordDialog from '@/admin-components/PasswordDialog.vue'
   import AddStudentDialog from '@/admin-components/AddStudentDialog.vue'
+  import {
+    addAdminAPI,
+    fetchAdminsAPI,
+    removeAdminAPI,
+    resetManagerPasswordAPI,
+  } from '../../../api/admin-teacher'
 
-  const searchInfo = ref('')
-  const manageAdminStore = useManageAdminStore()
-  const pageSize = ref(20)
+  const searchInfo = ref('') // 搜索关键字
+  const adminList = ref([]) // 管理员列表
+  const total = ref(0) // 总的管理员数量，用于分页
+  const pageNum = ref(1) // 当前页数
+  const pageSize = ref(20) // 每页显示的管理员数量
+
   const showAddAdminDialog = ref(false)
   const showPasswordDialog = ref(false)
   const showAddPasswordDialog = ref(false)
@@ -89,10 +99,38 @@
   const addPassword = ref('')
   const selectedAdmin = ref(null)
 
-  const onSubmit = () => {
-    manageAdminStore.searchAdmins(searchInfo.value)
+  // 获取管理员列表的函数
+  const getAdminList = async () => {
+    const response = await fetchAdminsAPI(pageNum.value, pageSize.value, searchInfo.value)
+    adminList.value = response.adminList // 更新管理员列表
+    total.value = response.total // 更新总数
   }
 
+  // 处理搜索操作
+  const onSubmit = () => {
+    pageNum.value = 1 // 搜索时从第一页开始
+    getAdminList() // 获取管理员列表
+  }
+
+  // 分页改变时处理
+  const handlePageChange = (newPage) => {
+    pageNum.value = newPage // 更新当前页
+    getAdminList() // 重新获取管理员列表
+  }
+
+  // 每页大小改变时处理
+  const handlePageSizeChange = (newSize) => {
+    pageSize.value = newSize // 更新每页大小
+    pageNum.value = 1 // 从第一页开始
+    getAdminList() // 重新获取管理员列表
+  }
+
+  // 页面加载时获取管理员列表
+  onMounted(() => {
+    getAdminList()
+  })
+
+  // 重置密码的操作
   const resetPassword = async (row) => {
     try {
       await ElMessageBox.confirm(
@@ -104,7 +142,7 @@
           type: 'warning',
         },
       )
-      newPassword.value = await manageAdminStore.resetPassword()
+      newPassword.value = await resetManagerPasswordAPI(row.adminAccount)
       selectedAdmin.value = row
       showPasswordDialog.value = true
     } catch (error) {
@@ -112,6 +150,7 @@
     }
   }
 
+  // 删除管理员的操作
   const deleteAdmin = async (row) => {
     try {
       await ElMessageBox.confirm(
@@ -123,40 +162,34 @@
           type: 'warning',
         },
       )
-      await manageAdminStore.removeAdminFromList(row.id)
+      await removeAdminAPI(row.adminAccount)
       ElMessage.success('删除成功')
+      getAdminList() // 重新获取管理员列表
     } catch (error) {
       console.log('删除账户取消')
     }
   }
 
+  // 打开添加管理员的弹窗
   const openAddAdminDialog = () => {
     showAddAdminDialog.value = true
   }
 
-  // 处理添加管理员的函数
+  // 处理添加管理员的操作
   const handleAddAdmin = async (form) => {
     try {
-      // 调用 addAdminToList 函数，获取返回的密码
-      const password = await manageAdminStore.addAdminToList(form.adminAccount, form.adminName)
-
-      // 在这里直接使用返回的密码进行操作，例如显示密码对话框
+      // 调用 API 添加管理员，获取密码
+      const password = await addAdminAPI(form.adminAccount, form.adminName)
       addPassword.value = password
       showAddPasswordDialog.value = true
+      getAdminList() // 添加成功后重新获取管理员列表
     } catch (err) {
-      // 这里可以处理特定的逻辑错误，或者不需要处理具体错误情况
       console.error('添加管理员失败', err)
     }
-  }
-
-  const handlePageSizeChange = (newSize) => {
-    pageSize.value = newSize
   }
 </script>
 
 <style scoped lang="scss">
-  @import './index';
-
   .middle {
     margin-top: 20px;
     display: flex;

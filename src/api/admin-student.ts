@@ -1,8 +1,8 @@
-import service from './request' // 假设这是你的 Axios 实例
+import service from './request'
 import { Student } from '../admin-interface/student'
 
 // 获取所有学生信息
-export function fetchStudents(): Promise<Student[]> {
+export function fetchStudentsAPI(value: any, value: number, value: string): Promise<any> {
   try {
     return service.get<Student[]>('/admin/studentlist').then((response) => response.data)
   } catch (error) {
@@ -11,10 +11,7 @@ export function fetchStudents(): Promise<Student[]> {
 }
 
 // 添加学生账户
-export function addStudent(
-  studentAccount: string,
-  studentName: string,
-): Promise<{ studentAccount: string; studentName: string }> {
+export function addStudentAPI(studentAccount: string, studentName: string): Promise<string> {
   try {
     return service
       .post('/manager/create_student_account', { studentAccount, studentName })
@@ -25,7 +22,7 @@ export function addStudent(
 }
 
 // 删除学生账户信息
-export function removeStudent(studentAccounts: string[]): Promise<void> {
+export function removeStudentAPI(studentAccounts: string[]): Promise<void> {
   try {
     return service.delete(`/manager/delete_student_account`, {
       params: {
@@ -38,7 +35,7 @@ export function removeStudent(studentAccounts: string[]): Promise<void> {
 }
 
 // 重置学生密码
-export function resetStudentPasswordAPI(studentAccount: string): Promise<{ password: string }> {
+export function resetStudentPasswordAPI(studentAccount: string): Promise<string> {
   try {
     return service
       .put(`/manager/reset_student_password`, null, {
@@ -53,7 +50,7 @@ export function resetStudentPasswordAPI(studentAccount: string): Promise<{ passw
 }
 
 // 下载批量添加模板文件
-export function downloadBatchFile(): Promise<string> {
+export function downloadBatchFileAPI(): Promise<string> {
   try {
     return service.get(`/manager/get_batch_file`).then((response) => response.data.file)
   } catch (error) {

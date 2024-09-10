@@ -2,19 +2,33 @@ import service from './request' // 假设这是你的 Axios 实例
 import { Admin } from '../admin-interface/teacher'
 
 // 获取所有管理员信息
-export function fetchAdmins(): Promise<Admin[]> {
-  return service.get<Admin[]>('/manager/get_admin_list').then((response) => response.data)
+export function fetchAdminsAPI(
+  pageNum: number,
+  pageSize: number,
+  adminAccount?: string,
+  adminName?: string,
+): Promise<any> {
+  return service
+    .get('/manager/get_admin_list', {
+      params: {
+        pageNum,
+        pageSize,
+        adminAccount,
+        adminName,
+      },
+    })
+    .then((response) => response.data) // 直接返回data中的total和array部分
 }
 
 // 添加管理员
-export function addAdmin(adminAccount: string, adminName: string): Promise<{ password: string }> {
+export function addAdminAPI(adminAccount: string, adminName: string): Promise<string> {
   return service
     .post('/manager/add_admin', { adminAccount, adminName })
     .then((response) => response.data.password)
 }
 
 // 重置管理员密码
-export function resetManagerPassword(adminAccount: string): Promise<{ password: string }> {
+export function resetManagerPasswordAPI(adminAccount: string): Promise<string> {
   return service
     .put('/manager/reset_manager_password', null, {
       params: {
@@ -25,12 +39,12 @@ export function resetManagerPassword(adminAccount: string): Promise<{ password: 
 }
 
 // 删除管理员信息
-export function removeAdmin(adminAccount: string): Promise<void> {
+export function removeAdminAPI(adminAccount: string): Promise<void> {
   return service.delete(`/manager/delete_admin?adminAccount=${adminAccount}`)
 }
 
 // 更新管理员个人信息
-export function updateAdmin(
+export function updateAdminAPI(
   adminAccount: string,
   telephone: string,
   wechat: string,
@@ -59,11 +73,11 @@ export function updateAdminPasswordAPI(
 
 // 登录API
 export const adminLoginAPI = (data) => {
-  return service.post('/api/admin/login', data)
+  return service.post('/manager/login', data).then((response) => response.data.token)
 }
 
 // 获取管理员信息API
-export const adminGetInfoAPI = (adminAccount: string): Promise<{ data: Admin }> => {
+export const adminGetInfoAPI = (adminAccount: string): Promise<Admin> => {
   return service
     .get(`/manager/get_admin_info`, {
       params: {

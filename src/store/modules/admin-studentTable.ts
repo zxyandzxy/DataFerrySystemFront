@@ -14,20 +14,6 @@ export const useStudentStore = defineStore('student', () => {
   const loading = ref(false)
   const error = ref<Error | null>(null)
 
-  // 获得学生列表
-  const fetchStudentsList = async () => {
-    loading.value = true
-    error.value = null
-    try {
-      const response = await fetchStudents()
-      students.value = response.data
-    } catch (err) {
-      error.value = err
-    } finally {
-      loading.value = false
-    }
-  }
-
   // 添加学生
   const addStudentToList = async (studentAccount: string, studentName: string) => {
     loading.value = true
@@ -84,7 +70,6 @@ export const useStudentStore = defineStore('student', () => {
     students,
     loading,
     error,
-    fetchStudentsList,
     addStudentToList,
     removeStudentFromList,
     resetStudentPassword,
