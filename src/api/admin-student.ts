@@ -2,9 +2,24 @@ import service from './request'
 import { Student } from '../admin-interface/student'
 
 // 获取所有学生信息
-export function fetchStudentsAPI(value: any, value: number, value: string): Promise<any> {
+export function fetchStudentsAPI(
+  pageNum: number,
+  pageSize: number,
+  studentAccount?: string,
+  studentName?: string,
+): Promise<any> {
   try {
-    return service.get<Student[]>('/admin/studentlist').then((response) => response.data)
+    // 发送带有查询参数的请求
+    return service
+      .get<Student[]>('/manager/get_student_list', {
+        params: {
+          pageNum,
+          pageSize,
+          studentAccount,
+          studentName,
+        },
+      })
+      .then((response) => response.data)
   } catch (error) {
     throw new Error(`Failed to fetch students: ${error.message}`)
   }
