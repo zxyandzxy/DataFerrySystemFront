@@ -45,7 +45,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { downloadBatchFile } from '../api/admin-student'
+import { downloadBatchFileAPI } from '../api/admin-student'
 
 const props = defineProps({
   show: Boolean,
