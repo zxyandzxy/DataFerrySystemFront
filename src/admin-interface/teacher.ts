@@ -1,6 +1,6 @@
 export interface Admin {
-  id: string
-  name: string
-  phone: string
+  adminAccount: string
+  adminName: string
+  telephone: string
   wechat: string
 }
