@@ -1,83 +1,55 @@
 import { defineStore } from 'pinia'
-import { ref, onMounted } from 'vue'
-import { fetchAdmins, addAdmin, removeAdmin, updateAdmin } from '@/api/admin-teacher'
+import { ref } from 'vue'
+import { updateAdmin, adminGetInfoAPI } from '@/api/admin-teacher'
 import { Admin } from '@/admin-interface/admin'
+import { adminLoginAPI, updateAdminPasswordAPI } from '../../api/admin-teacher'
 
-export const useAdminStore = defineStore('admin', () => {
-  const admins = ref<Admin[]>([])
-  const loading = ref(false)
-  const error = ref<Error | null>(null)
+export const useManageAdminStore = defineStore(
+  'manageAdmin',
+  () => {
+    const currentAdminAccount = ref(null)
+    const token = ref('')
+    const systemChoose = ref('')
 
-  // 获取管理员列表
-  const fetchAdminsList = async () => {
-    loading.value = true
-    error.value = null
-    try {
-      const response = await fetchAdmins()
-      admins.value = response.data
-    } catch (err) {
-      error.value = err
-    } finally {
-      loading.value = false
+    // 根据账户获得管理员信息
+    // const fetchCurrentAdmin = async (adminAccount: string) => {
+    //   const adminInfo = await adminGetInfoAPI(currentAdminAccount.value)
+    //   currentAdmin.value.adminAccount = currentAdminAccount.value // 赋值给 currentAdmin.value
+    //   currentAdmin.value.adminName = adminInfo.adminName
+    //   currentAdmin.value.telephone = adminInfo.telephone
+    //   currentAdmin.value.wechat = adminInfo.wechat
+    // }
+
+    //定义获取接口数据的action函数
+    const login = async (data, Choose) => {
+      systemChoose.value = Choose
+      const adminAccount = data.username
+      const password = data.password
+      const verificationCode = data.verificationCode
+      const verKey = data.verKey
+      token.value = await adminLoginAPI({ adminAccount, password, verKey, verificationCode })
     }
-  }
 
-  // 添加管理员
-  const addAdminToList = async (admin: Admin) => {
-    loading.value = true
-    error.value = null
-    try {
-      const newAdmin = await addAdmin(admin)
-      admins.value.push(newAdmin)
-    } catch (err) {
-      error.value = err
-    } finally {
-      loading.value = false
+    // 更新管理员个人信息
+    const updateAdminSelfInfo = async (telephone: string, wechat: string) => {
+      await updateAdmin(currentAdminAccount.value, telephone, wechat)
+      // fetchCurrentAdmin(currentAdminAccount.value)
     }
-  }
 
-  // 删除管理员
-  const removeAdminFromList = async (adminId: string) => {
-    loading.value = true
-    error.value = null
-    try {
-      await removeAdmin(adminId)
-      admins.value = admins.value.filter((admin) => admin.id !== adminId)
-    } catch (err) {
-      error.value = err
-    } finally {
-      loading.value = false
+    //退出时清除用户信息
+    const clearAdminInfo = () => {
+      token.value = ''
+      currentAdminAccount.value = ''
+      systemChoose.value = ''
     }
-  }
-
-  // 更新管理员
-  const updateAdminInList = async (adminId: string, admin: Admin) => {
-    loading.value = true
-    error.value = null
-    try {
-      const updatedAdmin = await updateAdmin(adminId, admin)
-      const index = admins.value.findIndex((a) => a.id === adminId)
-      if (index !== -1) {
-        admins.value[index] = updatedAdmin
-      }
-    } catch (err) {
-      error.value = err
-    } finally {
-      loading.value = false
+    return {
+      // fetchCurrentAdmin,
+      login,
+      updateAdminSelfInfo,
+      clearAdminInfo,
     }
-  }
-
-  onMounted(() => {
-    fetchAdminsList()
-  })
-
-  return {
-    admins,
-    loading,
-    error,
-    fetchAdminsList,
-    addAdminToList,
-    removeAdminFromList,
-    updateAdminInList,
-  }
-})
+  },
+  {
+    persist: true,
+  },
+)

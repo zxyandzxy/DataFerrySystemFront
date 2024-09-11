@@ -45,7 +45,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { downloadBatchFile } from '../api/admin-student'
+import { downloadBatchFileAPI } from '../api/admin-student'
 
 const props = defineProps({
   show: Boolean,
@@ -59,7 +59,7 @@ const uploadResult = ref<{ password: string, existStu: string[] } | null>(null)
 // 下载模板的逻辑
 const downloadTemplate = async () => {
   try {
-    const fileUrl = await downloadBatchFile()
+    const fileUrl = await downloadBatchFileAPI()
 
     const link = document.createElement('a')
     link.href = fileUrl

@@ -2,13 +2,13 @@
   <div class="app-container">
     <div class="app-container-inner">
       <div class="header">
-        <div class="title">学生磁盘管理</div>
+        <h2>学生空间管理</h2>
       </div>
       <div class="table">
-        <el-table :data="students" border style="width: 100%">
-          <el-table-column prop="name" label="学生姓名" align="center" />
-          <el-table-column prop="studentId" label="学号" align="center" />
-          <el-table-column prop="diskSize" label="磁盘容量" align="center" />
+        <el-table :data="studentsSpace" border style="width: 100%">
+          <el-table-column prop="studentAccount" label="学号" align="center" />
+          <el-table-column prop="studentName" label="姓名" align="center" />
+          <el-table-column prop="usedSpace" label="已使用容量" align="center" />
           <el-table-column label="操作" align="center">
             <template #default="{ row }">
               <el-button type="primary" @click="manageStudent(row)">管理</el-button>
@@ -16,28 +16,44 @@
           </el-table-column>
         </el-table>
       </div>
+      <!-- 分页组件 -->
+      <div class="pagination">
+        <el-pagination
+          background
+          layout="total, prev, pager, next"
+          :total="totalStudents"
+          :page-size="pageSize"
+          @current-change="handlePageChange"
+        />
+      </div>
     </div>
 
     <!-- 弹出窗口 -->
     <el-dialog title="文件管理" v-model="isDialogVisible" width="1000px">
       <div class="table">
-        <el-table :data="currentFiles" border style="width: 100%">
+        <el-table :data="currentFiles" border style="width: 100%" height="400px">
+          <!-- 设置表格高度 -->
           <el-table-column prop="fileName" label="文件名" align="center" />
           <el-table-column prop="fileSize" label="文件大小" align="center" />
           <el-table-column prop="fileType" label="文件类型" align="center" />
-          <el-table-column prop="uploadTime" label="上传时间" align="center" />
+          <el-table-column prop="submissionTime" label="上传时间" align="center" />
           <el-table-column label="操作" align="center">
             <template #default="{ row }">
               <el-button type="primary" @click="downloadFile(row)">下载</el-button>
-              <el-button
-                type="danger"
-                @click="deleteFile(row)"
-                :disabled="!canDeleteFile(row.uploadTime)"
-                >删除</el-button
-              >
+              <el-button type="danger" @click="deleteFile(row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
+      </div>
+      <!-- 文件分页组件 -->
+      <div class="pagination">
+        <el-pagination
+          background
+          layout="total, prev, pager, next"
+          :total="totalFiles"
+          :page-size="filePageSize"
+          @current-change="handleFilePageChange"
+        />
       </div>
     </el-dialog>
   </div>
@@ -46,62 +62,86 @@
 <script setup lang="ts">
   import { ref, onMounted } from 'vue'
   import { ElMessage } from 'element-plus'
-  import dayjs from 'dayjs'
+  import {
+    getAllStudentsSpaceAPI,
+    viewStudentFilesAPI,
+    deleteStudentFilesAPI,
+  } from '@/api/admin-disk'
 
-  // 模拟的学生和文件数据
-  const students = ref([
-    { name: '学生1', studentId: '20240101', diskSize: '10GB' },
-    { name: '学生2', studentId: '20240102', diskSize: '20GB' },
-    { name: '学生3', studentId: '20240103', diskSize: '30GB' },
-  ])
-
-  const files = {
-    '20240101': [
-      { fileName: '文件1', fileSize: '1GB', fileType: 'PDF', uploadTime: '2023-01-01' },
-      { fileName: '文件2', fileSize: '2GB', fileType: 'DOC', uploadTime: '2023-07-01' },
-    ],
-    '20240102': [
-      { fileName: '文件3', fileSize: '3GB', fileType: 'JPG', uploadTime: '2022-01-01' },
-      { fileName: '文件4', fileSize: '4GB', fileType: 'PNG', uploadTime: '2023-01-15' },
-    ],
-    '20240103': [
-      { fileName: '文件5', fileSize: '5GB', fileType: 'TXT', uploadTime: '2021-12-01' },
-      { fileName: '文件6', fileSize: '6GB', fileType: 'MP4', uploadTime: '2023-03-20' },
-    ],
-  }
-
-  const isDialogVisible = ref(false)
+  const studentsSpace = ref([])
   const currentFiles = ref([])
+  const isDialogVisible = ref(false)
+  const currentStudentAccount = ref('')
 
-  const manageStudent = (row) => {
-    currentFiles.value = files[row.studentId] || []
-    isDialogVisible.value = true
-  }
+  const totalStudents = ref(0) // 总学生数
+  const pageSize = 10 // 每页显示条数
+  const currentPage = ref(1) // 当前页
 
-  const downloadFile = (file) => {
-    ElMessage.success(`文件 ${file.fileName} 正在下载`)
-  }
+  // 文件分页相关
+  const totalFiles = ref(0) // 总文件数
+  const filePageSize = 10 // 每页显示文件条数
+  const currentFilePage = ref(1) // 当前文件页
 
-  const deleteFile = (file) => {
-    if (canDeleteFile(file.uploadTime)) {
-      ElMessage.success(`文件 ${file.fileName} 已删除`)
-      // 从currentFiles中移除文件
-      currentFiles.value = currentFiles.value.filter((f) => f.fileName !== file.fileName)
-    } else {
-      ElMessage.error('文件没超过6个月，无法删除')
+  // 获取学生空间数据
+  const getAllStudentsSpace = async (pageNum) => {
+    try {
+      const response = await getAllStudentsSpaceAPI(pageNum, pageSize)
+      studentsSpace.value = response.studentsSpace // 学生空间数据
+      totalStudents.value = response.total // 总学生数
+    } catch (error) {
+      ElMessage.error('获取学生空间数据失败')
     }
   }
 
-  const canDeleteFile = (uploadTime) => {
-    const uploadDate = dayjs(uploadTime)
-
-    const currentDate = dayjs()
-    // 超过6个月即可删除，否则不可删除
-    return currentDate.diff(uploadDate, 'month') >= 6
+  // 获得某个学生的所有文件
+  const manageStudent = async (row) => {
+    currentStudentAccount.value = row.studentAccount
+    await getStudentFiles(currentFilePage.value) // 获取文件列表
+    isDialogVisible.value = true
   }
 
-  onMounted(() => {
-    // 这里可以添加初始化逻辑，例如从服务器获取学生和文件数据
+  // 获取学生文件数据
+  const getStudentFiles = async (pageNum) => {
+    try {
+      const response = await viewStudentFilesAPI(currentStudentAccount.value, pageNum, filePageSize)
+      currentFiles.value = response.array // 获取学生文件列表
+      totalFiles.value = response.total // 总文件数
+    } catch (error) {
+      ElMessage.error('获取学生文件数据失败')
+    }
+  }
+
+  // 下载文件
+  const downloadFile = (file) => {
+    window.open(file.fileURL) // 通过文件的URL下载
+    ElMessage.success(`文件 ${file.fileName} 正在下载`)
+  }
+
+  // 删除文件
+  const deleteFile = async (file) => {
+    try {
+      await deleteStudentFilesAPI(currentStudentAccount.value, file.uploadId)
+      await getStudentFiles(currentFilePage.value) // 重新获取文件列表
+      ElMessage.success(`文件 ${file.fileName} 删除成功`)
+    } catch (error) {
+      ElMessage.error('删除文件失败')
+    }
+  }
+
+  // 处理分页
+  const handlePageChange = (page) => {
+    currentPage.value = page
+    getAllStudentsSpace(page) // 根据页码获取学生数据
+  }
+
+  const handleFilePageChange = (page) => {
+    currentFilePage.value = page
+    getStudentFiles(page) // 根据页码获取学生文件数据
+  }
+
+  // 组件挂载时获取学生数据
+  onMounted(async () => {
+    await getAllStudentsSpace(currentPage.value)
   })
 </script>
 
@@ -115,24 +155,12 @@
   }
 
   .table {
-    margin-top: 30px;
-  }
-
-  .form-item {
+    margin-top: 10px;
     margin-bottom: 20px;
+  }
+  .pagination {
     display: flex;
-    align-items: center;
-
-    label {
-      width: 100px;
-    }
-
-    .el-input {
-      flex: 1;
-    }
-
-    .el-button {
-      margin-left: 20px;
-    }
+    justify-content: flex-end; /* 将内容靠右对齐 */
+    align-items: center; /* 垂直居中 */
   }
 </style>
