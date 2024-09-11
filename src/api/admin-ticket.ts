@@ -9,9 +9,5 @@ export function getTickets(params: {
   StudentName?: string
   approvalStatus?: string
 }): Promise<ticket[]> {
-  try {
-    return service.get<ticket[]>('/manager/get_list', { params }).then((response) => response.data)
-  } catch (error) {
-    throw new Error(`Failed to fetch Tickets: ${error.message}`)
-  }
+  return service.get<ticket[]>('/manager/get_list', { params }).then((response) => response.data)
 }

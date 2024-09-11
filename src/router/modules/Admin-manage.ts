@@ -6,7 +6,7 @@ const manageRouter = [
     component: Layout,
     redirect: '/manage/student',
     name: 'manage',
-    alwaysShow: true,
+    // alwaysShow: true,
     meta: {
       title: '管理用户',
       icon: 'School',
@@ -22,7 +22,11 @@ const manageRouter = [
         path: 'teacher',
         component: () => import('@/views/Admin-management/manageTeacher/index.vue'),
         name: 'manage_teacher',
-        meta: { title: '管理管理员', icon: 'Avatar' },
+        meta: {
+          title: '管理管理员',
+          icon: 'Avatar',
+          requireRoot: true, // 只有 root 账号可以访问
+        },
       },
     ],
   },

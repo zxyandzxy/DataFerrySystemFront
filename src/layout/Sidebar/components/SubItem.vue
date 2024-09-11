@@ -30,7 +30,11 @@
   import { isExternal } from '@/utils/validate.js'
   import AppLink from './Link.vue'
   import path from 'path-browserify'
-  import { ref, computed } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
+  import { useAdminStore } from '@/store/modules/admin'
+
+  const adminStore = useAdminStore()
+
   const props = defineProps({
     item: {
       type: Object,
@@ -42,24 +46,33 @@
     },
   })
 
+  // 获取当前用户的账号信息
+  const adminAccount = computed(() => adminStore.adminAccount)
+
+  // 判断是否有权限访问
+  const hasAccess = (route) => {
+    // 如果路由要求 root 账号并且当前用户不是 root，返回 false
+    if (route.meta?.requireRoot && adminAccount.value !== 'root') {
+      return false
+    }
+    return true
+  }
+
   const onlyOneChild = ref(null)
   const hasOneShowingChild = (children = [], parent) => {
     const showingChildren = children.filter((item) => {
-      // 过滤掉需要隐藏的菜单
-      if (item.hidden) {
+      if (item.hidden || !hasAccess(item)) {
         return false
       } else {
-        // 临时设置（如果只有一个显示子项，则将使用）
         onlyOneChild.value = item
         return true
       }
     })
 
-    // 当只有一个子路由器时，默认情况下会显示该子路由器
     if (showingChildren.length === 1) {
       return true
     }
-    // 如果没有要显示的子路由器，则显示父路由器
+
     if (showingChildren.length === 0) {
       onlyOneChild.value = { ...parent, path: '', noShowingChildren: true }
       return true
@@ -77,4 +90,6 @@
     }
     return path.resolve(props.basePath, routePath)
   }
+
+  onMounted(() => {})
 </script>

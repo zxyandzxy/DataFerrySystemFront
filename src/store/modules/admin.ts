@@ -10,7 +10,7 @@ export const useAdminStore = defineStore(
     const adminInfo = ref({})
     const token = ref('')
     const systemRole = ref('')
-    const adminId = ref('')
+    const adminAccount = ref('root')
 
     // 定义获取接口数据的 action 函数
     const login = async (data, Role) => {
@@ -18,10 +18,16 @@ export const useAdminStore = defineStore(
       const adminIdValue = data.username
       const password = data.password
       const verification_code = data.verificationCode
-      const res = await adminLoginAPI({ adminId: adminIdValue, password, verification_code })
+      const verKey = data.verKey
+      const res = await adminLoginAPI({
+        adminAccount: adminIdValue,
+        password,
+        verKey,
+        verification_code,
+      })
       if (res.code === 200) {
         token.value = res.data.token
-        adminId.value = adminIdValue
+        adminAccount.value = adminIdValue
         return true
       } else {
         ElNotification({
@@ -33,7 +39,7 @@ export const useAdminStore = defineStore(
     }
 
     const getAdminInfo = async () => {
-      const res = await adminGetInfoAPI(adminId.value)
+      const res = await adminGetInfoAPI(adminAccount.value)
       if (res.code === 200) {
         adminInfo.value = res.data
       }
@@ -44,7 +50,7 @@ export const useAdminStore = defineStore(
     const clearAdminInfo = () => {
       adminInfo.value = {}
       token.value = ''
-      adminId.value = ''
+      adminAccount.value = ''
       systemRole.value = ''
     }
 
@@ -53,7 +59,7 @@ export const useAdminStore = defineStore(
       systemRole,
       token,
       adminInfo,
-      adminId,
+      adminAccount,
       login,
       getAdminInfo,
       clearAdminInfo,

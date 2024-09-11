@@ -74,9 +74,6 @@ const downloadTemplate = async () => {
 
 // 处理上传成功的回调函数
 const handleUploadSuccess = (response, file, fileList) => {
-  // 打印服务器返回的数据
-  console.log('服务器返回的数据:', response)
-
   // 检查响应的状态码
   if (response.code === 200) {
     uploadResult.value = {

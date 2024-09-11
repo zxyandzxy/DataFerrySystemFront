@@ -22,6 +22,7 @@ import manageTicketRouter from './modules/Admin-ticketManage'
 import systemConfigRouter from './modules/Admin-systemConfig'
 import manageDiskRouter from './modules/Admin-diskManage'
 import manageRouter from './modules/Admin-manage'
+import { useAdminStore } from '../store/modules/admin'
 
 // 异步组件
 export const asyncRoutes = [
@@ -87,4 +88,16 @@ const router = createRouter({
   routes: constantRoutes,
 })
 
+router.beforeEach((to, from, next) => {
+  const adminStore = useAdminStore()
+  const adminId = adminStore.adminAccount
+  // 检查是否需要 root 权限
+  if (to.meta.requireRoot && adminId !== 'root') {
+    // 如果不是 root 用户，阻止访问并跳转到 401 无权限页面
+    next({ path: '/login', replace: true })
+  } else {
+    // 如果是 root 或不需要 root 权限的路由，允许继续访问
+    next()
+  }
+})
 export default router

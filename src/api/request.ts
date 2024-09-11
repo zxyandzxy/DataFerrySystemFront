@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
-import { ElMessage } from 'element-plus'
+import { ElLoading, ElMessage } from 'element-plus'
 import { useUserStore } from '@/store/modules/user'
 // 创建axios实例 进行基本参数配置
 const service = axios.create({
@@ -11,23 +11,30 @@ const service = axios.create({
   withCredentials: true,
 })
 
+let loadingInstance: any = null // 用于存储loading实例
+
 //  request interceptor 接口请求拦截
 service.interceptors.request.use(
   (config: AxiosRequestConfig) => {
-    /**
-     * 用户登录之后获取服务端返回的token,后面每次请求都在请求头中带上token进行JWT校验
-     * token 存储在本地储存中（storage）、vuex、pinia
-     */
+    // 用户登录之后获取服务端返回的token, 后面每次请求都在请求头中带上token进行JWT校验
     const userStore = useUserStore()
     const token: string = userStore.token
-    // 自定义请求头
     if (token) {
-      config.headers['Authorization'] = token
+      config.headers['Authorization'] = token // 自定义请求头
     }
+
+    // 显示加载动画
+    loadingInstance = ElLoading.service({
+      lock: true,
+      text: '加载中...',
+      background: 'rgba(0, 0, 0, 0.7)',
+    })
+
     return config
   },
   (error: AxiosError) => {
     // 请求错误，这里可以用全局提示框进行提示
+    if (loadingInstance) loadingInstance.close() // 关闭加载动画
     return Promise.reject(error)
   },
 )
@@ -37,7 +44,16 @@ service.interceptors.response.use(
   (response: AxiosResponse) => {
     // 直接返回res，当然你也可以只返回res.data
     // 系统如果有自定义code也可以在这里处理
-    return response
+    if (loadingInstance) loadingInstance.close() // 关闭加载动画
+
+    const res = response.data
+    // 如果自定义的状态码不是 200，抛出错误提示
+    if (res.code !== 200) {
+      showErrMessage(res.msg, 'error', 5000)
+      return Promise.reject(new Error(res.msg || 'Error'))
+    } else {
+      return response
+    }
   },
   (error: AxiosError) => {
     return Promise.reject(error)
@@ -51,9 +67,11 @@ service.interceptors.response.use(
  * type 消息类型
  * duration 消息持续时间
  */
-function showErrMessage(opt, err, type: any = 'error', duration = 5000) {
+function showErrMessage(msg, type: any = 'error', duration = 5000) {
+  console.log(type)
+
   ElMessage({
-    message: err.msg,
+    message: msg,
     type: type,
     duration: duration,
   })
