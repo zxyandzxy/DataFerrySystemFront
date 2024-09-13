@@ -114,16 +114,18 @@
             <el-upload
               class="upload-demo"
               drag
-              limit="1"
-              :on-change="changeFile"
+              :limit="1"
+              v-model:file-list="fileList"
+              action="#"
+              :show-file-list="true"
+              list-type="text"
               :auto-upload="false"
-              :data="uploadForm"
             >
               <el-icon class="el-icon--upload"><upload-filled /></el-icon>
               <div class="el-upload__text"> 拖拽文件 或 <em> 点击上传 </em> </div>
               <template #tip>
                 <div class="el-upload__tip">
-                  只有文件上传后才能成功创建工单，后台处理文件上传需要一定时间，同学无需等待，提交工单即可。如需更新文件需先删除原来的上传的文件
+                  只有文件上传后才能成功提交工单，后台处理文件上传需要一定时间，同学无需等待，提交工单即可。如需更新文件需先删除原来的上传的文件
                 </div>
               </template>
             </el-upload>
@@ -246,16 +248,18 @@
               <el-upload
                 class="upload-demo"
                 drag
-                limit="1"
-                :on-change="changeFile"
+                :limit="1"
+                v-model:file-list="fileList"
+                action="#"
                 :auto-upload="false"
-                :data="uploadFormOnViewTime"
+                :show-file-list="true"
+                list-type="text"
               >
                 <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                 <div class="el-upload__text"> 拖拽文件 或 <em> 点击上传 </em> </div>
                 <template #tip>
                   <div class="el-upload__tip">
-                    只有文件上传后才能成功创建工单，后台处理文件上传需要一定时间，同学无需等待，提交工单即可
+                    只有文件上传后才能成功提交工单，后台处理文件上传需要一定时间，同学无需等待，提交工单即可
                   </div>
                 </template>
               </el-upload>
@@ -290,7 +294,7 @@
                 <el-select
                   disabled
                   v-model="workOrderDetailForm.fileType"
-                  placeholder="选择要要上传文件的类型"
+                  placeholder="选择要上传文件的类型"
                 >
                   <el-option
                     v-for="item in fileTypeOptions"
@@ -408,7 +412,7 @@
         <el-dialog v-model="advancedReviewVisible" title="超前审批" append-to-body>
           <el-form :model="advancedReviewForm" label-width="auto">
             <el-form-item label="超前审批工单号" prop="advancedWorkOrderId">
-              <el-input disabled v-model="advancedReviewForm.advancedWorkOrderId" />
+              <el-input disabled v-model="advancedReviewForm.workOrderId" />
             </el-form-item>
             <el-form-item label="学生学号" prop="studentId">
               <el-input disabled v-model="advancedReviewForm.studentId" />
@@ -537,7 +541,7 @@
     }
     // 后端创建工单
     const data = {
-      studentId: stuStore.studentId,
+      studentAccount: stuStore.studentId,
       auditType: auditType.value,
       workOrderTitle: workOrderForm.value.workOrderTitle,
       fileType: workOrderForm.value.fileType,
@@ -565,40 +569,31 @@
     isCreateWorkOrder.value = true // 开发用，后面注释掉
   }
   // 文件上传
-  const file = ref()
-  const changeFile = (uploadFile) => {
-    file.value = uploadFile
-  }
-  const uploadForm = reactive({
-    workOrderId: workOrderForm.value.workOrderId,
-    studentId: stuStore.stuId,
-  })
-  // 参考教程：https://blog.csdn.net/m0_51044974/article/details/131575698
-  // 参考教程：https://blog.csdn.net/qq_61402485/article/details/129317623
-  // 参考教程(此)：https://blog.csdn.net/qq_24787615/article/details/131477657
+  //定义一个响应式数组用来接收文件
+  const fileList = ref([])
   const submitTicket = async () => {
-    // 判断是否上传文件
-    const jsonStr = JSON.stringify(uploadForm)
-    const blob = new Blob([jsonStr], {
-      type: 'application/json',
-    })
-    let formData = new FormData()
-    formData.append('obj', blob)
-    // 这里很重要 file.value.raw才是真实的file文件，file.value只是一个Proxy代理对象
-    formData.append('file', file.value.raw)
-    let res = uploadFileAPI(formData)
-    res = res.data
-    if (res.code == 200) {
-      ElMessage({
-        message: res.msg,
-        type: 'success',
+    if (fileList.value.length > 0) {
+      // 封装为FromData对象
+      const fromData = new FormData()
+      fileList.value.forEach((val) => {
+        fromData.append('file', val.raw)
       })
-      createWorkOrderVisible.value = false
-    } else {
-      ElMessage({
-        message: res.msg,
-        type: 'error',
-      })
+      fromData.append('workOrderId', workOrderForm.value.workOrderId)
+      fromData.append('studentAccount', stuStore.stuId)
+      let res = uploadFileAPI(fromData)
+      res = res.data
+      if (res.code == 200) {
+        ElMessage({
+          message: res.msg,
+          type: 'success',
+        })
+        createWorkOrderVisible.value = false
+      } else {
+        ElMessage({
+          message: res.msg,
+          type: 'error',
+        })
+      }
     }
   }
 
@@ -629,7 +624,7 @@
   const active = ref(0) // 流程组件的控制
   const viewWorkOrderVisible = ref(false)
   const changeToAdvancedReview = () => {
-    advancedReviewForm.value.advancedWorkOrderId = workOrderDetailForm.value.workOrderId
+    advancedReviewForm.value.workOrderId = workOrderDetailForm.value.workOrderId
     advancedReviewVisible.value = true
   }
   const copyUnzipPassword = async (unzipPassword) => {
@@ -651,7 +646,7 @@
   // 超前审批
   const advancedReviewVisible = ref(false)
   const advancedReviewForm = ref({
-    advancedWorkOrderId: '',
+    workOrderId: '',
     studentId: stuStore.stuId,
     password: '',
   })
@@ -847,33 +842,29 @@
   }
 
   // 创建中状态提交工单（与新建工单直接提交不冲突，文件处理可以用一样的代码）
-  const uploadFormOnViewTime = reactive({
-    workOrderId: workOrderDetailForm.value.workOrderId,
-    studentId: stuStore.stuId,
-  })
   const submitTicketOnViewTime = async () => {
-    // 判断是否上传文件
-    const jsonStr = JSON.stringify(uploadFormOnViewTime)
-    const blob = new Blob([jsonStr], {
-      type: 'application/json',
-    })
-    let formData = new FormData()
-    formData.append('obj', blob)
-    // 这里很重要 file.value.raw才是真实的file文件，file.value只是一个Proxy代理对象
-    formData.append('file', file.value.raw)
-    let res = uploadFileAPI(formData)
-    res = res.data
-    if (res.code == 200) {
-      ElMessage({
-        message: res.msg,
-        type: 'success',
+    if (fileList.value.length > 0) {
+      // 封装为FromData对象
+      const fromData = new FormData()
+      fileList.value.forEach((val) => {
+        fromData.append('file', val.raw)
       })
-      viewWorkOrderVisible.value = false
-    } else {
-      ElMessage({
-        message: res.msg,
-        type: 'error',
-      })
+      fromData.append('workOrderId', workOrderDetailForm.value.workOrderId)
+      fromData.append('studentId', stuStore.stuId)
+      let res = uploadFileAPI(fromData)
+      res = res.data
+      if (res.code == 200) {
+        ElMessage({
+          message: res.msg,
+          type: 'success',
+        })
+        viewWorkOrderVisible.value = false
+      } else {
+        ElMessage({
+          message: res.msg,
+          type: 'error',
+        })
+      }
     }
   }
   // 测试用数据

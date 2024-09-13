@@ -9,14 +9,14 @@ export function getAuditTypeAPI() {
 }
 
 // 获取工单列表
-export function getWorkOrderListAPI(pageNum, pageSize, studentId) {
+export function getWorkOrderListAPI(pageNum, pageSize, studentAccount) {
   return request({
     url: '/student/get_list',
     method: 'GET',
     params: {
       pageNum,
       pageSize,
-      studentId,
+      studentAccount,
     },
   })
 }
@@ -69,7 +69,7 @@ export function advanceApprovalVerificationAPI(data) {
 // 拷贝文件
 export function copyFileAPI(data) {
   return request({
-    url: '/student/copy_ file',
+    url: '/student/copy_file',
     method: 'GET',
     data,
   })
@@ -81,8 +81,7 @@ export function uploadFileAPI(data) {
     method: 'POST',
     data,
     headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
+      'Content-Type': 'multipart/form-data',
     },
   })
 }
