@@ -47,7 +47,11 @@
       </el-table>
       <el-pagination
         layout="prev, pager, next"
-        :total="1000"
+        background
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-size="pageSize"
+        :total="total"
         style="margin-left: 70%; margin-top: 1%"
       />
       <el-dialog
@@ -420,8 +424,11 @@
             <el-form-item label="登录密码" prop="password">
               <el-input v-model="advancedReviewForm.password" />
             </el-form-item>
+            <el-form-item label="超前审批密钥" prop="advancedPassword">
+              <el-input v-model="advancedReviewForm.password" />
+            </el-form-item>
             <el-button style="margin-left: 40%" type="primary" @click="getAdvancedReviewResult"
-              >获取超前审批密钥</el-button
+              >发送超前审批请求</el-button
             >
           </el-form>
         </el-dialog>
@@ -516,6 +523,19 @@
     ['审批通过', 21],
     ['审批驳回', 22],
   ])
+  const fileType2LabelMap = new Map([
+    [0, 'docx'],
+    [1, 'pdf'],
+    [2, 'pptx'],
+    [3, 'zip'],
+    [4, 'else'],
+  ])
+  // 分页操作
+  const currentPage = ref(1)
+  const total = ref(0)
+  //const tableData = ref([])
+  const pageSize = ref(10)
+
   // 新建工单
   const createWorkOrderVisible = ref(false)
   const isCreateWorkOrder = ref(false) // isCreateWorkOrder 是 true 时，就显示文件上传
@@ -649,23 +669,30 @@
     workOrderId: '',
     studentId: stuStore.stuId,
     password: '',
+    advancedPassword: '',
   })
   const getAdvancedReviewResult = async () => {
-    if (advancedReviewForm.value.password == '') {
+    if (
+      advancedReviewForm.value.password == '' ||
+      advancedReviewForm.value.advancedPassword == ''
+    ) {
       ElMessage({
-        message: '请输入登录密码进行验证',
+        message: '请输入登录密码与超前审批密钥进行验证',
         type: 'error',
         plain: true,
       })
       return
     }
-    let res = await advanceApprovalVerificationAPI(advancedReviewForm.value)
+    let res = await advanceApprovalVerificationAPI(
+      advancedReviewForm.value.workOrderId,
+      advancedReviewForm.value.studentId,
+      advancedReviewForm.value.password,
+      advancedReviewForm.value.advancedPassword,
+    )
     res = res.data
     if (res.code == 200) {
-      await toClipboard(res.data.advancedReviewPassword)
       ElNotification({
-        title: '超前审批密钥已复制到剪贴板',
-        message: '超前审批密钥为:' + res.data.advancedReviewPassword,
+        title: res.msg,
         type: 'success',
         duration: 0,
       })
@@ -906,14 +933,16 @@
     },
   ])
 
-  //  const tableData = ref([])
-  const pageNum = ref(1)
-  const pageSize = ref(10)
   const getWorkOrderList = async () => {
-    let res = await getWorkOrderListAPI(pageNum, pageSize, stuStore.stuId)
+    let res = await getWorkOrderListAPI(currentPage.value, pageSize.value, stuStore.stuId)
     res = res.data
     if (res.code === 200) {
-      tableData.value = res.data
+      total.value = res.data.total
+      for (let i = 0; i < res.data.array.length; i++) {
+        res.data.array[i].workOrderStatus = num2LabelMap.get(res.data.array[i].workOrderStatus)
+        res.data.array[i].fileType = fileType2LabelMap.get(res.data.array[i].fileType)
+      }
+      tableData.value = res.data.array
     } else {
       ElMessage({
         showClose: true,
