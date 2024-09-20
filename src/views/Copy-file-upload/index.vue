@@ -1,54 +1,59 @@
 <template>
   <div class="app-container">
     <div class="app-container-inner">
-      <h1>外网文件上传</h1>
-      <div class="account-div">
-        <el-form :model="studentForm" label-width="auto" style="margin-left: 20%">
-          <el-form-item label="学号">
-            <el-input
-              v-model="studentForm.student_id"
-              style="width: 500px"
-              placeholder="请输入学号"
-              clearable
-            />
-          </el-form-item>
-          <el-form-item label="登录密码">
-            <el-input
-              v-model="studentForm.password"
-              type="password"
-              placeholder="请输入登录密码"
-              clearable
-            />
-          </el-form-item>
-        </el-form>
+      <div v-if="copyMachineStore.systemChoose != ''">
+        <h1>外网文件上传</h1>
+        <div class="account-div">
+          <el-form :model="studentForm" label-width="auto" style="margin-left: 20%">
+            <el-form-item label="学号">
+              <el-input
+                v-model="studentForm.student_id"
+                style="width: 500px"
+                placeholder="请输入学号"
+                clearable
+              />
+            </el-form-item>
+            <el-form-item label="登录密码">
+              <el-input
+                v-model="studentForm.password"
+                type="password"
+                placeholder="请输入登录密码"
+                clearable
+              />
+            </el-form-item>
+          </el-form>
+        </div>
+        <el-upload
+          class="upload-demo"
+          drag
+          style="margin-top: 3%"
+          v-model:file-list="fileList"
+          action="#"
+          :auto-upload="false"
+          :limit="1"
+          :show-file-list="true"
+          list-type="text"
+        >
+          <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+          <div class="el-upload__text"> 将文件拖入此处 或者 <em>点击此处上传文件</em> </div>
+          <template #tip>
+            <div class="el-upload__tip"> 请注意自己的可用空间大小 </div>
+          </template>
+        </el-upload>
+        <el-button
+          style="color: blue; margin-left: 40%"
+          size="large"
+          :type="success"
+          text
+          bg
+          @click="uploadFile"
+        >
+          上传（可联系管理员扩容）
+        </el-button>
       </div>
-      <el-upload
-        class="upload-demo"
-        drag
-        style="margin-top: 3%"
-        v-model:file-list="fileList"
-        action="#"
-        :auto-upload="false"
-        :limit="1"
-        :show-file-list="true"
-        list-type="text"
-      >
-        <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-        <div class="el-upload__text"> 将文件拖入此处 或者 <em>点击此处上传文件</em> </div>
-        <template #tip>
-          <div class="el-upload__tip"> 请注意自己的可用空间大小 </div>
-        </template>
-      </el-upload>
-      <el-button
-        style="color: blue; margin-left: 40%"
-        size="large"
-        :type="success"
-        text
-        bg
-        @click="uploadFile"
-      >
-        上传（可联系管理员扩容）
-      </el-button>
+      <div v-else>
+        <Error></Error>
+      </div>
     </div>
   </div>
 </template>
@@ -57,6 +62,9 @@
   import { ElMessage } from 'element-plus'
   import { UploadFilled } from '@element-plus/icons-vue'
   import { uploadFileAPI } from '@/api/studentFileProcessing'
+  import { useCopyMachineStore } from '@/store/modules/copyMachine'
+  import Error from '@/views/error/404.vue'
+  const copyMachineStore = useCopyMachineStore()
   const studentForm = ref({
     student_id: '',
     password: '',

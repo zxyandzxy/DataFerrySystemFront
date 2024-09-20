@@ -1,29 +1,34 @@
 <template>
   <div class="app-container">
     <div class="app-container-inner">
-      <h2 style="margin-left: 5%">文件上传列表</h2>
-      <el-table :data="tableData" style="width: 90%; margin-left: 3%">
-        <el-table-column prop="fileName" label="文件名称" width="400" />
-        <el-table-column prop="fileType" label="文件类型" width="200" />
-        <el-table-column prop="fileSize" label="文件大小(KB)" width="200" />
-        <el-table-column prop="uploadTime" label="上传时间" width="300" />
-        <el-table-column label="操作">
-          <template v-slot="scope">
-            <el-button link type="primary" size="small" @click="download(scope.$index)">
-              下载
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-pagination
-        style="margin-top: 3%; margin-left: 60%"
-        background
-        @current-change="handleCurrentChange"
-        :current-page="currentPage"
-        :page-size="pageSize"
-        :total="total"
-        layout="prev, pager, next"
-      />
+      <div v-if="stuStore.systemChoose != ''">
+        <h2 style="margin-left: 5%">文件上传列表</h2>
+        <el-table :data="tableData" style="width: 90%; margin-left: 3%">
+          <el-table-column prop="fileName" label="文件名称" width="400" />
+          <el-table-column prop="fileType" label="文件类型" width="200" />
+          <el-table-column prop="fileSize" label="文件大小(KB)" width="200" />
+          <el-table-column prop="uploadTime" label="上传时间" width="300" />
+          <el-table-column label="操作">
+            <template v-slot="scope">
+              <el-button link type="primary" size="small" @click="download(scope.$index)">
+                下载
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination
+          style="margin-top: 3%; margin-left: 60%"
+          background
+          @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-size="pageSize"
+          :total="total"
+          layout="prev, pager, next"
+        />
+      </div>
+      <div v-else>
+        <Error />
+      </div>
     </div>
   </div>
 </template>
@@ -32,6 +37,7 @@
   import { viewFileAPI } from '@/api/studentFileProcessing'
   import { useStuStore } from '@/store/modules/student'
   import { ElNotification } from 'element-plus'
+  import Error from '@/views/error/404.vue'
   const stuStore = useStuStore()
   onMounted(async () => {
     //从后端拉取数据
