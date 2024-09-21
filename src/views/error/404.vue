@@ -12,7 +12,7 @@
           <div class="bullshit">
             <div class="bullshit__oops">页面不存在！</div>
             <div class="bullshit__headline">{{ message }}</div>
-            <div class="bullshit__info">请检查URL地址是否正确, 或点击回到首页。</div>
+            <div class="bullshit__info">当前未具有访问该页面的权限，请登录正确的账号</div>
             <router-link to="/" class="bullshit__return-home">回到首页</router-link>
           </div>
         </div>

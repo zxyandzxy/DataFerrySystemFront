@@ -1,78 +1,83 @@
 <template>
   <div class="app-container">
     <div class="app-container-inner">
-      <el-row :gutter="20">
-        <el-col :span="11">
-          <div>
-            <h2>内网文件拷贝</h2>
-            <div class="account-div">
-              <el-form :model="ticketForm" label-width="auto" style="margin-left: 20%">
-                <el-form-item label="工单ID">
-                  <el-input
-                    v-model="ticketForm.workOrderId"
-                    style="width: 500px"
-                    placeholder="请输入工单ID"
-                    clearable
-                  />
+      <div v-if="copyMachineStore.systemChoose != ''">
+        <el-row :gutter="20">
+          <el-col :span="11">
+            <div>
+              <h2>内网文件拷贝</h2>
+              <div class="account-div">
+                <el-form :model="ticketForm" label-width="auto" style="margin-left: 20%">
+                  <el-form-item label="工单ID">
+                    <el-input
+                      v-model="ticketForm.workOrderId"
+                      style="width: 500px"
+                      placeholder="请输入工单ID"
+                      clearable
+                    />
+                  </el-form-item>
+                  <el-form-item label="学生学号">
+                    <el-input v-model="ticketForm.studentId" placeholder="请输入学号" clearable />
+                  </el-form-item>
+                  <el-form-item label="登录密码">
+                    <el-input
+                      v-model="ticketForm.password"
+                      type="password"
+                      placeholder="请输入登录密码"
+                      clearable
+                    />
+                  </el-form-item>
+                </el-form>
+                <el-button style="color: blue; margin-left: 50%" text bg @click="validate">
+                  验证
+                </el-button>
+              </div>
+            </div>
+          </el-col>
+          <el-col :span="11">
+            <div class="rightContent" v-if="isValid">
+              <el-form :model="fileForm" label-width="auto" style="margin-left: 20%">
+                <el-form-item label="文件下载链接">
+                  <div style="display: flex; justify-content: center; align-items: center">
+                    <el-input
+                      v-model="fileForm.fileDownloadLink"
+                      placeholder="文件下载链接"
+                      disabled
+                      style="margin-right: 5%"
+                    />
+                    <el-icon @click="copyFileDownPath"><DocumentCopy /></el-icon>
+                  </div>
                 </el-form-item>
-                <el-form-item label="学生学号">
-                  <el-input v-model="ticketForm.studentId" placeholder="请输入学号" clearable />
+                <el-form-item label="校验码">
+                  <div style="display: flex; justify-content: center; align-items: center">
+                    <el-input
+                      v-model="fileForm.checkCode"
+                      placeholder="校验码下载"
+                      disabled
+                      style="margin-right: 5%"
+                    />
+                    <el-icon @click="copyFileValid"><DocumentCopy /></el-icon>
+                  </div>
                 </el-form-item>
-                <el-form-item label="登录密码">
-                  <el-input
-                    v-model="ticketForm.password"
-                    type="password"
-                    placeholder="请输入登录密码"
-                    clearable
-                  />
+                <el-form-item label="文件解压密码">
+                  <div style="display: flex; justify-content: center; align-items: center">
+                    <el-input
+                      v-model="fileForm.unzipPassword"
+                      placeholder="文件解压密码"
+                      disabled
+                      style="margin-right: 5%"
+                    />
+                    <el-icon @click="copyFilePassword"><DocumentCopy /></el-icon>
+                  </div>
                 </el-form-item>
               </el-form>
-              <el-button style="color: blue; margin-left: 50%" text bg @click="validate">
-                验证
-              </el-button>
             </div>
-          </div>
-        </el-col>
-        <el-col :span="11">
-          <div class="rightContent" v-if="isValid">
-            <el-form :model="fileForm" label-width="auto" style="margin-left: 20%">
-              <el-form-item label="文件下载链接">
-                <div style="display: flex; justify-content: center; align-items: center">
-                  <el-input
-                    v-model="fileForm.fileDownloadLink"
-                    placeholder="文件下载链接"
-                    disabled
-                    style="margin-right: 5%"
-                  />
-                  <el-icon @click="copyFileDownPath"><DocumentCopy /></el-icon>
-                </div>
-              </el-form-item>
-              <el-form-item label="校验码">
-                <div style="display: flex; justify-content: center; align-items: center">
-                  <el-input
-                    v-model="fileForm.checkCode"
-                    placeholder="校验码下载"
-                    disabled
-                    style="margin-right: 5%"
-                  />
-                  <el-icon @click="copyFileValid"><DocumentCopy /></el-icon>
-                </div>
-              </el-form-item>
-              <el-form-item label="文件解压密码">
-                <div style="display: flex; justify-content: center; align-items: center">
-                  <el-input
-                    v-model="fileForm.unzipPassword"
-                    placeholder="文件解压密码"
-                    disabled
-                    style="margin-right: 5%"
-                  />
-                  <el-icon @click="copyFilePassword"><DocumentCopy /></el-icon>
-                </div>
-              </el-form-item>
-            </el-form>
-          </div>
-        </el-col>
-      </el-row>
+          </el-col>
+        </el-row>
+      </div>
+      <div v-else>
+        <Error />
+      </div>
     </div>
   </div>
 </template>
@@ -81,6 +86,9 @@
   import { ElMessage } from 'element-plus'
   import { copyFileAPI } from '@/api/stuWorkOrderApproval'
   import useClipboard from 'vue-clipboard3'
+  import { useCopyMachineStore } from '@/store/modules/copyMachine'
+  import Error from '@/views/error/404.vue'
+  const copyMachineStore = useCopyMachineStore()
   const { toClipboard } = useClipboard()
   const ticketForm = reactive({
     workOrderId: '',

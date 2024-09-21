@@ -1,193 +1,81 @@
 <template>
   <div class="app-container">
     <div class="app-container-inner">
-      <div style="display: flex; align-items: center">
-        <h2 style="margin-left: 5%">工单列表</h2>
-        <el-button
-          @click="showCreateWorkOrder"
-          size="large"
-          type="primary"
-          link
-          :icon="DocumentAdd"
-          style="margin-left: 70%"
-        >
-          新建工单
-        </el-button>
-      </div>
-      <el-table :data="tableData" style="width: 90%; margin-left: 3%">
-        <el-table-column fixed prop="workOrderId" label="工单号" width="150" />
-        <el-table-column prop="workOrderTitle" label="工单标题" width="150" />
-        <el-table-column prop="fileType" label="文件类型" width="150" />
-        <el-table-column prop="workOrderStatus" label="当前工单状态" width="150" />
-        <el-table-column prop="unzipPassword" label="解压密码" width="300">
-          <template #default="scope">
-            <div style="display: flex; align-items: center">
-              <el-input
-                v-model="scope.row.unzipPassword"
-                type="password"
-                disabled
-                style="margin-right: 5%"
-              />
-              <el-icon @click="viewUnzipPassword(scope.row.unzipPassword)" style="margin-right: 5%"
-                ><View></View
-              ></el-icon>
-              <el-icon @click="copyUnzipPassword(scope.row.unzipPassword)"
-                ><CopyDocument
-              /></el-icon>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" min-width="120">
-          <template v-slot="scope">
-            <el-button link type="primary" size="small" @click="viewWorkOrder(scope.$index)">
-              详情
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-pagination
-        layout="prev, pager, next"
-        :total="1000"
-        style="margin-left: 70%; margin-top: 1%"
-      />
-      <el-dialog
-        v-model="createWorkOrderVisible"
-        title="新建工单"
-        :show-close="false"
-        draggable
-        overflow
-      >
-        <h3>基本信息</h3>
-        <el-divider />
-        <div>
-          <el-form :model="workOrderForm" :rules="workOrderRules" label-width="auto">
-            <el-form-item label="当前审批类型" prop="auditType">
-              <el-input disabled v-model="workOrderForm.auditType" />
-            </el-form-item>
-            <el-form-item label="工单标题" prop="workOrderTitle">
-              <el-input v-model="workOrderForm.workOrderTitle" />
-            </el-form-item>
-            <el-form-item label="文件类型" prop="fileType">
-              <el-select v-model="workOrderForm.fileType" placeholder="选择要要上传文件的类型">
-                <el-option
-                  v-for="item in fileTypeOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="文件概述" prop="fileAbstract">
-              <el-input v-model="workOrderForm.fileAbstract" type="textarea" />
-            </el-form-item>
-            <el-form-item label="拷贝原因" prop="copyReason">
-              <el-input v-model="workOrderForm.copyReason" type="textarea" />
-            </el-form-item>
-            <el-form-item label="文件解压密码" prop="unzipPassword">
-              <el-input v-model="workOrderForm.unzipPassword" />
-              <el-button @click="createUnzipPassword" size="large" type="primary" link
-                >系统生成</el-button
-              >
-            </el-form-item>
-          </el-form>
-        </div>
-        <div style="margin-left: 50%; margin-bottom: 2%">
-          <el-popconfirm
-            width="220"
-            confirm-button-text="确定"
-            cancel-button-text="取消"
-            :icon="InfoFilled"
-            icon-color="#626AEF"
-            title="退出后此次不会生成工单，确定退出吗？"
-            @confirm="createWorkOrderVisible = false"
+      <div v-if="stuStore.systemChoose != ''">
+        <div style="display: flex; align-items: center">
+          <h2 style="margin-left: 5%">工单列表</h2>
+          <el-button
+            @click="showCreateWorkOrder"
+            size="large"
+            type="primary"
+            link
+            :icon="DocumentAdd"
+            style="margin-left: 70%"
           >
-            <template #reference>
-              <el-button>退出</el-button>
+            新建工单
+          </el-button>
+        </div>
+        <el-table :data="tableData" style="width: 90%; margin-left: 3%">
+          <el-table-column fixed prop="workOrderId" label="工单号" width="150" />
+          <el-table-column prop="workOrderTitle" label="工单标题" width="150" />
+          <el-table-column prop="fileType" label="文件类型" width="150" />
+          <el-table-column prop="workOrderStatus" label="当前工单状态" width="150" />
+          <el-table-column prop="unzipPassword" label="解压密码" width="300">
+            <template #default="scope">
+              <div style="display: flex; align-items: center">
+                <el-input
+                  v-model="scope.row.unzipPassword"
+                  type="password"
+                  disabled
+                  style="margin-right: 5%"
+                />
+                <el-icon
+                  @click="viewUnzipPassword(scope.row.unzipPassword)"
+                  style="margin-right: 5%"
+                  ><View></View
+                ></el-icon>
+                <el-icon @click="copyUnzipPassword(scope.row.unzipPassword)"
+                  ><CopyDocument
+                /></el-icon>
+              </div>
             </template>
-          </el-popconfirm>
-          <el-button type="success" @click="createWorkOrder"> 保存 </el-button>
-        </div>
-        <div v-if="isCreateWorkOrder == true">
-          <h3>文件上传</h3>
-          <el-divider />
-          <div>
-            <el-upload
-              class="upload-demo"
-              drag
-              limit="1"
-              :on-change="changeFile"
-              :auto-upload="false"
-              :data="uploadForm"
-            >
-              <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-              <div class="el-upload__text"> 拖拽文件 或 <em> 点击上传 </em> </div>
-              <template #tip>
-                <div class="el-upload__tip">
-                  只有文件上传后才能成功创建工单，后台处理文件上传需要一定时间，同学无需等待，提交工单即可。如需更新文件需先删除原来的上传的文件
-                </div>
-              </template>
-            </el-upload>
-          </div>
-          <div style="margin-left: 40%; margin-top: 1%">
-            <el-popconfirm
-              width="220"
-              confirm-button-text="确定"
-              cancel-button-text="取消"
-              :icon="InfoFilled"
-              icon-color="#626AEF"
-              title="退出后此次工单会暂存，请及时上传文件，确定退出吗？"
-              @confirm="createWorkOrderVisible = false"
-            >
-              <template #reference>
-                <el-button>退出</el-button>
-              </template>
-            </el-popconfirm>
-            <el-button type="success" @click="submitTicket"> 提交工单 </el-button>
-          </div>
-        </div>
-      </el-dialog>
-      <el-dialog
-        v-model="viewWorkOrderVisible"
-        title="工单流程"
-        :show-close="false"
-        draggable
-        overflow
-      >
-        <el-steps
-          class="mb-4"
-          style="max-width: 600px"
-          :space="200"
-          :active="active"
-          simple
-          finish-status="success"
-          process-status="process"
-          align-center
+          </el-table-column>
+          <el-table-column label="操作" min-width="120">
+            <template v-slot="scope">
+              <el-button link type="primary" size="small" @click="viewWorkOrder(scope.$index)">
+                详情
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination
+          layout="prev, pager, next"
+          background
+          @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-size="pageSize"
+          :total="total"
+          style="margin-left: 70%; margin-top: 1%"
+        />
+        <el-dialog
+          v-model="createWorkOrderVisible"
+          title="新建工单"
+          :show-close="false"
+          draggable
+          overflow
         >
-          <el-step title="创建中" :icon="Postcard" />
-          <el-step title="审核中" :icon="FolderChecked" />
-          <el-step title="可拷贝" :icon="SuccessFilled" />
-          <el-step
-            :status="workOrderDetailForm.workOrderStatus == 21 ? 'success' : 'error'"
-            title="审核成功/失败"
-            :icon="Lock"
-          />
-        </el-steps>
-        <div v-if="workOrderDetailForm.workOrderStatus == 1">
           <h3>基本信息</h3>
           <el-divider />
           <div>
             <el-form :model="workOrderForm" :rules="workOrderRules" label-width="auto">
               <el-form-item label="当前审批类型" prop="auditType">
-                <el-input disabled v-model="workOrderDetailForm.auditType" />
+                <el-input disabled v-model="workOrderForm.auditType" />
               </el-form-item>
               <el-form-item label="工单标题" prop="workOrderTitle">
-                <el-input v-model="workOrderDetailForm.workOrderTitle" />
+                <el-input v-model="workOrderForm.workOrderTitle" />
               </el-form-item>
               <el-form-item label="文件类型" prop="fileType">
-                <el-select
-                  v-model="workOrderDetailForm.fileType"
-                  placeholder="选择要要上传文件的类型"
-                >
+                <el-select v-model="workOrderForm.fileType" placeholder="选择要要上传文件的类型">
                   <el-option
                     v-for="item in fileTypeOptions"
                     :key="item.value"
@@ -197,15 +85,15 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="文件概述" prop="fileAbstract">
-                <el-input v-model="workOrderDetailForm.fileAbstract" type="textarea" />
+                <el-input v-model="workOrderForm.fileAbstract" type="textarea" />
               </el-form-item>
               <el-form-item label="拷贝原因" prop="copyReason">
-                <el-input v-model="workOrderDetailForm.copyReason" type="textarea" />
+                <el-input v-model="workOrderForm.copyReason" type="textarea" />
               </el-form-item>
               <el-form-item label="文件解压密码" prop="unzipPassword">
-                <el-input v-model="workOrderDetailForm.unzipPassword" />
+                <el-input v-model="workOrderForm.unzipPassword" />
                 <el-button @click="createUnzipPassword" size="large" type="primary" link
-                  >系统生成(建议使用)</el-button
+                  >系统生成</el-button
                 >
               </el-form-item>
             </el-form>
@@ -217,45 +105,34 @@
               cancel-button-text="取消"
               :icon="InfoFilled"
               icon-color="#626AEF"
-              title="撤销工单后，此工单将消失，确定撤销吗？"
-              @confirm="deleteWorkOrder"
-            >
-              <template #reference>
-                <el-button type="danger">撤销工单</el-button>
-              </template>
-            </el-popconfirm>
-            <el-popconfirm
-              width="220"
-              confirm-button-text="确定"
-              cancel-button-text="取消"
-              :icon="InfoFilled"
-              icon-color="#626AEF"
               title="退出后此次不会生成工单，确定退出吗？"
-              @confirm="viewWorkOrderVisible = false"
+              @confirm="createWorkOrderVisible = false"
             >
               <template #reference>
                 <el-button>退出</el-button>
               </template>
             </el-popconfirm>
-            <el-button type="success" @click="updateWorkOrder"> 保存 </el-button>
+            <el-button type="success" @click="createWorkOrder"> 保存 </el-button>
           </div>
-          <div>
+          <div v-if="isCreateWorkOrder == true">
             <h3>文件上传</h3>
             <el-divider />
             <div>
               <el-upload
                 class="upload-demo"
                 drag
-                limit="1"
-                :on-change="changeFile"
+                :limit="1"
+                v-model:file-list="fileList"
+                action="#"
+                :show-file-list="true"
+                list-type="text"
                 :auto-upload="false"
-                :data="uploadFormOnViewTime"
               >
                 <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                 <div class="el-upload__text"> 拖拽文件 或 <em> 点击上传 </em> </div>
                 <template #tip>
                   <div class="el-upload__tip">
-                    只有文件上传后才能成功创建工单，后台处理文件上传需要一定时间，同学无需等待，提交工单即可
+                    只有文件上传后才能成功提交工单，后台处理文件上传需要一定时间，同学无需等待，提交工单即可。如需更新文件需先删除原来的上传的文件
                   </div>
                 </template>
               </el-upload>
@@ -267,161 +144,305 @@
                 cancel-button-text="取消"
                 :icon="InfoFilled"
                 icon-color="#626AEF"
-                title="退出后此次填写的所有工单信息都失效（除非点击保存按钮），确定退出吗？"
+                title="退出后此次工单会暂存，请及时上传文件，确定退出吗？"
+                @confirm="createWorkOrderVisible = false"
+              >
+                <template #reference>
+                  <el-button>退出</el-button>
+                </template>
+              </el-popconfirm>
+              <el-button type="success" @click="submitTicket"> 提交工单 </el-button>
+            </div>
+          </div>
+        </el-dialog>
+        <el-dialog
+          v-model="viewWorkOrderVisible"
+          title="工单流程"
+          :show-close="false"
+          draggable
+          overflow
+        >
+          <el-steps
+            class="mb-4"
+            style="max-width: 600px"
+            :space="200"
+            :active="active"
+            simple
+            finish-status="success"
+            process-status="process"
+            align-center
+          >
+            <el-step title="创建中" :icon="Postcard" />
+            <el-step title="审核中" :icon="FolderChecked" />
+            <el-step title="可拷贝" :icon="SuccessFilled" />
+            <el-step
+              :status="workOrderDetailForm.workOrderStatus == 21 ? 'success' : 'error'"
+              title="审核成功/失败"
+              :icon="Lock"
+            />
+          </el-steps>
+          <div v-if="workOrderDetailForm.workOrderStatus == 1">
+            <h3>基本信息</h3>
+            <el-divider />
+            <div>
+              <el-form :model="workOrderForm" :rules="workOrderRules" label-width="auto">
+                <el-form-item label="当前审批类型" prop="auditType">
+                  <el-input disabled v-model="workOrderDetailForm.auditType" />
+                </el-form-item>
+                <el-form-item label="工单标题" prop="workOrderTitle">
+                  <el-input v-model="workOrderDetailForm.workOrderTitle" />
+                </el-form-item>
+                <el-form-item label="文件类型" prop="fileType">
+                  <el-select
+                    v-model="workOrderDetailForm.fileType"
+                    placeholder="选择要要上传文件的类型"
+                  >
+                    <el-option
+                      v-for="item in fileTypeOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    />
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="文件概述" prop="fileAbstract">
+                  <el-input v-model="workOrderDetailForm.fileAbstract" type="textarea" />
+                </el-form-item>
+                <el-form-item label="拷贝原因" prop="copyReason">
+                  <el-input v-model="workOrderDetailForm.copyReason" type="textarea" />
+                </el-form-item>
+                <el-form-item label="文件解压密码" prop="unzipPassword">
+                  <el-input v-model="workOrderDetailForm.unzipPassword" />
+                  <el-button @click="createUnzipPassword" size="large" type="primary" link
+                    >系统生成(建议使用)</el-button
+                  >
+                </el-form-item>
+              </el-form>
+            </div>
+            <div style="margin-left: 50%; margin-bottom: 2%">
+              <el-popconfirm
+                width="220"
+                confirm-button-text="确定"
+                cancel-button-text="取消"
+                :icon="InfoFilled"
+                icon-color="#626AEF"
+                title="撤销工单后，此工单将消失，确定撤销吗？"
+                @confirm="deleteWorkOrder"
+              >
+                <template #reference>
+                  <el-button type="danger">撤销工单</el-button>
+                </template>
+              </el-popconfirm>
+              <el-popconfirm
+                width="220"
+                confirm-button-text="确定"
+                cancel-button-text="取消"
+                :icon="InfoFilled"
+                icon-color="#626AEF"
+                title="退出后此次不会生成工单，确定退出吗？"
                 @confirm="viewWorkOrderVisible = false"
               >
                 <template #reference>
                   <el-button>退出</el-button>
                 </template>
               </el-popconfirm>
-              <el-button type="success" @click="submitTicketOnViewTime"> 提交工单 </el-button>
+              <el-button type="success" @click="updateWorkOrder"> 保存 </el-button>
+            </div>
+            <div>
+              <h3>文件上传</h3>
+              <el-divider />
+              <div>
+                <el-upload
+                  class="upload-demo"
+                  drag
+                  :limit="1"
+                  v-model:file-list="fileList"
+                  action="#"
+                  :auto-upload="false"
+                  :show-file-list="true"
+                  list-type="text"
+                >
+                  <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                  <div class="el-upload__text"> 拖拽文件 或 <em> 点击上传 </em> </div>
+                  <template #tip>
+                    <div class="el-upload__tip">
+                      只有文件上传后才能成功提交工单，后台处理文件上传需要一定时间，同学无需等待，提交工单即可
+                    </div>
+                  </template>
+                </el-upload>
+              </div>
+              <div style="margin-left: 40%; margin-top: 1%">
+                <el-popconfirm
+                  width="220"
+                  confirm-button-text="确定"
+                  cancel-button-text="取消"
+                  :icon="InfoFilled"
+                  icon-color="#626AEF"
+                  title="退出后此次填写的所有工单信息都失效（除非点击保存按钮），确定退出吗？"
+                  @confirm="viewWorkOrderVisible = false"
+                >
+                  <template #reference>
+                    <el-button>退出</el-button>
+                  </template>
+                </el-popconfirm>
+                <el-button type="success" @click="submitTicketOnViewTime"> 提交工单 </el-button>
+              </div>
             </div>
           </div>
-        </div>
-        <div v-if="workOrderDetailForm.workOrderStatus == 3">
-          <h3>基本信息</h3>
-          <el-divider />
-          <div>
-            <el-form :model="workOrderDetailForm" label-width="auto">
-              <el-form-item label="工单标题" prop="workOrderTitle">
-                <el-input disabled v-model="workOrderDetailForm.workOrderTitle" />
-              </el-form-item>
-              <el-form-item label="文件类型" prop="fileType">
-                <el-select
-                  disabled
-                  v-model="workOrderDetailForm.fileType"
-                  placeholder="选择要要上传文件的类型"
-                >
-                  <el-option
-                    v-for="item in fileTypeOptions"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  />
-                </el-select>
-              </el-form-item>
-              <el-form-item label="文件概述" prop="fileAbstract">
-                <el-input disabled v-model="workOrderDetailForm.fileAbstract" type="textarea" />
-              </el-form-item>
-              <el-form-item label="拷贝原因" prop="copyReason">
-                <el-input disabled v-model="workOrderDetailForm.copyReason" type="textarea" />
-              </el-form-item>
-              <el-form-item label="文件解压密码" prop="unzipPassword">
-                <el-input disabled v-model="workOrderDetailForm.unzipPassword" />
-              </el-form-item>
-              <el-form-item label="审批结果">
-                <div style="display: flex; align-items: center">
-                  <el-input disabled v-model="workOrderDetailForm.remark" />
-                  <el-button style="margin-left: 5%" type="primary" @click="changeToAdvancedReview"
-                    >点此进入超前审批</el-button
+          <div v-if="workOrderDetailForm.workOrderStatus == 3">
+            <h3>基本信息</h3>
+            <el-divider />
+            <div>
+              <el-form :model="workOrderDetailForm" label-width="auto">
+                <el-form-item label="工单标题" prop="workOrderTitle">
+                  <el-input disabled v-model="workOrderDetailForm.workOrderTitle" />
+                </el-form-item>
+                <el-form-item label="文件类型" prop="fileType">
+                  <el-select
+                    disabled
+                    v-model="workOrderDetailForm.fileType"
+                    placeholder="选择要上传文件的类型"
                   >
-                </div>
-              </el-form-item>
-            </el-form>
+                    <el-option
+                      v-for="item in fileTypeOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    />
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="文件概述" prop="fileAbstract">
+                  <el-input disabled v-model="workOrderDetailForm.fileAbstract" type="textarea" />
+                </el-form-item>
+                <el-form-item label="拷贝原因" prop="copyReason">
+                  <el-input disabled v-model="workOrderDetailForm.copyReason" type="textarea" />
+                </el-form-item>
+                <el-form-item label="文件解压密码" prop="unzipPassword">
+                  <el-input disabled v-model="workOrderDetailForm.unzipPassword" />
+                </el-form-item>
+                <el-form-item label="审批结果">
+                  <div style="display: flex; align-items: center">
+                    <el-input disabled v-model="workOrderDetailForm.remark" />
+                    <el-button
+                      style="margin-left: 5%"
+                      type="primary"
+                      @click="changeToAdvancedReview"
+                      >点此进入超前审批</el-button
+                    >
+                  </div>
+                </el-form-item>
+              </el-form>
+            </div>
           </div>
-        </div>
-        <div v-if="workOrderDetailForm.workOrderStatus == 11">
-          <h3>基本信息</h3>
-          <el-divider />
-          <div>
-            <el-form :model="workOrderDetailForm" label-width="auto">
-              <el-form-item label="工单标题" prop="workOrderTitle">
-                <el-input disabled v-model="workOrderDetailForm.workOrderTitle" />
-              </el-form-item>
-              <el-form-item label="文件类型" prop="fileType">
-                <el-select
-                  disabled
-                  v-model="workOrderDetailForm.fileType"
-                  placeholder="选择要要上传文件的类型"
-                >
-                  <el-option
-                    v-for="item in fileTypeOptions"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  />
-                </el-select>
-              </el-form-item>
-              <el-form-item label="文件概述" prop="fileAbstract">
-                <el-input disabled v-model="workOrderDetailForm.fileAbstract" type="textarea" />
-              </el-form-item>
-              <el-form-item label="拷贝原因" prop="copyReason">
-                <el-input disabled v-model="workOrderDetailForm.copyReason" type="textarea" />
-              </el-form-item>
-              <el-form-item label="文件解压密码" prop="unzipPassword">
-                <el-input disabled v-model="workOrderDetailForm.unzipPassword" />
-              </el-form-item>
-              <el-form-item label="审批结果">
-                <div style="display: flex; align-items: center">
-                  <el-input disabled v-model="workOrderDetailForm.remark" />
-                </div>
-              </el-form-item>
-            </el-form>
+          <div v-if="workOrderDetailForm.workOrderStatus == 11">
+            <h3>基本信息</h3>
+            <el-divider />
+            <div>
+              <el-form :model="workOrderDetailForm" label-width="auto">
+                <el-form-item label="工单标题" prop="workOrderTitle">
+                  <el-input disabled v-model="workOrderDetailForm.workOrderTitle" />
+                </el-form-item>
+                <el-form-item label="文件类型" prop="fileType">
+                  <el-select
+                    disabled
+                    v-model="workOrderDetailForm.fileType"
+                    placeholder="选择要要上传文件的类型"
+                  >
+                    <el-option
+                      v-for="item in fileTypeOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    />
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="文件概述" prop="fileAbstract">
+                  <el-input disabled v-model="workOrderDetailForm.fileAbstract" type="textarea" />
+                </el-form-item>
+                <el-form-item label="拷贝原因" prop="copyReason">
+                  <el-input disabled v-model="workOrderDetailForm.copyReason" type="textarea" />
+                </el-form-item>
+                <el-form-item label="文件解压密码" prop="unzipPassword">
+                  <el-input disabled v-model="workOrderDetailForm.unzipPassword" />
+                </el-form-item>
+                <el-form-item label="审批结果">
+                  <div style="display: flex; align-items: center">
+                    <el-input disabled v-model="workOrderDetailForm.remark" />
+                  </div>
+                </el-form-item>
+              </el-form>
+            </div>
+            <h3>可拷贝</h3>
+            <el-divider />
+            <h4>请在拷贝机上进行拷贝</h4>
           </div>
-          <h3>可拷贝</h3>
-          <el-divider />
-          <h4>请在拷贝机上进行拷贝</h4>
-        </div>
-        <div
-          v-if="
-            workOrderDetailForm.workOrderStatus == 21 || workOrderDetailForm.workOrderStatus == 22
-          "
-        >
-          <h3>基本信息</h3>
-          <el-divider />
-          <div>
-            <el-form :model="workOrderDetailForm" label-width="auto">
-              <el-form-item label="工单标题" prop="workOrderTitle">
-                <el-input disabled v-model="workOrderDetailForm.workOrderTitle" />
-              </el-form-item>
-              <el-form-item label="文件类型" prop="fileType">
-                <el-select
-                  disabled
-                  v-model="workOrderDetailForm.fileType"
-                  placeholder="选择要要上传文件的类型"
-                >
-                  <el-option
-                    v-for="item in fileTypeOptions"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  />
-                </el-select>
-              </el-form-item>
-              <el-form-item label="文件概述" prop="fileAbstract">
-                <el-input disabled v-model="workOrderDetailForm.fileAbstract" type="textarea" />
-              </el-form-item>
-              <el-form-item label="拷贝原因" prop="copyReason">
-                <el-input disabled v-model="workOrderDetailForm.copyReason" type="textarea" />
-              </el-form-item>
-              <el-form-item label="文件解压密码" prop="unzipPassword">
-                <el-input disabled v-model="workOrderDetailForm.unzipPassword" />
-              </el-form-item>
-              <el-form-item label="审批结果">
-                <div style="display: flex; align-items: center">
-                  <el-input disabled v-model="workOrderDetailForm.remark" />
-                </div>
-              </el-form-item>
-            </el-form>
+          <div
+            v-if="
+              workOrderDetailForm.workOrderStatus == 21 || workOrderDetailForm.workOrderStatus == 22
+            "
+          >
+            <h3>基本信息</h3>
+            <el-divider />
+            <div>
+              <el-form :model="workOrderDetailForm" label-width="auto">
+                <el-form-item label="工单标题" prop="workOrderTitle">
+                  <el-input disabled v-model="workOrderDetailForm.workOrderTitle" />
+                </el-form-item>
+                <el-form-item label="文件类型" prop="fileType">
+                  <el-select
+                    disabled
+                    v-model="workOrderDetailForm.fileType"
+                    placeholder="选择要要上传文件的类型"
+                  >
+                    <el-option
+                      v-for="item in fileTypeOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    />
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="文件概述" prop="fileAbstract">
+                  <el-input disabled v-model="workOrderDetailForm.fileAbstract" type="textarea" />
+                </el-form-item>
+                <el-form-item label="拷贝原因" prop="copyReason">
+                  <el-input disabled v-model="workOrderDetailForm.copyReason" type="textarea" />
+                </el-form-item>
+                <el-form-item label="文件解压密码" prop="unzipPassword">
+                  <el-input disabled v-model="workOrderDetailForm.unzipPassword" />
+                </el-form-item>
+                <el-form-item label="审批结果">
+                  <div style="display: flex; align-items: center">
+                    <el-input disabled v-model="workOrderDetailForm.remark" />
+                  </div>
+                </el-form-item>
+              </el-form>
+            </div>
           </div>
-        </div>
-        <el-dialog v-model="advancedReviewVisible" title="超前审批" append-to-body>
-          <el-form :model="advancedReviewForm" label-width="auto">
-            <el-form-item label="超前审批工单号" prop="advancedWorkOrderId">
-              <el-input disabled v-model="advancedReviewForm.advancedWorkOrderId" />
-            </el-form-item>
-            <el-form-item label="学生学号" prop="studentId">
-              <el-input disabled v-model="advancedReviewForm.studentId" />
-            </el-form-item>
-            <el-form-item label="登录密码" prop="password">
-              <el-input v-model="advancedReviewForm.password" />
-            </el-form-item>
-            <el-button style="margin-left: 40%" type="primary" @click="getAdvancedReviewResult"
-              >获取超前审批密钥</el-button
-            >
-          </el-form>
+          <el-dialog v-model="advancedReviewVisible" title="超前审批" append-to-body>
+            <el-form :model="advancedReviewForm" label-width="auto">
+              <el-form-item label="超前审批工单号" prop="advancedWorkOrderId">
+                <el-input disabled v-model="advancedReviewForm.workOrderId" />
+              </el-form-item>
+              <el-form-item label="学生学号" prop="studentId">
+                <el-input disabled v-model="advancedReviewForm.studentId" />
+              </el-form-item>
+              <el-form-item label="登录密码" prop="password">
+                <el-input v-model="advancedReviewForm.password" />
+              </el-form-item>
+              <el-form-item label="超前审批密钥" prop="advancedPassword">
+                <el-input v-model="advancedReviewForm.password" />
+              </el-form-item>
+              <el-button style="margin-left: 40%" type="primary" @click="getAdvancedReviewResult"
+                >发送超前审批请求</el-button
+              >
+            </el-form>
+          </el-dialog>
         </el-dialog>
-      </el-dialog>
+      </div>
+      <div v-else>
+        <Error />
+      </div>
     </div>
   </div>
 </template>
@@ -449,6 +470,7 @@
     advanceApprovalVerificationAPI,
   } from '@/api/stuWorkOrderApproval'
   import { useStuStore } from '@/store/modules/student'
+  import Error from '@/views/error/404.vue'
 
   const { toClipboard } = useClipboard()
   const stuStore = useStuStore()
@@ -512,6 +534,19 @@
     ['审批通过', 21],
     ['审批驳回', 22],
   ])
+  const fileType2LabelMap = new Map([
+    [0, 'docx'],
+    [1, 'pdf'],
+    [2, 'pptx'],
+    [3, 'zip'],
+    [4, 'else'],
+  ])
+  // 分页操作
+  const currentPage = ref(1)
+  const total = ref(0)
+  //const tableData = ref([])
+  const pageSize = ref(10)
+
   // 新建工单
   const createWorkOrderVisible = ref(false)
   const isCreateWorkOrder = ref(false) // isCreateWorkOrder 是 true 时，就显示文件上传
@@ -537,7 +572,7 @@
     }
     // 后端创建工单
     const data = {
-      studentId: stuStore.studentId,
+      studentAccount: stuStore.studentId,
       auditType: auditType.value,
       workOrderTitle: workOrderForm.value.workOrderTitle,
       fileType: workOrderForm.value.fileType,
@@ -565,40 +600,31 @@
     isCreateWorkOrder.value = true // 开发用，后面注释掉
   }
   // 文件上传
-  const file = ref()
-  const changeFile = (uploadFile) => {
-    file.value = uploadFile
-  }
-  const uploadForm = reactive({
-    workOrderId: workOrderForm.value.workOrderId,
-    studentId: stuStore.stuId,
-  })
-  // 参考教程：https://blog.csdn.net/m0_51044974/article/details/131575698
-  // 参考教程：https://blog.csdn.net/qq_61402485/article/details/129317623
-  // 参考教程(此)：https://blog.csdn.net/qq_24787615/article/details/131477657
+  //定义一个响应式数组用来接收文件
+  const fileList = ref([])
   const submitTicket = async () => {
-    // 判断是否上传文件
-    const jsonStr = JSON.stringify(uploadForm)
-    const blob = new Blob([jsonStr], {
-      type: 'application/json',
-    })
-    let formData = new FormData()
-    formData.append('obj', blob)
-    // 这里很重要 file.value.raw才是真实的file文件，file.value只是一个Proxy代理对象
-    formData.append('file', file.value.raw)
-    let res = uploadFileAPI(formData)
-    res = res.data
-    if (res.code == 200) {
-      ElMessage({
-        message: res.msg,
-        type: 'success',
+    if (fileList.value.length > 0) {
+      // 封装为FromData对象
+      const fromData = new FormData()
+      fileList.value.forEach((val) => {
+        fromData.append('file', val.raw)
       })
-      createWorkOrderVisible.value = false
-    } else {
-      ElMessage({
-        message: res.msg,
-        type: 'error',
-      })
+      fromData.append('workOrderId', workOrderForm.value.workOrderId)
+      fromData.append('studentAccount', stuStore.stuId)
+      let res = uploadFileAPI(fromData)
+      res = res.data
+      if (res.code == 200) {
+        ElMessage({
+          message: res.msg,
+          type: 'success',
+        })
+        createWorkOrderVisible.value = false
+      } else {
+        ElMessage({
+          message: res.msg,
+          type: 'error',
+        })
+      }
     }
   }
 
@@ -629,7 +655,7 @@
   const active = ref(0) // 流程组件的控制
   const viewWorkOrderVisible = ref(false)
   const changeToAdvancedReview = () => {
-    advancedReviewForm.value.advancedWorkOrderId = workOrderDetailForm.value.workOrderId
+    advancedReviewForm.value.workOrderId = workOrderDetailForm.value.workOrderId
     advancedReviewVisible.value = true
   }
   const copyUnzipPassword = async (unzipPassword) => {
@@ -651,26 +677,33 @@
   // 超前审批
   const advancedReviewVisible = ref(false)
   const advancedReviewForm = ref({
-    advancedWorkOrderId: '',
+    workOrderId: '',
     studentId: stuStore.stuId,
     password: '',
+    advancedPassword: '',
   })
   const getAdvancedReviewResult = async () => {
-    if (advancedReviewForm.value.password == '') {
+    if (
+      advancedReviewForm.value.password == '' ||
+      advancedReviewForm.value.advancedPassword == ''
+    ) {
       ElMessage({
-        message: '请输入登录密码进行验证',
+        message: '请输入登录密码与超前审批密钥进行验证',
         type: 'error',
         plain: true,
       })
       return
     }
-    let res = await advanceApprovalVerificationAPI(advancedReviewForm.value)
+    let res = await advanceApprovalVerificationAPI(
+      advancedReviewForm.value.workOrderId,
+      advancedReviewForm.value.studentId,
+      advancedReviewForm.value.password,
+      advancedReviewForm.value.advancedPassword,
+    )
     res = res.data
     if (res.code == 200) {
-      await toClipboard(res.data.advancedReviewPassword)
       ElNotification({
-        title: '超前审批密钥已复制到剪贴板',
-        message: '超前审批密钥为:' + res.data.advancedReviewPassword,
+        title: res.msg,
         type: 'success',
         duration: 0,
       })
@@ -847,33 +880,29 @@
   }
 
   // 创建中状态提交工单（与新建工单直接提交不冲突，文件处理可以用一样的代码）
-  const uploadFormOnViewTime = reactive({
-    workOrderId: workOrderDetailForm.value.workOrderId,
-    studentId: stuStore.stuId,
-  })
   const submitTicketOnViewTime = async () => {
-    // 判断是否上传文件
-    const jsonStr = JSON.stringify(uploadFormOnViewTime)
-    const blob = new Blob([jsonStr], {
-      type: 'application/json',
-    })
-    let formData = new FormData()
-    formData.append('obj', blob)
-    // 这里很重要 file.value.raw才是真实的file文件，file.value只是一个Proxy代理对象
-    formData.append('file', file.value.raw)
-    let res = uploadFileAPI(formData)
-    res = res.data
-    if (res.code == 200) {
-      ElMessage({
-        message: res.msg,
-        type: 'success',
+    if (fileList.value.length > 0) {
+      // 封装为FromData对象
+      const fromData = new FormData()
+      fileList.value.forEach((val) => {
+        fromData.append('file', val.raw)
       })
-      viewWorkOrderVisible.value = false
-    } else {
-      ElMessage({
-        message: res.msg,
-        type: 'error',
-      })
+      fromData.append('workOrderId', workOrderDetailForm.value.workOrderId)
+      fromData.append('studentId', stuStore.stuId)
+      let res = uploadFileAPI(fromData)
+      res = res.data
+      if (res.code == 200) {
+        ElMessage({
+          message: res.msg,
+          type: 'success',
+        })
+        viewWorkOrderVisible.value = false
+      } else {
+        ElMessage({
+          message: res.msg,
+          type: 'error',
+        })
+      }
     }
   }
   // 测试用数据
@@ -915,14 +944,16 @@
     },
   ])
 
-  //  const tableData = ref([])
-  const pageNum = ref(1)
-  const pageSize = ref(10)
   const getWorkOrderList = async () => {
-    let res = await getWorkOrderListAPI(pageNum, pageSize, stuStore.stuId)
+    let res = await getWorkOrderListAPI(currentPage.value, pageSize.value, stuStore.stuId)
     res = res.data
     if (res.code === 200) {
-      tableData.value = res.data
+      total.value = res.data.total
+      for (let i = 0; i < res.data.array.length; i++) {
+        res.data.array[i].workOrderStatus = num2LabelMap.get(res.data.array[i].workOrderStatus)
+        res.data.array[i].fileType = fileType2LabelMap.get(res.data.array[i].fileType)
+      }
+      tableData.value = res.data.array
     } else {
       ElMessage({
         showClose: true,
