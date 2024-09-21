@@ -55,13 +55,7 @@
       </div>
     </el-form-item>
     <el-form-item style="width: 100%">
-      <el-button
-        :loading="loading"
-        class="login-btn"
-        type="primary"
-        @click="submitForm(ruleFormRef)"
-        >登录</el-button
-      >
+      <el-button class="login-btn" type="primary" @click="submitForm(ruleFormRef)">登录</el-button>
     </el-form-item>
   </el-form>
   <el-form
@@ -72,13 +66,7 @@
     label-width="0"
   >
     <el-form-item style="width: 100%">
-      <el-button
-        :loading="loading"
-        class="login-btn"
-        type="primary"
-        @click="submitForm(ruleFormRef)"
-        >登录</el-button
-      >
+      <el-button class="login-btn" type="primary" @click="submitForm(ruleFormRef)">登录</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -91,12 +79,14 @@
   import { useCopyMachineStore } from '@/store/modules/copyMachine'
   import { getTimeState } from '@/utils/index'
   import { stuGetCaptchaAPI } from '@/api/stuAccountManagement'
+  import { useAdminStore } from '../../../store/modules/admin'
   const ruleFormRef = ref<FormInstance>()
   const router = useRouter()
   const stuStore = useStuStore()
   const copyMachineStore = useCopyMachineStore()
   const verImgSrc = ref('')
   const verImgId = 'verImg'
+  const adminStore = useAdminStore()
 
   const fetchVerificationImage = async () => {
     // 获取验证码
@@ -109,7 +99,7 @@
   }
 
   const passwordType = ref('password')
-  const loading = ref(false)
+  // const loading = ref(false)
   const rules = reactive({
     verificationCode: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
     password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
@@ -138,7 +128,7 @@
     },
   })
   const submitForm = (formEl: FormInstance | undefined) => {
-    loading.value = true
+    // loading.value = true
     if (!formEl) return
     formEl.validate((valid) => {
       if (valid) {
@@ -149,8 +139,10 @@
           } else if (props.systemChoose === '拷贝机端') {
             await copyMachineStore.login(props.systemChoose)
           } else if (props.systemChoose === '管理员端') {
-            await stuStore.login(ruleForm, props.systemChoose)
+            await adminStore.login(ruleForm, props.systemChoose)
           }
+          console.log('va')
+
           // 登录成功后跳转
           await router.push({
             path: '/',
@@ -161,15 +153,17 @@
             type: 'success',
             duration: 3000,
           })
-          loading.value = false
+          // loading.value = false
         }, 1000)
       } else {
+        console.log('not va')
+
         ElNotification({
           message: '账号/密码错误，请重试',
           type: 'error',
           duration: 3000,
         })
-        loading.value = false
+        // loading.value = false
         return false
       }
     })

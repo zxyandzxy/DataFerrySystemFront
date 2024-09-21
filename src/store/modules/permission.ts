@@ -32,9 +32,9 @@ export const usePermissionStore = defineStore({
         } else {
           accessedRoutes = asyncRoutes || []
         }
-        //console.log(accessedRoutes)
+        console.log('1', accessedRoutes)
         this.routes = constantRoutes.concat(accessedRoutes)
-        //console.log(this.routes)
+        console.log('2', this.routes)
         this.addRoutes = accessedRoutes
         resolve(accessedRoutes)
       })

@@ -23,7 +23,7 @@
   import { useRoute } from 'vue-router'
   import { usePermissionStore } from '@/store/modules/permission'
   import { useSettingStore } from '@/store/modules/setting'
-  import { computed } from 'vue'
+  import { computed, onMounted } from 'vue'
 
   // 在setup中获取store
   const route = useRoute()
@@ -48,4 +48,8 @@
 
   // 横向
   const mode = computed(() => SettingStore.themeConfig.mode)
+
+  // onMounted(() => {
+  //   console.log('1111:', permission_routes)
+  // })
 </script>

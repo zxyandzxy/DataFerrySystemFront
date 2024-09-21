@@ -12,9 +12,22 @@ import StuInwardTransfer from './modules/Stu-inward-transfer'
 import StuTicketManagement from './modules/Stu-ticket-management'
 import CopyFileDownload from './modules/Copy-file-download'
 import CopyFileUpload from './modules/Copy-file-upload'
+import adminSelfInfoRouter from './modules/Admin-selfInformation'
+import manageTicketRouter from './modules/Admin-ticketManage'
+import systemConfigRouter from './modules/Admin-systemConfig'
+import manageDiskRouter from './modules/Admin-diskManage'
+import manageRouter from './modules/Admin-manage'
+import { useAdminStore } from '../store/modules/admin'
+import logRouter from './Admin-log'
 
 // 异步组件
 export const asyncRoutes = [
+  ...manageRouter,
+  ...adminSelfInfoRouter,
+  ...manageTicketRouter,
+  ...systemConfigRouter,
+  ...manageDiskRouter,
+  ...logRouter,
   ...errorRouter,
   ...StuTicketManagement,
   ...StuInwardTransfer,
