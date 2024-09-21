@@ -21,7 +21,7 @@
       <div class="tool-bar-right">
         <GlobalComSize class="right-item-menu" />
         <HeaderSearch class="right-item-menu" />
-        <Remind class="right-item-menu" />
+        <!--<Remind class="right-item-menu" />-->
         <ScreenFull class="right-item-menu" />
         <Avatar />
       </div>

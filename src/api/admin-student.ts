@@ -5,8 +5,8 @@ import { Student } from '../admin-interface/student'
 export function fetchStudentsAPI(
   pageNum: number,
   pageSize: number,
-  studentAccount?: string,
-  studentName?: string,
+  studentAccount = '',
+  studentName = '',
 ): Promise<any> {
   // 发送带有查询参数的请求
   return service
@@ -29,10 +29,14 @@ export function addStudentAPI(studentAccount: string, studentName: string): Prom
 }
 
 // 删除学生账户信息
+// 删除学生账户信息
 export function removeStudentAPI(studentAccounts: string[]): Promise<void> {
   return service.delete(`/manager/delete_student_account`, {
     params: {
       studentAccount: studentAccounts, // 通过 query 参数传递字符串数组
+    },
+    paramsSerializer: (params) => {
+      return new URLSearchParams(params).toString()
     },
   })
 }

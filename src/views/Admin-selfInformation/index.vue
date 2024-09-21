@@ -80,8 +80,10 @@
   import { adminGetInfoAPI, updateAdminAPI, updateAdminPasswordAPI } from '../../api/admin-teacher'
   import { Admin } from '../../admin-interface/teacher'
   import { ElMessage } from 'element-plus'
+  import { useRouter } from 'vue-router' // 导入 useRouter
 
   const manageAdminStore = useAdminStore()
+  const router = useRouter() // 初始化 router
 
   // 绑定当前管理员数据
   const currentAdmin = ref<Admin>({
@@ -179,7 +181,10 @@
         passwordForm.confirmPassword,
       )
       passwordDialogVisible.value = false
+      ElMessage.success('修改密码成功,请重新登录')
       resetPasswordForm() // 成功修改密码后重置表单
+      manageAdminStore.clearAdminInfo()
+      router.push('/login')
     } catch (error) {
       return
     }

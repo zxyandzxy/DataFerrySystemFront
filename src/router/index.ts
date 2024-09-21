@@ -1,42 +1,39 @@
-import {
-  createRouter,
-  createWebHistory,
-  RouteRecordRaw,
-  createWebHashHistory,
-  Router,
-} from 'vue-router'
+import { createRouter, RouteRecordRaw, createWebHashHistory } from 'vue-router'
 import Layout from '@/layout/index.vue'
 // 扩展继承属性
 interface extendRoute {
   hidden?: boolean
 }
 //
-// import tableRouter from './modules/table'
-// import errorRouter from './modules/error'
-// import nestedRouter from './modules/nested'
-// import externalLink from './modules/externalLink'
-// import formRouter from './modules/from'
-// import functionPageRouter from './modules/functionPage'
+
+import errorRouter from './modules/error'
+import StuPersonalInformation from './modules/Stu-personal-information'
+import StuInwardTransfer from './modules/Stu-inward-transfer'
+import StuTicketManagement from './modules/Stu-ticket-management'
+import CopyFileDownload from './modules/Copy-file-download'
+import CopyFileUpload from './modules/Copy-file-upload'
 import adminSelfInfoRouter from './modules/Admin-selfInformation'
 import manageTicketRouter from './modules/Admin-ticketManage'
 import systemConfigRouter from './modules/Admin-systemConfig'
 import manageDiskRouter from './modules/Admin-diskManage'
 import manageRouter from './modules/Admin-manage'
 import { useAdminStore } from '../store/modules/admin'
+import logRouter from './Admin-log'
 
 // 异步组件
 export const asyncRoutes = [
-  // ...tableRouter,
-  // ...formRouter,
-  // ...functionPageRouter,
-  // ...nestedRouter,
-  // ...errorRouter,
-  // ...externalLink,
   ...manageRouter,
   ...adminSelfInfoRouter,
   ...manageTicketRouter,
   ...systemConfigRouter,
   ...manageDiskRouter,
+  ...logRouter,
+  ...errorRouter,
+  ...StuTicketManagement,
+  ...StuInwardTransfer,
+  ...StuPersonalInformation,
+  ...CopyFileDownload,
+  ...CopyFileUpload,
   {
     path: '/:pathMatch(.*)',
     redirect: '/404',
@@ -70,15 +67,15 @@ export const constantRoutes: Array<RouteRecordRaw & extendRoute> = [
     path: '/',
     name: 'layout',
     component: Layout,
-    redirect: '/manage',
-    //   children: [
-    //     {
-    //       path: '/home',
-    //       component: () => import('@/views/home/index.vue'),
-    //       name: 'home',
-    //       meta: { title: '首页', icon: 'House', affix: true, role: ['other'] },
-    //     },
-    //   ],
+    redirect: '/home',
+    children: [
+      {
+        path: '/home',
+        component: () => import('@/views/home/index.vue'),
+        name: 'home',
+        meta: { title: '首页', icon: 'House', affix: true, role: ['other'] },
+      },
+    ],
   },
 ]
 
@@ -88,16 +85,4 @@ const router = createRouter({
   routes: constantRoutes,
 })
 
-router.beforeEach((to, from, next) => {
-  const adminStore = useAdminStore()
-  const adminId = adminStore.adminAccount
-  // 检查是否需要 root 权限
-  if (to.meta.requireRoot && adminId !== 'root') {
-    // 如果不是 root 用户，阻止访问并跳转到 401 无权限页面
-    next({ path: '/login', replace: true })
-  } else {
-    // 如果是 root 或不需要 root 权限的路由，允许继续访问
-    next()
-  }
-})
 export default router

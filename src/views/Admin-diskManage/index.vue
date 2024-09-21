@@ -109,11 +109,7 @@
   // 获取学生文件数据
   const getStudentFiles = async (pageNum) => {
     try {
-      const response = await viewStudentFilesAPI(
-        currentStudentAccount.value,
-        pageNum.value,
-        filePageSize,
-      )
+      const response = await viewStudentFilesAPI(currentStudentAccount.value, pageNum, filePageSize)
       currentFiles.value = response.array // 获取学生文件列表
       totalFiles.value = response.total // 总文件数
     } catch (error) {

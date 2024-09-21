@@ -5,8 +5,8 @@ import { Admin } from '../admin-interface/teacher'
 export function fetchAdminsAPI(
   pageNum: number,
   pageSize: number,
-  adminAccount?: string,
-  adminName?: string,
+  adminAccount = '',
+  adminName = '',
 ): Promise<any> {
   return service
     .get('/manager/get_admin_list', {
@@ -73,7 +73,7 @@ export function updateAdminPasswordAPI(
 
 // 登录API
 export const adminLoginAPI = (data) => {
-  return service.post('/manager/login', data).then((response) => response.data.token)
+  return service.post('/manager/login', data).then((response) => response.data)
 }
 
 // 获取管理员信息API

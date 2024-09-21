@@ -163,27 +163,27 @@ export default [
       }
     },
   },
-  {
-    url: '/manager/delete_student_account',
-    method: 'delete',
-    response: ({ query }) => {
-      const { studentAccount } = query
+  // {
+  //   url: '/manager/delete_student_account',
+  //   method: 'delete',
+  //   response: ({ query }) => {
+  //     const { studentAccount } = query
 
-      // 模拟删除逻辑，检查 studentAccount 是否为数组
-      if (!studentAccount || !Array.isArray(studentAccount)) {
-        return {
-          code: 400,
-          msg: 'Invalid parameters',
-        }
-      }
+  //     // 模拟删除逻辑，检查 studentAccount 是否为数组
+  //     if (!studentAccount || !Array.isArray(studentAccount)) {
+  //       return {
+  //         code: 400,
+  //         msg: 'Invalid parameters',
+  //       }
+  //     }
 
-      return {
-        code: 200,
-        msg: 'success',
-        data: `Deleted accounts: ${studentAccount.join(', ')}`,
-      }
-    },
-  },
+  //     return {
+  //       code: 200,
+  //       msg: 'success',
+  //       data: `Deleted accounts: ${studentAccount.join(', ')}`,
+  //     }
+  //   },
+  // },
   {
     url: '/manager/get_batch_file',
     method: 'get',

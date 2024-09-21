@@ -1,26 +1,26 @@
 import { defineStore } from 'pinia'
 import { ref, onMounted } from 'vue'
 import {
-  fetchStudents,
-  addStudent,
-  removeStudent,
+  fetchStudentsAPI,
+  addStudentAPI,
+  removeStudentAPI,
   // updateStudent,
   resetStudentPasswordAPI,
 } from '@/api/admin-student'
-import { Student } from '@/admin-interface/student'
+// import { Student } from '@/admin-interface/student'
 
 export const useStudentStore = defineStore('student', () => {
   // 添加学生
   const addStudentToList = async (studentAccount: string, studentName: string) => {
-    const password = await addStudent(studentAccount, studentName)
-    fetchStudents()
+    const password = await addStudentAPI(studentAccount, studentName)
+    fetchStudentsAPI()
     return password
   }
 
   // 删除学生
   const removeStudentFromList = async (studentId: string) => {
-    await removeStudent(studentId)
-    fetchStudents()
+    await removeStudentAPI(studentId)
+    fetchStudentsAPI()
   }
 
   // 更新学生

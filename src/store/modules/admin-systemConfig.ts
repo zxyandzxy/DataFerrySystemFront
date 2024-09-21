@@ -4,18 +4,18 @@ import { onMounted, ref } from 'vue'
 import { getSystemConfig } from '../../api/admin-systemConfig'
 
 export interface SystemConfig {
-  approvalMode: string
-  advancedApproval: boolean
+  approvalMode: number
+  advancedApproval: number
   salt: string
 }
 
 export const useSystemConfigStore = defineStore('systemConfig', () => {
-  const currentConfig = ref<SystemConfig | null>(null)
+  const currentConfig = ref({})
 
   const fetchSystemConfig = async () => {
     try {
       const config = await getSystemConfig()
-      currentConfig.value = config.data
+      currentConfig.value = config
     } catch (error) {
       ElMessage.error(`获取系统配置失败: ${error.message}`)
     }

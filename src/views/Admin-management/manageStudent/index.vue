@@ -249,6 +249,7 @@
   const handleAddStudent = async (form) => {
     try {
       const password = await addStudentAPI(form.studentAccount, form.studentName)
+      getStudentList()
       addPassword.value = password
       showAddPasswordDialog.value = true
     } catch (err) {

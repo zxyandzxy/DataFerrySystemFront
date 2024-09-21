@@ -1,12 +1,14 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { ElLoading, ElMessage } from 'element-plus'
-import { useUserStore } from '@/store/modules/user'
+import { useStuStore } from '@/store/modules/student'
+import { useCopyMachineStore } from '@/store/modules/copyMachine'
+import { useAdminStore } from '@/store/modules/admin'
 // 创建axios实例 进行基本参数配置
 const service = axios.create({
   // 默认请求地址，根据环境的不同可在.env 文件中进行修改
-  baseURL: import.meta.env.VUE_APP_BASE_API,
+  baseURL: import.meta.env.VITE_APP_API_URL,
   // 设置接口访问超时时间
-  timeout: 3000000, // request timeout，
+  timeout: 3000, // request timeout，
   // 跨域时候允许携带凭证
   withCredentials: true,
 })
@@ -16,11 +18,27 @@ let loadingInstance: any = null // 用于存储loading实例
 //  request interceptor 接口请求拦截
 service.interceptors.request.use(
   (config: AxiosRequestConfig) => {
-    // 用户登录之后获取服务端返回的token, 后面每次请求都在请求头中带上token进行JWT校验
-    const userStore = useUserStore()
-    const token: string = userStore.token
+    /**
+     * 用户登录之后获取服务端返回的token,后面每次请求都在请求头中带上token进行JWT校验
+     * token 存储在本地储存中（storage）、vuex、pinia
+     */
+
+    const stuStore = useStuStore()
+    const copyMachineStore = useCopyMachineStore()
+    const adminStore = useAdminStore()
+    if (copyMachineStore.systemChoose == '拷贝机端') {
+      return config
+    }
+
+    let token
+    if (stuStore.systemChoose == '学生端') {
+      token = stuStore.token
+    } else if (adminStore.systemChoose == '管理员端') {
+      token = adminStore.token
+    }
+    // 自定义请求头
     if (token) {
-      config.headers['Authorization'] = token // 自定义请求头
+      config.headers.Authorization = token
     }
 
     // 显示加载动画
@@ -49,13 +67,15 @@ service.interceptors.response.use(
     const res = response.data
     // 如果自定义的状态码不是 200，抛出错误提示
     if (res.code !== 200) {
-      showErrMessage(res.msg, 'error', 5000)
+      showErrMessage(res.msg, 'error', 2000)
       return Promise.reject(new Error(res.msg || 'Error'))
     } else {
       return response
     }
   },
   (error: AxiosError) => {
+    loadingInstance.close()
+    showErrMessage('请重新登录或者重试', 'error', 2000)
     return Promise.reject(error)
   },
 )

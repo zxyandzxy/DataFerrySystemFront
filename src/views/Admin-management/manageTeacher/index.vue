@@ -124,6 +124,8 @@
         searchParams.adminAccount,
         searchParams.adminName,
       )
+      console.log(response)
+
       adminList.value = response.adminList // 更新管理员列表
       total.value = response.total // 更新总数
     } catch (error) {
