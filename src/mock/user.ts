@@ -402,4 +402,28 @@ export default [
       }
     },
   },
+  // 学生登录
+  {
+    url: '/student/login',
+    method: 'post',
+    response: ({ body }) => {
+      const { studentId, password, verification_code } = body
+
+      // 假设我们有一个简单的验证逻辑
+      if (studentId === '1' && password === '1' && verification_code === '1') {
+        return {
+          code: 200,
+          data: {
+            token: 'mock-token-123456',
+          },
+          msg: '登录成功',
+        }
+      } else {
+        return {
+          code: 401,
+          msg: '用户名或密码错误',
+        }
+      }
+    },
+  },
 ] as MockMethod[]

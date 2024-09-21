@@ -54,6 +54,21 @@ export function updateAdminAPI(
     telephone, // 必需字段
     wechat, // 必需字段
   })
+export function removeAdminAPI(adminAccount: string): Promise<void> {
+  return service.delete(`/manager/delete_admin?adminAccount=${adminAccount}`)
+}
+
+// 更新管理员个人信息
+export function updateAdminAPI(
+  adminAccount: string,
+  telephone: string,
+  wechat: string,
+): Promise<null> {
+  return service.put(`/manager/update_manager_information`, {
+    adminAccount, // 必需字段
+    telephone, // 必需字段
+    wechat, // 必需字段
+  })
 }
 
 // 更新管理员密码

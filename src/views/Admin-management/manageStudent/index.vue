@@ -109,10 +109,17 @@
 <script setup lang="ts">
   import { Search } from '@element-plus/icons-vue'
   import { onMounted, ref } from 'vue'
+  import { onMounted, ref } from 'vue'
   import { ElMessageBox, ElMessage } from 'element-plus'
   import PasswordDialog from '@/admin-components/PasswordDialog.vue'
   import AddStudentDialog from '@/admin-components/AddStudentDialog.vue'
   import BatchAddDialog from '@/admin-components/BatchAddDialog.vue'
+  import {
+    addStudentAPI,
+    fetchStudentsAPI,
+    removeStudentAPI,
+    resetStudentPasswordAPI,
+  } from '../../../api/admin-student'
   import {
     addStudentAPI,
     fetchStudentsAPI,
@@ -173,6 +180,8 @@
     try {
       await ElMessageBox.confirm(
         `确认重置学号为 ${row.studentAccount} 的学生的密码吗？`,
+      await ElMessageBox.confirm(
+        `确认重置学号为 ${row.studentAccount} 的学生的密码吗？`,
         '重置密码',
         {
           confirmButtonText: '确定',
@@ -183,6 +192,9 @@
       newPassword.value = await resetStudentPasswordAPI(row.studentAccount)
       selectedStudent.value = row
       showPasswordDialog.value = true
+      newPassword.value = await resetStudentPasswordAPI(row.studentAccount)
+      selectedStudent.value = row
+      showPasswordDialog.value = true
     } catch (error) {
       return
     }
@@ -190,6 +202,8 @@
 
   const deleteStudent = async (row) => {
     try {
+      await ElMessageBox.confirm(
+        `确认删除学号为 ${row.studentAccount} 的学生账户吗？`,
       await ElMessageBox.confirm(
         `确认删除学号为 ${row.studentAccount} 的学生账户吗？`,
         '删除账户',
@@ -209,13 +223,19 @@
   }
 
   // 批量删除
+  // 批量删除
   const batchDeleteStudents = async () => {
     try {
+      await ElMessageBox.confirm(`确认删除所选学生的账户吗？`, '批量删除', {
       await ElMessageBox.confirm(`确认删除所选学生的账户吗？`, '批量删除', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
       })
+      const selectedAccounts = selection.value.map((row) => row.studentAccount)
+      await removeStudentAPI(selectedAccounts)
+      ElMessage.success('批量删除成功')
+      getStudentList() // 批量删除后刷新列表
       const selectedAccounts = selection.value.map((row) => row.studentAccount)
       await removeStudentAPI(selectedAccounts)
       ElMessage.success('批量删除成功')
@@ -232,9 +252,14 @@
     selection.value = selectedRows
   }
 
+  const handleSelectionChange = (selectedRows) => {
+    selection.value = selectedRows
+  }
+
   // 新密码弹窗相关逻辑
   const showPasswordDialog = ref(false)
   const newPassword = ref('')
+  const selectedStudent = ref(null)
   const selectedStudent = ref(null)
 
   // 添加学生逻辑
@@ -262,6 +287,7 @@
   const openBatchAddDialog = () => {
     showBatchAddDialog.value = true
   }
+
 
   const handleBatchAdd = (files) => {
     console.log('批量添加的文件:', files)

@@ -76,6 +76,7 @@
   import { ElNotification } from 'element-plus'
   import { useRouter } from 'vue-router'
   import { useStuStore } from '@/store/modules/student'
+  import { useAdminStore } from '@/store/modules/admin'
   import { useCopyMachineStore } from '@/store/modules/copyMachine'
   import { getTimeState } from '@/utils/index'
   import { stuGetCaptchaAPI } from '@/api/stuAccountManagement'
@@ -83,6 +84,7 @@
   const ruleFormRef = ref<FormInstance>()
   const router = useRouter()
   const stuStore = useStuStore()
+  const adminStore = useAdminStore()
   const copyMachineStore = useCopyMachineStore()
   const verImgSrc = ref('')
   const verImgId = 'verImg'

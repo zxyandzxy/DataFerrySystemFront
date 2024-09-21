@@ -72,6 +72,14 @@
 
   const studentsSpace = ref([])
   const currentFiles = ref([])
+  import {
+    getAllStudentsSpaceAPI,
+    viewStudentFilesAPI,
+    deleteStudentFilesAPI,
+  } from '@/api/admin-disk'
+
+  const studentsSpace = ref([])
+  const currentFiles = ref([])
   const isDialogVisible = ref(false)
   const currentStudentAccount = ref('')
 
@@ -118,7 +126,9 @@
   }
 
   // 下载文件
+  // 下载文件
   const downloadFile = (file) => {
+    window.open(file.fileURL) // 通过文件的URL下载
     window.open(file.fileURL) // 通过文件的URL下载
     ElMessage.success(`文件 ${file.fileName} 正在下载`)
   }

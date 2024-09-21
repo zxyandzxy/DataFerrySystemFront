@@ -3,9 +3,13 @@ import { ref } from 'vue'
 import { ElNotification } from 'element-plus'
 import { adminLoginAPI, adminGetInfoAPI } from '@/api/admin-teacher'
 
+import { adminLoginAPI, adminGetInfoAPI } from '@/api/admin-teacher'
+
 export const useAdminStore = defineStore(
   'admin',
   () => {
+    // 定义状态
+    const adminInfo = ref({})
     // 定义状态
     const adminInfo = ref({})
     const token = ref('')
@@ -46,9 +50,14 @@ export const useAdminStore = defineStore(
       const res = await adminGetInfoAPI(adminAccount.value)
       if (res.code === 200) {
         adminInfo.value = res.data
+        adminInfo.value = res.data
       }
       return res
     }
+
+    // 退出时清除管理员信息
+    const clearAdminInfo = () => {
+      adminInfo.value = {}
 
     // 退出时清除管理员信息
     const clearAdminInfo = () => {
@@ -59,12 +68,16 @@ export const useAdminStore = defineStore(
     }
 
     // 导出数据
+
+    // 导出数据
     return {
-      systemChoose,
+      systemRole,
       token,
       adminInfo,
       adminAccount,
       login,
+      getAdminInfo,
+      clearAdminInfo,
       getAdminInfo,
       clearAdminInfo,
     }

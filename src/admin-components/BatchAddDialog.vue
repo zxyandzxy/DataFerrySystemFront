@@ -7,9 +7,13 @@
       class="upload-demo"
       drag
       action="https://example.com/manager/batch_create_student_account" 
+      action="https://example.com/manager/batch_create_student_account" 
       :on-success="handleUploadSuccess"
       :on-error="handleUploadError"
+      :on-error="handleUploadError"
       :file-list="fileList"
+      accept=".xlsx"
+      multiple
       accept=".xlsx"
       multiple
     >
@@ -39,6 +43,22 @@
         <el-button @click="resultDialogVisible = false">关闭</el-button>
       </template>
     </el-dialog>
+    <!-- 显示上传结果 -->
+    <el-dialog v-model="resultDialogVisible" title="上传结果" width="400">
+      <div v-if="uploadResult">
+        <p><strong>初始化密码:</strong> {{ uploadResult.password }}</p>
+        <p v-if="uploadResult.existStu.length > 0">
+          <strong>已存在的学生学号:</strong>
+          <ul>
+            <li v-for="student in uploadResult.existStu" :key="student">{{ student }}</li>
+          </ul>
+        </p>
+        <p v-else>所有学生账户都已成功创建。</p>
+      </div>
+      <template #footer>
+        <el-button @click="resultDialogVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
   </el-dialog>
 </template>
 
@@ -46,7 +66,14 @@
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { downloadBatchFileAPI } from '../api/admin-student'
+import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
+import { downloadBatchFileAPI } from '../api/admin-student'
 
+const props = defineProps({
+  show: Boolean,
+})
+const emit = defineEmits(['update:show', 'submit'])
 const props = defineProps({
   show: Boolean,
 })
@@ -63,10 +90,15 @@ const downloadTemplate = async () => {
 
     const link = document.createElement('a')
     link.href = fileUrl
+    link.href = fileUrl
     link.download = '批量添加模板.xlsx'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  } catch (error) {
+    console.error('Error downloading the template:', error)
+  }
+}
   } catch (error) {
     console.error('Error downloading the template:', error)
   }
@@ -107,7 +139,20 @@ const submitFiles = () => {
   emit('submit', fileList.value)
   closeDialog()
 }
+// 提交文件
+const submitFiles = () => {
+  if (fileList.value.length === 0) {
+    ElMessage.error('请先上传文件')
+    return
+  }
+  emit('submit', fileList.value)
+  closeDialog()
+}
 
+// 重置表单
+const resetForm = () => {
+  fileList.value = []
+}
 // 重置表单
 const resetForm = () => {
   fileList.value = []
@@ -115,6 +160,9 @@ const resetForm = () => {
 </script>
 
 <style scoped>
+.dialog-footer {
+  text-align: right;
+}
 .dialog-footer {
   text-align: right;
 }

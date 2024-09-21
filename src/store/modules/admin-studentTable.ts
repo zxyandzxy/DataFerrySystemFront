@@ -35,5 +35,6 @@ export const useStudentStore = defineStore('student', () => {
     addStudentToList,
     removeStudentFromList,
     resetStudentPassword,
+    resetStudentPassword,
   }
 })

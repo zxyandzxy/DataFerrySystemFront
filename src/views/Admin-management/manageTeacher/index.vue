@@ -85,9 +85,16 @@
 <script setup lang="ts">
   import { Search } from '@element-plus/icons-vue'
   import { onMounted, ref } from 'vue'
+  import { onMounted, ref } from 'vue'
   import { ElMessageBox, ElMessage } from 'element-plus'
   import PasswordDialog from '@/admin-components/PasswordDialog.vue'
   import AddStudentDialog from '@/admin-components/AddStudentDialog.vue'
+  import {
+    addAdminAPI,
+    fetchAdminsAPI,
+    removeAdminAPI,
+    resetManagerPasswordAPI,
+  } from '../../../api/admin-teacher'
   import {
     addAdminAPI,
     fetchAdminsAPI,
@@ -163,6 +170,16 @@
         },
       )
       newPassword.value = await resetManagerPasswordAPI(row.adminAccount)
+      await ElMessageBox.confirm(
+        `确认重置账号为 ${row.adminAccount} 的管理员的密码吗？`,
+        '重置密码',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        },
+      )
+      newPassword.value = await resetManagerPasswordAPI(row.adminAccount)
       selectedAdmin.value = row
       showPasswordDialog.value = true
     } catch (error) {
@@ -171,8 +188,19 @@
   }
 
   // 删除管理员的操作
+  // 删除管理员的操作
   const deleteAdmin = async (row) => {
     try {
+      await ElMessageBox.confirm(
+        `确认删除账号为 ${row.adminAccount} 的管理员的账户吗？`,
+        '删除账户',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        },
+      )
+      await removeAdminAPI(row.adminAccount)
       await ElMessageBox.confirm(
         `确认删除账号为 ${row.adminAccount} 的管理员的账户吗？`,
         '删除账户',
@@ -190,6 +218,7 @@
     }
   }
 
+  // 打开添加管理员的弹窗
   // 打开添加管理员的弹窗
   const openAddAdminDialog = () => {
     showAddAdminDialog.value = true

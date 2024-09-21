@@ -151,6 +151,8 @@
   const resetForm = () => {
     contactForm.telephone = currentAdmin.value.telephone
     contactForm.wechat = currentAdmin.value.wechat
+    contactForm.telephone = currentAdmin.value.telephone
+    contactForm.wechat = currentAdmin.value.wechat
     editMode.value = false
   }
 
@@ -167,6 +169,7 @@
   }
 
   // 修改密码
+  const changePassword = async () => {
   const changePassword = async () => {
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       ElMessage.error('新密码和确认密码不一致')
