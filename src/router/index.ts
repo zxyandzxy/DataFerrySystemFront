@@ -18,7 +18,7 @@ import systemConfigRouter from './modules/Admin-systemConfig'
 import manageDiskRouter from './modules/Admin-diskManage'
 import manageRouter from './modules/Admin-manage'
 import { useAdminStore } from '../store/modules/admin'
-import logRouter from './Admin-log'
+import logRouter from './modules/Admin-log'
 
 // 异步组件
 export const asyncRoutes = [

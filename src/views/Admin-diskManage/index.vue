@@ -2,61 +2,65 @@
   <div>
     <div class="app-container">
       <div class="app-container-inner">
-        <div class="header">
-          <h2>学生空间管理</h2>
+        <div v-if="adminStore.systemChoose != ''">
+          <div class="header">
+            <h2>学生空间管理</h2>
+          </div>
+          <div class="table">
+            <el-table :data="studentsSpace" border style="width: 100%">
+              <el-table-column prop="studentAccount" label="学号" align="center" />
+              <el-table-column prop="studentName" label="姓名" align="center" />
+              <el-table-column prop="usedSpace" label="已使用容量" align="center" />
+              <el-table-column label="操作" align="center">
+                <template #default="{ row }">
+                  <el-button type="primary" @click="manageStudent(row)">管理</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+          <!-- 分页组件 -->
+          <div class="pagination">
+            <el-pagination
+              background
+              layout="total, prev, pager, next"
+              :total="totalStudents"
+              :page-size="pageSize"
+              @current-change="handlePageChange"
+            />
+          </div>
         </div>
-        <div class="table">
-          <el-table :data="studentsSpace" border style="width: 100%">
-            <el-table-column prop="studentAccount" label="学号" align="center" />
-            <el-table-column prop="studentName" label="姓名" align="center" />
-            <el-table-column prop="usedSpace" label="已使用容量" align="center" />
-            <el-table-column label="操作" align="center">
-              <template #default="{ row }">
-                <el-button type="primary" @click="manageStudent(row)">管理</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
+        <div v-else>
+          <Error />
         </div>
-        <!-- 分页组件 -->
-        <div class="pagination">
-          <el-pagination
-            background
-            layout="total, prev, pager, next"
-            :total="totalStudents"
-            :page-size="pageSize"
-            @current-change="handlePageChange"
-          />
-        </div>
+        <!-- 弹出窗口 -->
+        <el-dialog title="文件管理" v-model="isDialogVisible" width="1000px">
+          <div class="table">
+            <el-table :data="currentFiles" border style="width: 100%" height="400px">
+              <!-- 设置表格高度 -->
+              <el-table-column prop="fileName" label="文件名" align="center" />
+              <el-table-column prop="fileSize" label="文件大小" align="center" />
+              <el-table-column prop="fileType" label="文件类型" align="center" />
+              <el-table-column prop="submissionTime" label="上传时间" align="center" />
+              <el-table-column label="操作" align="center">
+                <template #default="{ row }">
+                  <el-button type="primary" @click="downloadFile(row)">下载</el-button>
+                  <el-button type="danger" @click="deleteFile(row)">删除</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+          <!-- 文件分页组件 -->
+          <div class="pagination">
+            <el-pagination
+              background
+              layout="total, prev, pager, next"
+              :total="totalFiles"
+              :page-size="filePageSize"
+              @current-change="handleFilePageChange"
+            />
+          </div>
+        </el-dialog>
       </div>
-
-      <!-- 弹出窗口 -->
-      <el-dialog title="文件管理" v-model="isDialogVisible" width="1000px">
-        <div class="table">
-          <el-table :data="currentFiles" border style="width: 100%" height="400px">
-            <!-- 设置表格高度 -->
-            <el-table-column prop="fileName" label="文件名" align="center" />
-            <el-table-column prop="fileSize" label="文件大小" align="center" />
-            <el-table-column prop="fileType" label="文件类型" align="center" />
-            <el-table-column prop="submissionTime" label="上传时间" align="center" />
-            <el-table-column label="操作" align="center">
-              <template #default="{ row }">
-                <el-button type="primary" @click="downloadFile(row)">下载</el-button>
-                <el-button type="danger" @click="deleteFile(row)">删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
-        <!-- 文件分页组件 -->
-        <div class="pagination">
-          <el-pagination
-            background
-            layout="total, prev, pager, next"
-            :total="totalFiles"
-            :page-size="filePageSize"
-            @current-change="handleFilePageChange"
-          />
-        </div>
-      </el-dialog>
     </div>
   </div>
 </template>
@@ -69,7 +73,10 @@
     viewStudentFilesAPI,
     deleteStudentFilesAPI,
   } from '@/api/admin-disk'
+  import { useAdminStore } from '../../store/modules/admin'
+  import Error from '@/views/error/404.vue'
 
+  const adminStore = useAdminStore()
   const studentsSpace = ref([])
   const currentFiles = ref([])
   const isDialogVisible = ref(false)

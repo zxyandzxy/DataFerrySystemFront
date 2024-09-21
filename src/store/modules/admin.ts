@@ -15,6 +15,7 @@ export const useAdminStore = defineStore(
     // 定义获取接口数据的 action 函数
     const login = async (data, Role) => {
       systemChoose.value = Role
+      console.log('admin,,', Role)
       const adminIdValue = data.username
       const password = data.password
       const verificationCode = data.verificationCode

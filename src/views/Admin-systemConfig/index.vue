@@ -2,28 +2,32 @@
   <div>
     <div class="app-container">
       <div class="app-container-inner">
-        <h2>审批模式</h2>
-        <el-card :shadow="false" class="card-content">
-          <div class="card-inner">
-            <p
-              >当前审批模式:
-              {{ systemConfigStore.currentConfig?.auditType == 0 ? '即时审批' : '定期审批' }}</p
-            >
-            <p
-              >超前审批状态:
-              {{ systemConfigStore.currentConfig?.advanceApproval == 0 ? '未开启' : '已开启' }}</p
-            >
-            <p v-if="systemConfigStore.currentConfig?.advanceApproval == 1" class="salt">
-              盐值
-              <el-tooltip content="盐值是用于加密的字符串">
-                <el-icon style="margin-left: 5px; margin-right: 5px"><QuestionFilled /></el-icon>
-              </el-tooltip>
-              : {{ systemConfigStore.currentConfig?.saltValue }}
-            </p>
-            <el-button type="primary" @click="editMode">编辑</el-button>
-          </div>
-        </el-card>
-
+        <div v-if="adminStore.systemChoose != ''">
+          <h2>审批模式</h2>
+          <el-card :shadow="false" class="card-content">
+            <div class="card-inner">
+              <p
+                >当前审批模式:
+                {{ systemConfigStore.currentConfig?.auditType == 0 ? '即时审批' : '定期审批' }}</p
+              >
+              <p
+                >超前审批状态:
+                {{ systemConfigStore.currentConfig?.advanceApproval == 0 ? '未开启' : '已开启' }}</p
+              >
+              <p v-if="systemConfigStore.currentConfig?.advanceApproval == 1" class="salt">
+                盐值
+                <el-tooltip content="盐值是用于加密的字符串">
+                  <el-icon style="margin-left: 5px; margin-right: 5px"><QuestionFilled /></el-icon>
+                </el-tooltip>
+                : {{ systemConfigStore.currentConfig?.saltValue }}
+              </p>
+              <el-button type="primary" @click="editMode">编辑</el-button>
+            </div>
+          </el-card>
+        </div>
+        <div v-else>
+          <Error />
+        </div>
         <!-- 审批模式编辑窗口 -->
         <el-dialog
           title="编辑审批模式"
@@ -104,6 +108,9 @@
   import { ElMessage } from 'element-plus'
   import { useSystemConfigStore } from '../../store/modules/admin-systemConfig'
   import { switchAuditMode } from '../../api/admin-systemConfig'
+  import Error from '@/views/error/404.vue'
+  import { useAdminStore } from '../../store/modules/admin'
+  const adminStore = useAdminStore()
 
   const systemConfigStore = useSystemConfigStore()
 

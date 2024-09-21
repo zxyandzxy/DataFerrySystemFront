@@ -170,6 +170,7 @@
   }
   onMounted(async () => {
     await fetchVerificationImage()
+    // console.log('test', props.systemChoose)
   })
 </script>
 

@@ -2,63 +2,67 @@
   <div>
     <div class="app-container">
       <div class="app-container-inner">
-        <div class="header">
-          <h2>管理工单</h2>
-        </div>
-        <div class="middle">
-          <!-- 搜索 -->
-          <div class="search">
-            <div class="search-type">
-              <el-select v-model="searchType" placeholder="选择查询条件">
-                <el-option label="工单号" value="workOrderId"></el-option>
-                <el-option label="工单标题" value="workOrderTitle"></el-option>
-                <el-option label="发起人姓名" value="studentName"></el-option>
-                <el-option label="审批状态" value="auditType"></el-option>
-              </el-select>
+        <div v-if="adminStore.systemChoose != ''">
+          <div class="header">
+            <h2>管理工单</h2>
+          </div>
+          <div class="middle">
+            <!-- 搜索 -->
+            <div class="search">
+              <div class="search-type">
+                <el-select v-model="searchType" placeholder="选择查询条件">
+                  <el-option label="工单号" value="workOrderId"></el-option>
+                  <el-option label="工单标题" value="workOrderTitle"></el-option>
+                  <el-option label="发起人姓名" value="studentName"></el-option>
+                  <el-option label="审批状态" value="auditType"></el-option>
+                </el-select>
+              </div>
+              <el-input
+                v-model="searchInfo"
+                class="search-input"
+                :placeholder="searchMap[searchType]"
+              />
+              <el-button type="primary" @click="onSubmit" :icon="Search" class="search-button">
+                查询
+              </el-button>
             </div>
-            <el-input
-              v-model="searchInfo"
-              class="search-input"
-              :placeholder="searchMap[searchType]"
+          </div>
+          <!-- 表格部分 -->
+          <div class="table">
+            <el-table :data="ticketList" border style="width: 100%">
+              <el-table-column prop="workOrderId" label="工单号" width="180" align="center" />
+              <el-table-column prop="workOrderTitle" label="标题" width="180" align="center" />
+              <el-table-column prop="studentName" label="发起人" width="180" align="center" />
+              <el-table-column prop="createTime" label="发起时间" width="180" align="center" />
+              <el-table-column label="审批状态" width="180" align="center">
+                <template #default="{ row }">
+                  {{ statusMap[row.auditType] }}
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" align="center">
+                <template #default="{ row }">
+                  <el-button type="primary" @click="viewTicket(row)">{{
+                    row.auditType === 11 ? '查看' : '审批'
+                  }}</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+          <div class="pagination">
+            <el-pagination
+              background
+              layout="prev, pager, next"
+              :total="total"
+              :page-size="pageSize"
+              :current-page="currentPage"
+              @current-change="handlePageChange"
             />
-            <el-button type="primary" @click="onSubmit" :icon="Search" class="search-button">
-              查询
-            </el-button>
           </div>
         </div>
-        <!-- 表格部分 -->
-        <div class="table">
-          <el-table :data="ticketList" border style="width: 100%">
-            <el-table-column prop="workOrderId" label="工单号" width="180" align="center" />
-            <el-table-column prop="workOrderTitle" label="标题" width="180" align="center" />
-            <el-table-column prop="studentName" label="发起人" width="180" align="center" />
-            <el-table-column prop="createTime" label="发起时间" width="180" align="center" />
-            <el-table-column label="审批状态" width="180" align="center">
-              <template #default="{ row }">
-                {{ statusMap[row.auditType] }}
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" align="center">
-              <template #default="{ row }">
-                <el-button type="primary" @click="viewTicket(row)">{{
-                  row.auditType === 11 ? '查看' : '审批'
-                }}</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
-        <div class="pagination">
-          <el-pagination
-            background
-            layout="prev, pager, next"
-            :total="total"
-            :page-size="pageSize"
-            :current-page="currentPage"
-            @current-change="handlePageChange"
-          />
+        <div v-else>
+          <Error />
         </div>
       </div>
-
       <!-- 弹出窗口 -->
       <el-dialog title="工单详情" v-model="isDialogVisible" width="600px">
         <div>
@@ -124,6 +128,7 @@
     getWorkOrderDetailAPI,
     reviewWorkOrderAPI,
   } from '../../api/admin-ticket'
+  import Error from '@/views/error/404.vue'
 
   const ticketList = ref([]) // 工单列表
   const total = ref(0) // 总工单数

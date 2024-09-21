@@ -13,7 +13,7 @@ const logRouter = [
       {
         path: '',
         component: () => import('@/views/Admin-log/index.vue'),
-        name: 'manage-disk',
+        name: 'log',
         meta: { title: '查看日志', keepAlive: true, icon: 'Files' },
       },
     ],
