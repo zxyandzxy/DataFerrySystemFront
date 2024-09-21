@@ -25,6 +25,7 @@ router.beforeEach(async (to, from, next) => {
   // 确定用户是否已登录过，存在Token
   let hasToken
   let userStore
+
   if (stuStore.systemChoose != '') {
     hasToken = stuStore.token
     userStore = stuStore

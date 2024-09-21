@@ -1,58 +1,85 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { ElNotification } from 'element-plus'
-import { stuLoginAPI, stuGetInfoAPI } from '@/api/stuAccountManagement'
+import { adminLoginAPI, adminGetInfoAPI } from '@/api/admin-teacher'
+
+import { adminLoginAPI, adminGetInfoAPI } from '@/api/admin-teacher'
+
 export const useAdminStore = defineStore(
   'admin',
   () => {
-    //定义数据state
-    const userInfo = ref({})
+    // 定义状态
+    const adminInfo = ref({})
+    // 定义状态
+    const adminInfo = ref({})
     const token = ref('')
     const systemChoose = ref('')
-    const stuId = ref('')
-    //定义获取接口数据的action函数
-    const login = async (data, Choose) => {
-      systemChoose.value = Choose
-      const studentId = data.username
+    const adminAccount = ref('root')
+
+    // 定义获取接口数据的 action 函数
+    const login = async (data, Role) => {
+      systemChoose.value = Role
+      const adminIdValue = data.username
       const password = data.password
-      const verification_code = data.verificationCode
-      let res = await stuLoginAPI({ studentId, password, verification_code })
-      res = res.data
-      if (res.code === 200) {
-        token.value = res.data.token
-        stuId.value = studentId
+      const verificationCode = data.verificationCode
+      const verKey = data.verKey
+      console.log(1111)
+
+      const resp = await adminLoginAPI({
+        adminAccount: adminIdValue,
+        password,
+        verKey,
+        verificationCode,
+      })
+      console.log(resp)
+
+      if (resp.code === 200) {
+        token.value = resp.data.token
+        adminAccount.value = adminIdValue
         return true
       } else {
         ElNotification({
-          message: res.msg,
+          message: resp.msg,
           type: 'warning',
           duration: 3000,
         })
       }
     }
-    const getStuInfo = async () => {
-      const res = await stuGetInfoAPI(stuId.value)
+
+    const getAdminInfo = async () => {
+      const res = await adminGetInfoAPI(adminAccount.value)
       if (res.code === 200) {
-        userInfo.value = res.data
+        adminInfo.value = res.data
+        adminInfo.value = res.data
       }
       return res
     }
-    //退出时清除用户信息
-    const clearStuInfo = () => {
-      userInfo.value = {}
+
+    // 退出时清除管理员信息
+    const clearAdminInfo = () => {
+      adminInfo.value = {}
+
+    // 退出时清除管理员信息
+    const clearAdminInfo = () => {
+      adminInfo.value = {}
       token.value = ''
-      stuId.value = ''
+      adminAccount.value = ''
       systemChoose.value = ''
     }
-    //导出数据
+
+    // 导出数据
+
+    // 导出数据
     return {
-      systemChoose,
+      systemRole,
       token,
-      userInfo,
-      stuId,
+      adminInfo,
+      adminAccount,
       login,
-      getStuInfo,
-      clearStuInfo,
+      getAdminInfo,
+      clearAdminInfo,
+      getAdminInfo,
+      clearAdminInfo,
     }
   },
   {
