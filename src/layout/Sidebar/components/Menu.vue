@@ -32,7 +32,7 @@
 
   // 获取路由
   const permission_routes = computed(() => PermissionStore.permission_routes)
-  console.log(permission_routes)
+  // console.log(permission_routes)
 
   const activeMenu = computed(() => {
     const { meta, path } = route

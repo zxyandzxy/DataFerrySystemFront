@@ -92,7 +92,7 @@ export async function downloadFiles2ZipWithFolder(params: IDownloadFiles2ZipWith
 }
 
 async function handleFolder(zip: JsZip, folder: IFolder) {
-  console.log({ folder })
+  // console.log({ folder })
   const folderPromises: Promise<any>[] = []
   const promises = folder?.files?.map(
     async (param) => await handleEachFile(param, zip, folder.folderName),
@@ -167,7 +167,7 @@ function handleDataWithRender(worksheet: Worksheet, sheet: ISheet) {
       return data[column.name]
     })
   })
-  console.log({ rowsData })
+  // console.log({ rowsData })
   // 添加行
   const rows = worksheet.addRows(rowsData)
   // 设置每行的样式

@@ -1,3 +1,4 @@
+import { copy } from 'clipboard'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 export const useCopyMachineStore = defineStore(
@@ -8,8 +9,10 @@ export const useCopyMachineStore = defineStore(
     const token = ref(
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
     )
+    const roles = ref([])
     //定义获取接口数据的action函数
     const login = async (Choose) => {
+      roles.value = ['copy']
       systemChoose.value = Choose
       return true
     }
@@ -23,6 +26,8 @@ export const useCopyMachineStore = defineStore(
       token,
       login,
       clearCopyMachineInfo,
+      copy,
+      roles,
     }
   },
   {

@@ -143,13 +143,13 @@
   })
 
   const submitForm = async (formEl: FormInstance | undefined) => {
-    console.log('--FORM---', ruleForm)
+    // console.log('--FORM---', ruleForm)
     if (!formEl) return
     await formEl.validate((valid, fields) => {
       if (valid) {
-        console.log('submit!')
+        // console.log('submit!')
       } else {
-        console.log('error submit!', fields)
+        // console.log('error submit!', fields)
       }
     })
   }

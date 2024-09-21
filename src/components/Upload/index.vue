@@ -44,7 +44,7 @@
   const dialogVisible = ref(false)
 
   const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
-    console.log(uploadFile, uploadFiles)
+    // console.log(uploadFile, uploadFiles)
   }
 
   const beforeUploadAction = (file, fileLi) => {

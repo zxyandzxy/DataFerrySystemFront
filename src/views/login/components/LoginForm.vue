@@ -141,7 +141,6 @@
           } else if (props.systemChoose === '管理员端') {
             await adminStore.login(ruleForm, props.systemChoose)
           }
-          console.log('va')
 
           // 登录成功后跳转
           await router.push({
@@ -156,8 +155,6 @@
           // loading.value = false
         }, 1000)
       } else {
-        console.log('not va')
-
         ElNotification({
           message: '账号/密码错误，请重试',
           type: 'error',
@@ -170,7 +167,6 @@
   }
   onMounted(async () => {
     await fetchVerificationImage()
-    // console.log('test', props.systemChoose)
   })
 </script>
 

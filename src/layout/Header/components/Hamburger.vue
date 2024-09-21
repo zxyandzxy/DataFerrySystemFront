@@ -36,5 +36,5 @@
     route.matched.filter((item) => item.meta && item.meta.title && item.meta.breadcrumb !== false),
   )
 
-  console.log('======matched=======', matched)
+  // console.log('======matched=======', matched)
 </script>

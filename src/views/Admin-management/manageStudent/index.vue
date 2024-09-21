@@ -272,7 +272,7 @@
   }
 
   const handleBatchAdd = (files) => {
-    console.log('批量添加的文件:', files)
+    // console.log('批量添加的文件:', files)
     // 处理批量添加的逻辑
   }
 </script>

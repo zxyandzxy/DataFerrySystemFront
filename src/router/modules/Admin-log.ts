@@ -8,13 +8,14 @@ const logRouter = [
     meta: {
       title: '查看日志',
       icon: 'Grape',
+      roles: ['admin'],
     },
     children: [
       {
         path: '',
         component: () => import('@/views/Admin-log/index.vue'),
         name: 'log',
-        meta: { title: '查看日志', keepAlive: true, icon: 'Files' },
+        meta: { title: '查看日志', keepAlive: true, icon: 'Files', roles: ['admin'] },
       },
     ],
   },

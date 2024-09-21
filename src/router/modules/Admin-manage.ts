@@ -10,13 +10,14 @@ const manageRouter = [
     meta: {
       title: '管理用户',
       icon: 'School',
+      roles: ['admin'],
     },
     children: [
       {
         path: 'student',
         component: () => import('@/views/Admin-management/manageStudent/index.vue'),
         name: 'manage-student',
-        meta: { title: '管理学生', icon: 'UserFilled' },
+        meta: { title: '管理学生', icon: 'UserFilled', roles: ['admin'] },
       },
       {
         path: 'teacher',
@@ -26,6 +27,7 @@ const manageRouter = [
           title: '管理管理员',
           icon: 'Avatar',
           requireRoot: true, // 只有 root 账号可以访问
+          roles: ['admin'],
         },
       },
     ],

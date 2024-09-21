@@ -27,14 +27,12 @@ export const usePermissionStore = defineStore({
         // 在这判断是否有权限，哪些角色拥有哪些权限
         let accessedRoutes
         //let accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
-        if (roles && roles.length && !roles.includes('admin')) {
+        if (roles && roles.length) {
           accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
         } else {
           accessedRoutes = asyncRoutes || []
         }
-        console.log('1', accessedRoutes)
         this.routes = constantRoutes.concat(accessedRoutes)
-        console.log('2', this.routes)
         this.addRoutes = accessedRoutes
         resolve(accessedRoutes)
       })

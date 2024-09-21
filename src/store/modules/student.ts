@@ -10,6 +10,7 @@ export const useStuStore = defineStore(
     const token = ref('')
     const systemChoose = ref('')
     const stuId = ref('')
+    const roles = ref([])
     //定义获取接口数据的action函数
     const login = async (data, Choose) => {
       systemChoose.value = Choose
@@ -17,6 +18,7 @@ export const useStuStore = defineStore(
       const password = data.password
       const verificationCode = data.verificationCode
       const verKey = data.verKey
+      roles.value = ['student']
       let res = await stuLoginAPI({ studentId, password, verKey, verificationCode })
       res = res.data
       if (res.code === 200) {
@@ -62,6 +64,7 @@ export const useStuStore = defineStore(
       login,
       getStuInfo,
       clearStuInfo,
+      roles,
     }
   },
   {

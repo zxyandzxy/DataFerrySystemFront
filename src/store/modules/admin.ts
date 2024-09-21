@@ -11,16 +11,16 @@ export const useAdminStore = defineStore(
     const token = ref('')
     const systemChoose = ref('')
     const adminAccount = ref('root')
+    const roles = ref([])
 
     // 定义获取接口数据的 action 函数
     const login = async (data, Role) => {
       systemChoose.value = Role
-      console.log('admin,,', Role)
       const adminIdValue = data.username
       const password = data.password
       const verificationCode = data.verificationCode
       const verKey = data.verKey
-      console.log(1111)
+      roles.value = ['admin']
 
       const resp = await adminLoginAPI({
         adminAccount: adminIdValue,
@@ -28,7 +28,6 @@ export const useAdminStore = defineStore(
         verKey,
         verificationCode,
       })
-      console.log(resp)
 
       if (resp.code === 200) {
         token.value = resp.data.token
@@ -68,6 +67,7 @@ export const useAdminStore = defineStore(
       login,
       getAdminInfo,
       clearAdminInfo,
+      roles,
     }
   },
   {

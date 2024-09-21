@@ -235,15 +235,15 @@ function mergeColumnCell(headers, rowHeader1, rowHeader2, nameRow1, nameRow2, wo
     // 是否应该行合并
     const shouldHorizontalMerge = index !== nameRow1.lastIndexOf(name)
 
-    console.log(
-      '==',
-      name,
-      nameRow2[index],
-      index,
-      nameRow1.lastIndexOf(name),
-      shouldVerticalMerge,
-      shouldHorizontalMerge,
-    )
+    // console.log(
+    //   '==',
+    //   name,
+    //   nameRow2[index],
+    //   index,
+    //   nameRow1.lastIndexOf(name),
+    //   shouldVerticalMerge,
+    //   shouldHorizontalMerge,
+    // )
 
     pointer = nameRow1.lastIndexOf(name)
     if (shouldVerticalMerge && shouldHorizontalMerge) {

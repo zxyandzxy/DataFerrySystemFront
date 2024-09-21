@@ -69,7 +69,6 @@
   // 页面加载时获取日志列表
   onMounted(async () => {
     await getLogList()
-    console.log('from log', adminStore.systemChoose)
   })
 </script>
 

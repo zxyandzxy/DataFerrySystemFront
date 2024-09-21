@@ -25,12 +25,14 @@
   import { useCopyMachineStore } from '@/store/modules/copyMachine'
   import { useAdminStore } from '@/store/modules/admin'
   import { useTagsViewStore } from '@/store/modules/tagsView'
+  import { usePermissionStore } from '../../../store/modules/permission'
 
   const router = useRouter()
   const stuStore = useStuStore()
   const copyMachineStore = useCopyMachineStore()
   const adminStore = useAdminStore()
   const TagsViewStore = useTagsViewStore()
+  const permissionStore = usePermissionStore()
 
   const logOut = async () => {
     ElMessageBox.confirm('您是否确认退出登录?', '温馨提示', {
@@ -46,7 +48,11 @@
         } else if (adminStore.systemChoose != '') {
           await adminStore.clearAdminInfo()
         }
+
+        permissionStore.clearRoutes()
+        console.log(permissionStore.routes)
         await router.push({ path: '/login' })
+
         TagsViewStore.clearVisitedView()
         ElMessage({
           type: 'success',

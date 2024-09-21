@@ -8,13 +8,14 @@ const manageTicketRouter = [
     meta: {
       title: '管理工单',
       icon: 'Grape',
+      roles: ['admin'],
     },
     children: [
       {
         path: '',
         component: () => import('@/views/Admin-ticketManage/index.vue'),
         name: 'manage-ticket',
-        meta: { title: '管理工单', keepAlive: true, icon: 'Tickets' },
+        meta: { title: '管理工单', keepAlive: true, icon: 'Tickets', roles: ['admin'] },
       },
     ],
   },
