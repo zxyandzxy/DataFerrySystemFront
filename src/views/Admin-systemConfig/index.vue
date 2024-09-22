@@ -185,8 +185,8 @@
       if (valid) {
         // 调用切换审批模式的API
         await switchAuditMode(
-          Number(form.value.auditType),
-          form.value.advancedApproval,
+          form.value.auditType,
+          form.value.advancedApproval + '',
           form.value.saltValue,
           authForm.value.password,
         )

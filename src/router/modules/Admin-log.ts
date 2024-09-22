@@ -15,7 +15,7 @@ const logRouter = [
         path: '',
         component: () => import('@/views/Admin-log/index.vue'),
         name: 'log',
-        meta: { title: '查看日志', keepAlive: true, icon: 'Files', roles: ['admin'] },
+        meta: { title: '查看日志', keepAlive: true, icon: 'Notebook', roles: ['admin'] },
       },
     ],
   },

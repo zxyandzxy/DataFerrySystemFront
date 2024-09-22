@@ -6,12 +6,13 @@
     <el-upload
       class="upload-demo"
       drag
-      action="https://example.com/manager/batch_create_student_account" 
+      action="http://localhost:8080/manager/batch_create_student_account" 
       :on-success="handleUploadSuccess"
       :on-error="handleUploadError"
       :file-list="fileList"
       accept=".xlsx"
       multiple
+      :headers="customHeaders"
     >
       <el-icon size="35"><UploadFilled /></el-icon>
       <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -43,9 +44,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { downloadBatchFileAPI } from '../api/admin-student'
+import { useAdminStore } from '../store/modules/admin'
 
 const props = defineProps({
   show: Boolean,
@@ -55,7 +57,11 @@ const emit = defineEmits(['update:show', 'submit'])
 const fileList = ref([])
 const resultDialogVisible = ref(false)
 const uploadResult = ref<{ password: string, existStu: string[] } | null>(null)
+const adminStore=useAdminStore()
 
+const customHeaders = computed(() => ({
+  Authorization: `${adminStore.token}`
+}))
 // 下载模板的逻辑
 const downloadTemplate = async () => {
   try {

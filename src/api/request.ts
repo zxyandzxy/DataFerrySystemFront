@@ -88,7 +88,7 @@ service.interceptors.response.use(
  * duration 消息持续时间
  */
 function showErrMessage(msg, type: any = 'error', duration = 5000) {
-  console.log(type)
+  // console.log(type)
 
   ElMessage({
     message: msg,

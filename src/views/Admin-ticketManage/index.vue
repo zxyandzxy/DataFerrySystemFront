@@ -14,7 +14,7 @@
                   <el-option label="工单号" value="workOrderId"></el-option>
                   <el-option label="工单标题" value="workOrderTitle"></el-option>
                   <el-option label="发起人姓名" value="studentName"></el-option>
-                  <el-option label="审批状态" value="auditType"></el-option>
+                  <el-option label="工单审批状态" value="auditType"></el-option>
                 </el-select>
               </div>
               <el-input
@@ -34,7 +34,7 @@
               <el-table-column prop="workOrderTitle" label="标题" width="180" align="center" />
               <el-table-column prop="studentName" label="发起人" width="180" align="center" />
               <el-table-column prop="createTime" label="发起时间" width="180" align="center" />
-              <el-table-column label="审批状态" width="180" align="center">
+              <el-table-column label="工单审批状态" width="180" align="center">
                 <template #default="{ row }">
                   {{ statusMap[row.auditType] }}
                 </template>
@@ -144,15 +144,15 @@
     workOrderId: '按照工单号查询',
     workOrderTitle: '按照工单标题查询',
     studentName: '按照发起人姓名查询',
-    auditType: '按照审批状态查询',
+    auditType: '按照工单审批状态查询',
   }
   const statusMap = {
-    1: '创建中',
-    2: '处理中',
-    3: '审批中',
-    11: '可拷贝',
-    21: '审批通过',
-    22: '审批驳回',
+    '1': '创建中',
+    '2': '处理中',
+    '3': '审批中',
+    '11': '可拷贝',
+    '21': '审批通过',
+    '22': '审批驳回',
   }
 
   const adminStore = useAdminStore()
@@ -170,7 +170,9 @@
     }
     try {
       const response = await getTicketListAPI(searchParams)
-      ticketList.value = response.list
+      // console.log(response)
+
+      ticketList.value = response.items
       total.value = response.total
     } catch (error) {
       ElMessage.error('获取工单列表失败')

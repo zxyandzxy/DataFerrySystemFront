@@ -45,7 +45,7 @@
 
   const logList = ref([]) // 日志列表数据
   const total = ref(0) // 总日志数
-  const pageSize = ref(20) // 每页显示条数
+  const pageSize = ref(7) // 每页显示条数
   const currentPage = ref(1) // 当前页码
   const adminStore = useAdminStore()
 
@@ -53,7 +53,8 @@
   const getLogList = async () => {
     try {
       const response = await getLogListAPI(currentPage.value, pageSize.value)
-      logList.value = response.data // 响应的日志数据
+      logList.value = response.items // 响应的日志数据
+
       total.value = response.total // 总条数
     } catch (error) {
       ElMessage.error('获取日志列表失败')
@@ -86,11 +87,5 @@
 
   .app-container {
     padding: 20px;
-  }
-
-  .header h2 {
-    margin: 0;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #ccc;
   }
 </style>

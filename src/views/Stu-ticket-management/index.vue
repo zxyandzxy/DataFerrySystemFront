@@ -507,6 +507,8 @@
     copyReason: '',
     unzipPassword: '',
   })
+  // console.log(workOrderForm, 121211211122121)
+
   const workOrderDetailForm = ref({
     workOrderId: '',
     auditType: '',
@@ -572,7 +574,7 @@
     }
     // 后端创建工单
     const data = {
-      studentAccount: stuStore.studentId,
+      studentAccount: stuStore.stuId,
       auditType: auditType.value,
       workOrderTitle: workOrderForm.value.workOrderTitle,
       fileType: workOrderForm.value.fileType,
@@ -580,7 +582,8 @@
       copyReason: workOrderForm.value.copyReason,
       unzipPassword: workOrderForm.value.unzipPassword,
     }
-    /*
+    // console.log( data)
+
     let res = await createWorkOrderAPI(data)
     res = res.data
     if (res.code == 200) {
@@ -596,8 +599,7 @@
         type: 'error',
       })
     }
-      */
-    isCreateWorkOrder.value = true // 开发用，后面注释掉
+    // isCreateWorkOrder.value = true // 开发用，后面注释掉
   }
   // 文件上传
   //定义一个响应式数组用来接收文件
@@ -858,6 +860,7 @@
       copyReason: workOrderDetailForm.value.copyReason,
       unzipPassword: workOrderDetailForm.value.unzipPassword,
     }
+
     let res = await updateWorkOrderAPI(data)
     res = res.data
     if (res.code == 200) {
@@ -888,7 +891,7 @@
         fromData.append('file', val.raw)
       })
       fromData.append('workOrderId', workOrderDetailForm.value.workOrderId)
-      fromData.append('studentId', stuStore.stuId)
+      fromData.append('studentAccount', stuStore.stuId)
       let res = uploadFileAPI(fromData)
       res = res.data
       if (res.code == 200) {
@@ -947,13 +950,15 @@
   const getWorkOrderList = async () => {
     let res = await getWorkOrderListAPI(currentPage.value, pageSize.value, stuStore.stuId)
     res = res.data
+
     if (res.code === 200) {
       total.value = res.data.total
-      for (let i = 0; i < res.data.array.length; i++) {
-        res.data.array[i].workOrderStatus = num2LabelMap.get(res.data.array[i].workOrderStatus)
-        res.data.array[i].fileType = fileType2LabelMap.get(res.data.array[i].fileType)
+
+      for (let i = 0; i < res.data.items.length; i++) {
+        res.data.items[i].workOrderStatus = num2LabelMap.get(res.data.items[i].workOrderStatus)
+        res.data.items[i].fileType = fileType2LabelMap.get(res.data.items[i].fileType)
       }
-      tableData.value = res.data.array
+      tableData.value = res.data.items
     } else {
       ElMessage({
         showClose: true,
@@ -967,7 +972,9 @@
   onMounted(async () => {
     // 获取工单列表
     await getWorkOrderList()
-    auditType.value = await getAuditTypeAPI()
+    let tmp = await getAuditTypeAPI()
+    auditType.value = tmp.data.data
+    workOrderForm.value.auditType = auditType.value == 0 ? '即时审批' : '定期审批' // 0 即时审批，1 定期审批
   })
 </script>
 
