@@ -14,7 +14,7 @@
                   <el-option label="工单号" value="workOrderId"></el-option>
                   <el-option label="工单标题" value="workOrderTitle"></el-option>
                   <el-option label="发起人姓名" value="studentName"></el-option>
-                  <el-option label="工单审批状态" value="auditType"></el-option>
+                  <el-option label="工单审批状态" value="workOrderStatus"></el-option>
                 </el-select>
               </div>
               <el-input
@@ -36,14 +36,20 @@
               <el-table-column prop="createTime" label="发起时间" width="180" align="center" />
               <el-table-column label="工单审批状态" width="180" align="center">
                 <template #default="{ row }">
-                  {{ statusMap[row.auditType] }}
+                  {{ statusMapNum2Str[row.workOrderStatus] }}
                 </template>
               </el-table-column>
               <el-table-column label="操作" align="center">
                 <template #default="{ row }">
-                  <el-button type="primary" @click="viewTicket(row)">{{
-                    row.auditType === 11 ? '查看' : '审批'
-                  }}</el-button>
+                  <el-button type="primary" @click="viewTicket(row)"
+                    >{{
+                      row.workOrderStatus === 21 ||
+                      row.workOrderStatus === 22 ||
+                      row.workOrderStatus === 1
+                        ? '查看'
+                        : '审批'
+                    }}
+                  </el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -75,8 +81,22 @@
             <el-input v-model="currentTicket.auditType" readonly />
           </div>
           <div class="form-item">
-            <label>文件内容:</label>
-            <el-link type="primary" :href="currentTicket.fileURL" target="_blank">点击下载</el-link>
+            <div
+              v-if="
+                currentTicket.workOrderStatus == 11 ||
+                currentTicket.workOrderStatus == 21 ||
+                currentTicket.workOrderStatus == 22
+              "
+            >
+              <label>文件内容:</label>
+              <el-link
+                type="primary"
+                :href="currentTicket.fileURL"
+                target="_blank"
+                style="margin-left: 230px"
+                >点击下载</el-link
+              >
+            </div>
           </div>
           <div class="form-item">
             <label>文件概述:</label>
@@ -92,7 +112,7 @@
           </div>
           <div class="form-item">
             <label>提交时间:</label>
-            <el-input v-model="currentTicket.create_time" readonly />
+            <el-input v-model="currentTicket.createTime" readonly />
           </div>
           <div class="form-item">
             <label>备注:</label>
@@ -101,14 +121,15 @@
               type="textarea"
               :readonly="
                 !(
-                  currentTicket.auditType === 1 ||
-                  currentTicket.auditType === 2 ||
-                  currentTicket.auditType === 3
+                  currentTicket.workOrderStatus == 1 ||
+                  currentTicket.workOrderStatus == 2 ||
+                  currentTicket.workOrderStatus == 3 ||
+                  currentTicket.workOrderStatus == 11
                 )
               "
             />
           </div>
-          <div v-if="[1, 2, 3].includes(currentTicket?.auditType)">
+          <div v-if="currentTicket?.workOrderStatus == 3 || currentTicket?.workOrderStatus == 11">
             <el-button type="primary" @click="approveTicket(21)">审批通过</el-button>
             <el-button type="danger" @click="approveTicket(22)">审批驳回</el-button>
           </div>
@@ -120,8 +141,8 @@
 
 <script setup lang="ts">
   import { Search } from '@element-plus/icons-vue'
-  import { ref, computed, onMounted } from 'vue'
-  import { ElMessageBox, ElMessage } from 'element-plus'
+  import { ref, onMounted } from 'vue'
+  import { ElMessage } from 'element-plus'
   import { useAdminStore } from '@/store/modules/admin'
   import {
     getTicketListAPI,
@@ -146,19 +167,31 @@
     studentName: '按照发起人姓名查询',
     auditType: '按照工单审批状态查询',
   }
-  const statusMap = {
-    '1': '创建中',
-    '2': '处理中',
-    '3': '审批中',
-    '11': '可拷贝',
-    '21': '审批通过',
-    '22': '审批驳回',
+  const statusMapNum2Str = {
+    1: '创建中',
+    2: '处理中',
+    3: '审批中',
+    11: '可拷贝',
+    21: '审批通过',
+    22: '审批驳回',
   }
 
   const adminStore = useAdminStore()
 
   // 获取工单列表
+  const statusMapStr2Num = {
+    创建中: 1,
+    处理中: 2,
+    审批中: 3,
+    可拷贝: 11,
+    审批通过: 21,
+    审批驳回: 22,
+  }
   const getTicketList = async () => {
+    console.log(
+      searchType.value === 'workOrderStatus' ? statusMapStr2Num[searchInfo.value] || null : null,
+    )
+
     // 动态构建 API 查询参数
     const searchParams = {
       pageNum: currentPage.value,
@@ -166,7 +199,9 @@
       workOrderId: searchType.value === 'workOrderId' ? searchInfo.value : '',
       workOrderTitle: searchType.value === 'workOrderTitle' ? searchInfo.value : '',
       studentName: searchType.value === 'studentName' ? searchInfo.value : '',
-      auditType: searchType.value === 'auditType' ? searchInfo.value || 0 : 0,
+      workOrderStatus:
+        searchType.value === 'workOrderStatus' ? statusMapStr2Num[searchInfo.value] || -1 : null,
+      auditType: searchType.value === 'auditType' ? Number(searchInfo.value) || -1 : null,
     }
     try {
       const response = await getTicketListAPI(searchParams)
@@ -190,6 +225,7 @@
     try {
       const response = await getWorkOrderDetailAPI(ticket.workOrderId)
       currentTicket.value = response
+      currentTicket.value.workOrderId = ticket.workOrderId
       isDialogVisible.value = true
     } catch (error) {
       ElMessage.error('获取工单详情失败')
@@ -202,13 +238,14 @@
     await getTicketList() // 重新获取数据
   }
 
-  // 工单审批
   // 审批工单
   const approveTicket = async (status: number) => {
     try {
+      console.log(currentTicket)
+
       const params = {
         workOrderId: currentTicket.value.workOrderId,
-        adminAccount: adminStore.currentAdminAccount, // 这里需要替换为实际的管理员账号
+        adminAccount: adminStore.adminAccount, // 这里需要替换为实际的管理员账号
         workOrderStatus: status,
         remark: currentTicket.value.remark || '审批备注', // 可以根据需要填写备注
       }

@@ -39,8 +39,18 @@
               <!-- 设置表格高度 -->
               <el-table-column prop="fileName" label="文件名" align="center" />
               <el-table-column prop="fileSize" label="文件大小" align="center" />
-              <el-table-column prop="fileType" label="文件类型" align="center" />
-              <el-table-column prop="submissionTime" label="上传时间" align="center" />
+              <el-table-column
+                prop="fileType"
+                label="文件类型"
+                align="center"
+                :formatter="formatFileType"
+              />
+              <el-table-column
+                prop="submissionTime"
+                label="上传时间"
+                align="center"
+                :formatter="formatSubmissionTime"
+              />
               <el-table-column label="操作" align="center">
                 <template #default="{ row }">
                   <el-button type="primary" @click="downloadFile(row)">下载</el-button>
@@ -90,6 +100,24 @@
   const totalFiles = ref(0) // 总文件数
   const filePageSize = 6 // 每页显示文件条数
   const currentFilePage = ref(1) // 当前文件页
+
+  const formatFileType = (row) => {
+    const fileTypeMap = {
+      0: 'Docx',
+      1: 'PDF',
+      2: 'PPTX',
+      3: 'ZIP',
+      4: '其他',
+    }
+    return fileTypeMap[row.fileType] || '未知'
+  }
+
+  const formatSubmissionTime = (row: any, column: any, cellValue: string) => {
+    if (cellValue) {
+      return cellValue.replace('T', ' ')
+    }
+    return ''
+  }
 
   // 获取学生空间数据
   const getAllStudentsSpace = async (pageNum) => {

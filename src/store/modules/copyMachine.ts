@@ -6,13 +6,13 @@ export const useCopyMachineStore = defineStore(
   () => {
     //定义数据state
     const systemChoose = ref('')
-    const token = ref(
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-    )
+    const token = ref()
     const roles = ref([])
     //定义获取接口数据的action函数
     const login = async (Choose) => {
       roles.value = ['copy']
+      token.value =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
       systemChoose.value = Choose
       return true
     }

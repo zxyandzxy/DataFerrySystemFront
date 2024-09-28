@@ -50,7 +50,6 @@
         }
 
         permissionStore.clearRoutes()
-        console.log(permissionStore.routes)
         await router.push({ path: '/login' })
 
         TagsViewStore.clearVisitedView()

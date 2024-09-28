@@ -431,7 +431,7 @@
                 <el-input v-model="advancedReviewForm.password" />
               </el-form-item>
               <el-form-item label="超前审批密钥" prop="advancedPassword">
-                <el-input v-model="advancedReviewForm.password" />
+                <el-input v-model="advancedReviewForm.advancedPassword" />
               </el-form-item>
               <el-button style="margin-left: 40%" type="primary" @click="getAdvancedReviewResult"
                 >发送超前审批请求</el-button
@@ -621,11 +621,6 @@
           type: 'success',
         })
         createWorkOrderVisible.value = false
-      } else {
-        ElMessage({
-          message: res.msg,
-          type: 'error',
-        })
       }
     }
   }
@@ -709,12 +704,6 @@
         type: 'success',
         duration: 0,
       })
-    } else {
-      ElMessage({
-        message: res.msg,
-        type: 'error',
-        plain: true,
-      })
     }
   }
 
@@ -780,11 +769,6 @@
       workOrderDetailForm.value.unzipPassword = res.data.unzipPassword
       workOrderDetailForm.value.remark = res.data.remark
     } else {
-      ElMessage({
-        message: res.msg,
-        type: 'error',
-        plain: true,
-      })
       return
     }
 
@@ -821,12 +805,6 @@
       await getWorkOrderList()
       viewWorkOrderVisible.value = false
     } else {
-      ElMessage({
-        showClose: true,
-        message: res.msg,
-        type: 'error',
-        plain: true,
-      })
       viewWorkOrderVisible.value = false
     }
   }
@@ -872,13 +850,6 @@
       })
       await getWorkOrderList()
       viewWorkOrderVisible.value = false
-    } else {
-      ElMessage({
-        showClose: true,
-        message: res.msg,
-        type: 'error',
-        plain: true,
-      })
     }
   }
 
@@ -900,11 +871,6 @@
           type: 'success',
         })
         viewWorkOrderVisible.value = false
-      } else {
-        ElMessage({
-          message: res.msg,
-          type: 'error',
-        })
       }
     }
   }
@@ -959,13 +925,6 @@
         res.data.items[i].fileType = fileType2LabelMap.get(res.data.items[i].fileType)
       }
       tableData.value = res.data.items
-    } else {
-      ElMessage({
-        showClose: true,
-        message: res.msg,
-        type: 'success',
-        plain: true,
-      })
     }
   }
 

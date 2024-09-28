@@ -3,12 +3,6 @@ import { defineStore } from 'pinia'
 import { onMounted, ref } from 'vue'
 import { getSystemConfig } from '../../api/admin-systemConfig'
 
-export interface SystemConfig {
-  approvalMode: number
-  advancedApproval: number
-  salt: string
-}
-
 export const useSystemConfigStore = defineStore('systemConfig', () => {
   const currentConfig = ref({})
 

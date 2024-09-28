@@ -111,6 +111,7 @@
   import { stuUpdateContactInfoAPI, stuUpdatePasswordAPI } from '@/api/stuAccountManagement'
   import { useStuStore } from '@/store/modules/student'
   import Error from '@/views/error/404.vue'
+  import router from '../../router'
   const stuStore = useStuStore()
   const changePwdDialogVisible = ref(false)
   const changeLinkDialogVisible = ref(false)
@@ -201,6 +202,8 @@
         duration: 2000,
       })
       changePwdDialogVisible.value = false
+      stuStore.clearStuInfo()
+      router.push('/login')
     } else {
       ElNotification({
         message: res.msg,

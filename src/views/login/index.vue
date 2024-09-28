@@ -12,7 +12,7 @@
             v-model="systemChoose"
             placeholder="登录系统"
             style="width: 120px"
-            change="handleChange"
+            @change="handleChange"
           >
             <el-option
               v-for="item in options"
@@ -30,13 +30,13 @@
 
 <script lang="ts" setup>
   import { useAdminStore } from '../../store/modules/admin'
-  import { useStudentStore } from '../../store/modules/admin-studentTable'
   import { useCopyMachineStore } from '../../store/modules/copyMachine'
+  import { useStuStore } from '../../store/modules/student'
   import LoginForm from './components/LoginForm.vue'
   import { ref } from 'vue'
 
   const systemChoose = ref('学生端')
-  const studentStore = useStudentStore()
+  const studentStore = useStuStore()
   const adminStore = useAdminStore()
   const copyStore = useCopyMachineStore()
 

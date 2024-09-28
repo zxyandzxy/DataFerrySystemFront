@@ -134,26 +134,29 @@
       if (valid) {
         // 登录
         setTimeout(async () => {
+          let isLoginValid = false
           if (props.systemChoose === '学生端') {
-            await stuStore.login(ruleForm, props.systemChoose)
+            isLoginValid = await stuStore.login(ruleForm, props.systemChoose)
           } else if (props.systemChoose === '拷贝机端') {
-            await copyMachineStore.login(props.systemChoose)
+            isLoginValid = await copyMachineStore.login(props.systemChoose)
           } else if (props.systemChoose === '管理员端') {
-            await adminStore.login(ruleForm, props.systemChoose)
+            isLoginValid = await adminStore.login(ruleForm, props.systemChoose)
           }
 
           // 登录成功后跳转
-          await router.push({
-            path: '/',
-          })
-          ElNotification({
-            title: getTimeState(),
-            message: '欢迎登录数据摆渡系统',
-            type: 'success',
-            duration: 3000,
-          })
+          if (isLoginValid) {
+            await router.push({
+              path: '/',
+            })
+            ElNotification({
+              title: getTimeState(),
+              message: '欢迎登录数据摆渡系统',
+              type: 'success',
+              duration: 3000,
+            })
+          }
           // loading.value = false
-        }, 1000)
+        }, 500)
       } else {
         ElNotification({
           message: '账号/密码错误，请重试',

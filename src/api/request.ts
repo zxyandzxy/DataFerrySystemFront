@@ -68,7 +68,7 @@ service.interceptors.response.use(
     // 如果自定义的状态码不是 200，抛出错误提示
     if (res.code !== 200) {
       showErrMessage(res.msg, 'error', 2000)
-      return Promise.reject(new Error(res.msg || 'Error'))
+      return response
     } else {
       return response
     }

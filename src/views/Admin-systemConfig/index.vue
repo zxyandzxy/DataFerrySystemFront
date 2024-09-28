@@ -54,7 +54,7 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item v-if="form.auditType == 1" label="是否开启超前审批">
+            <el-form-item v-if="form.auditType == 0" label="是否开启超前审批">
               <el-radio-group v-model="form.advancedApproval">
                 <el-radio :label="1">是</el-radio>
                 <el-radio :label="0">否</el-radio>
@@ -185,7 +185,9 @@
       if (valid) {
         // 调用切换审批模式的API
         await switchAuditMode(
-          form.value.auditType,
+          form.value.auditType == ''
+            ? systemConfigStore.currentConfig.auditType + ''
+            : form.value.auditType,
           form.value.advancedApproval + '',
           form.value.saltValue,
           authForm.value.password,

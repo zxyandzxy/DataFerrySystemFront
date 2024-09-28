@@ -6,6 +6,7 @@ export function getTicketListAPI(params: {
   workOrderId: string
   workOrderTitle: string
   studentName: string
+  workOrderStatus: number
   auditType: number
 }): Promise<any> {
   return service
@@ -32,5 +33,5 @@ export const reviewWorkOrderAPI = async (params: {
   workOrderStatus: number
   remark: string
 }): Promise<any> => {
-  return service.put('/manager/work_order_review', { params })
+  return service.put('/manager/work_order_review', params)
 }

@@ -39,6 +39,8 @@ export const useAdminStore = defineStore(
           type: 'warning',
           duration: 3000,
         })
+        // localStorage.clear() // 清除所有 localStorage 数据
+        return false
       }
     }
 
@@ -56,6 +58,7 @@ export const useAdminStore = defineStore(
       token.value = ''
       adminAccount.value = ''
       systemChoose.value = ''
+      // localStorage.clear() // 清除所有 localStorage 数据
     }
 
     // 导出数据

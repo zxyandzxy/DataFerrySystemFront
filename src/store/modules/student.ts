@@ -38,6 +38,8 @@ export const useStuStore = defineStore(
           type: 'warning',
           duration: 3000,
         })
+        // localStorage.clear() // 清除所有 localStorage 数据
+        return false
       }
     }
     const getStuInfo = async () => {

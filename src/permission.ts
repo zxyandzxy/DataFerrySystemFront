@@ -5,6 +5,7 @@ import { useStuStore } from '@/store/modules/student'
 import { useAdminStore } from './store/modules/admin'
 import { useCopyMachineStore } from './store/modules/copyMachine'
 import { usePermissionStore } from '@/store/modules/permission'
+import { copy } from 'clipboard'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
@@ -58,7 +59,12 @@ router.beforeEach(async (to, from, next) => {
       }
     }
   } else {
-    if (whiteList.indexOf(to.path) !== -1 || copyMachineStore.token != '') {
+    if (
+      whiteList.indexOf(to.path) !== -1 ||
+      (copyMachineStore.token != '' &&
+        copyMachineStore.token != undefined &&
+        copyMachineStore.systemChoose != '')
+    ) {
       next()
     } else {
       next(`/login?redirect=${to.path}`)
