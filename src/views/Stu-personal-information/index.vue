@@ -107,6 +107,7 @@
 </template>
 <script setup lang="ts">
   import { ref, reactive, onMounted } from 'vue'
+  import { useRouter } from 'vue-router'
   import { ElForm, ElNotification } from 'element-plus'
   import { stuUpdateContactInfoAPI, stuUpdatePasswordAPI } from '@/api/stuAccountManagement'
   import { useStuStore } from '@/store/modules/student'
@@ -114,6 +115,7 @@
   const stuStore = useStuStore()
   const changePwdDialogVisible = ref(false)
   const changeLinkDialogVisible = ref(false)
+  const router = useRouter()
 
   const ruleForm = reactive({
     curPassword: '',
@@ -201,6 +203,8 @@
         duration: 2000,
       })
       changePwdDialogVisible.value = false
+      // 直接转到登录页面
+      router.push('/login')
     } else {
       ElNotification({
         message: res.msg,

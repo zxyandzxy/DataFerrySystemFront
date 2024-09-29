@@ -431,7 +431,7 @@
                 <el-input v-model="advancedReviewForm.password" />
               </el-form-item>
               <el-form-item label="超前审批密钥" prop="advancedPassword">
-                <el-input v-model="advancedReviewForm.password" />
+                <el-input v-model="advancedReviewForm.advancedPassword" />
               </el-form-item>
               <el-button style="margin-left: 40%" type="primary" @click="getAdvancedReviewResult"
                 >发送超前审批请求</el-button
