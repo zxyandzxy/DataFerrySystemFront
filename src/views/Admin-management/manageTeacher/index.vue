@@ -1,89 +1,87 @@
 <template>
-  <div>
-    <div class="app-container">
-      <div class="app-container-inner">
-        <div v-if="adminStore.systemChoose != '' && adminStore.adminAccount == 'root'">
-          <div class="header">
-            <h2>管理员列表</h2>
-          </div>
-          <div class="middle">
-            <!-- 搜索 -->
-            <div class="search">
-              <el-select v-model="searchType" class="search-type" placeholder="选择搜索类型">
-                <el-option label="账号" value="adminAccount" />
-                <el-option label="姓名" value="adminName" />
-              </el-select>
-              <el-input
-                v-model="searchInfo"
-                class="search-input"
-                :placeholder="searchType === 'adminAccount' ? '按照账号查找' : '按照姓名查找'"
-              />
-              <el-button type="primary" @click="onSubmit" :icon="Search" class="search-button"
-                >查询</el-button
-              >
-            </div>
-            <!-- 添加管理员部分 -->
-            <div class="edit">
-              <el-button type="primary" @click="openAddAdminDialog">添加管理员</el-button>
-            </div>
-          </div>
-          <!-- 表格部分 -->
-          <div class="table">
-            <el-table :data="adminList" border style="width: 100%">
-              <el-table-column prop="adminAccount" label="账号" width="180" align="center" />
-              <el-table-column prop="adminName" label="姓名" width="180" align="center" />
-              <el-table-column prop="telephone" label="电话" align="center" />
-              <el-table-column prop="wechat" label="微信" align="center" />
-              <el-table-column label="操作" align="center">
-                <template #default="{ row }">
-                  <el-button type="primary" @click="resetPassword(row)">重置密码</el-button>
-                  <el-button type="danger" @click="deleteAdmin(row)">删除</el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-          <div class="pagination">
-            <el-pagination
-              background
-              layout="total, prev, pager, next"
-              :total="total"
-              :current-page="pageNum"
-              :page-size="pageSize"
-              @current-change="handlePageChange"
+  <div class="app-container">
+    <div class="app-container-inner">
+      <div v-if="adminStore.systemChoose != '' && adminStore.adminAccount == 'root'">
+        <div class="header">
+          <h2>管理员列表</h2>
+        </div>
+        <div class="middle">
+          <!-- 搜索 -->
+          <div class="search">
+            <el-select v-model="searchType" class="search-type" placeholder="选择搜索类型">
+              <el-option label="账号" value="adminAccount" />
+              <el-option label="姓名" value="adminName" />
+            </el-select>
+            <el-input
+              v-model="searchInfo"
+              class="search-input"
+              :placeholder="searchType === 'adminAccount' ? '按照账号查找' : '按照姓名查找'"
             />
+            <el-button type="primary" @click="onSubmit" :icon="Search" class="search-button"
+              >查询</el-button
+            >
+          </div>
+          <!-- 添加管理员部分 -->
+          <div class="edit">
+            <el-button type="primary" @click="openAddAdminDialog">添加管理员</el-button>
           </div>
         </div>
-
-        <div v-else>
-          <Error />
+        <!-- 表格部分 -->
+        <div class="table">
+          <el-table :data="adminList" border style="width: 100%">
+            <el-table-column prop="adminAccount" label="账号" width="180" align="center" />
+            <el-table-column prop="adminName" label="姓名" width="180" align="center" />
+            <el-table-column prop="telephone" label="电话" align="center" />
+            <el-table-column prop="wechat" label="微信" align="center" />
+            <el-table-column label="操作" align="center">
+              <template #default="{ row }">
+                <el-button type="primary" @click="resetPassword(row)">重置密码</el-button>
+                <el-button type="danger" @click="deleteAdmin(row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
         </div>
-        <!-- 添加管理员弹窗 -->
-        <add-student-dialog
-          :show="showAddAdminDialog"
-          title="添加管理员"
-          field1-name="账号"
-          field2-name="姓名"
-          field1="adminAccount"
-          field2="adminName"
-          @update:show="showAddAdminDialog = $event"
-          @submit="handleAddAdmin"
-        />
-        <!-- 重置密码弹窗 -->
-        <password-dialog
-          :show="showPasswordDialog"
-          :new-password="newPassword"
-          @update:show="showPasswordDialog = $event"
-          :account-info="selectedAdmin"
-          title="重置密码成功！"
-        />
-        <!-- 添加管理员密码回显 -->
-        <password-dialog
-          :show="showAddPasswordDialog"
-          :new-password="addPassword"
-          @update:show="showAddPasswordDialog = $event"
-          title="添加成功！"
-        />
+        <div class="pagination">
+          <el-pagination
+            background
+            layout="total, prev, pager, next"
+            :total="total"
+            :current-page="pageNum"
+            :page-size="pageSize"
+            @current-change="handlePageChange"
+          />
+        </div>
       </div>
+
+      <div v-else>
+        <Error />
+      </div>
+      <!-- 添加管理员弹窗 -->
+      <add-student-dialog
+        :show="showAddAdminDialog"
+        title="添加管理员"
+        field1-name="账号"
+        field2-name="姓名"
+        field1="adminAccount"
+        field2="adminName"
+        @update:show="showAddAdminDialog = $event"
+        @submit="handleAddAdmin"
+      />
+      <!-- 重置密码弹窗 -->
+      <password-dialog
+        :show="showPasswordDialog"
+        :new-password="newPassword"
+        @update:show="showPasswordDialog = $event"
+        :account-info="selectedAdmin"
+        title="重置密码成功！"
+      />
+      <!-- 添加管理员密码回显 -->
+      <password-dialog
+        :show="showAddPasswordDialog"
+        :new-password="addPassword"
+        @update:show="showAddPasswordDialog = $event"
+        title="添加成功！"
+      />
     </div>
   </div>
 </template>
@@ -219,6 +217,7 @@
 </script>
 
 <style scoped lang="scss">
+  @import './index';
   .middle {
     margin-top: 20px;
     display: flex;

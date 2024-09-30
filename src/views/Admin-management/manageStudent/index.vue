@@ -1,112 +1,110 @@
 <template>
-  <div>
-    <div class="app-container">
-      <div class="app-container-inner">
-        <div v-if="adminStore.systemChoose != ''">
-          <div class="header">
-            <h2>学生列表</h2>
-          </div>
-          <div class="middle">
-            <!-- 搜索 -->
-            <div class="search">
-              <div class="search-type">
-                <el-select v-model="searchType" placeholder="选择查询条件">
-                  <el-option label="学号" value="studentAccount"></el-option>
-                  <el-option label="姓名" value="studentName"></el-option>
-                </el-select>
-              </div>
-              <el-input
-                v-model="searchInfo"
-                class="search-input"
-                :placeholder="searchType === 'studentAccount' ? '按照学号查找' : '按照姓名查找'"
-              />
-              <el-button type="primary" @click="onSubmit" :icon="Search" class="search-button">
-                查询
-              </el-button>
+  <div class="app-container">
+    <div class="app-container-inner">
+      <div v-if="adminStore.systemChoose != ''">
+        <div class="header">
+          <h2>学生列表</h2>
+        </div>
+        <div class="middle">
+          <!-- 搜索 -->
+          <div class="search">
+            <div class="search-type">
+              <el-select v-model="searchType" placeholder="选择查询条件">
+                <el-option label="学号" value="studentAccount"></el-option>
+                <el-option label="姓名" value="studentName"></el-option>
+              </el-select>
             </div>
-            <!-- 添加学生，批量添加，批量删除部分 -->
-            <div class="edit">
-              <el-button type="primary" @click="openAddStudentDialog">添加学生</el-button>
-              <el-button type="primary" @click="openBatchAddDialog">批量添加</el-button>
-              <el-button
-                type="danger"
-                @click="batchDeleteStudents"
-                :disabled="selection.length === 0"
-              >
-                批量删除
-              </el-button>
-            </div>
-          </div>
-          <!-- 表格部分 -->
-          <div class="table">
-            <el-table
-              :data="studentList"
-              border
-              style="width: 100%"
-              @selection-change="handleSelectionChange"
-            >
-              <el-table-column type="selection" width="55" align="center" />
-              <el-table-column prop="studentAccount" label="学号" width="180" align="center" />
-              <el-table-column prop="studentName" label="姓名" width="180" align="center" />
-              <el-table-column prop="telephone" label="电话" align="center" />
-              <el-table-column prop="wechat" label="微信号" align="center" />
-              <el-table-column label="操作" align="center">
-                <template #default="{ row }">
-                  <el-button type="primary" @click="resetPassword(row)">重置密码</el-button>
-                  <el-button type="danger" @click="deleteStudent(row)">删除</el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-          <div class="pagination">
-            <el-pagination
-              background
-              layout="total, prev, pager, next"
-              :total="total"
-              :page-size="pageSize"
-              v-model:current-page="pageNum"
-              @current-change="handlePageChange"
+            <el-input
+              v-model="searchInfo"
+              class="search-input"
+              :placeholder="searchType === 'studentAccount' ? '按照学号查找' : '按照姓名查找'"
             />
+            <el-button type="primary" @click="onSubmit" :icon="Search" class="search-button">
+              查询
+            </el-button>
+          </div>
+          <!-- 添加学生，批量添加，批量删除部分 -->
+          <div class="edit">
+            <el-button type="primary" @click="openAddStudentDialog">添加学生</el-button>
+            <el-button type="primary" @click="openBatchAddDialog">批量添加</el-button>
+            <el-button
+              type="danger"
+              @click="batchDeleteStudents"
+              :disabled="selection.length === 0"
+            >
+              批量删除
+            </el-button>
           </div>
         </div>
-        <div v-else>
-          <Error />
+        <!-- 表格部分 -->
+        <div class="table">
+          <el-table
+            :data="studentList"
+            border
+            style="width: 100%"
+            @selection-change="handleSelectionChange"
+          >
+            <el-table-column type="selection" width="55" align="center" />
+            <el-table-column prop="studentAccount" label="学号" width="180" align="center" />
+            <el-table-column prop="studentName" label="姓名" width="180" align="center" />
+            <el-table-column prop="telephone" label="电话" align="center" />
+            <el-table-column prop="wechat" label="微信号" align="center" />
+            <el-table-column label="操作" align="center">
+              <template #default="{ row }">
+                <el-button type="primary" @click="resetPassword(row)">重置密码</el-button>
+                <el-button type="danger" @click="deleteStudent(row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
         </div>
-        <!-- 添加学生弹窗 -->
-        <add-student-dialog
-          :show="showAddStudentDialog"
-          title="添加学生"
-          field1-name="学号"
-          field2-name="姓名"
-          field1="studentAccount"
-          field2="studentName"
-          @update:show="showAddStudentDialog = $event"
-          @submit="handleAddStudent"
-        />
-
-        <!-- 重置密码回显 -->
-        <password-dialog
-          :show="showPasswordDialog"
-          :new-password="newPassword"
-          @update:show="showPasswordDialog = $event"
-          :account-info="selectedStudent"
-          title="重置密码成功！"
-        />
-        <!-- 添加学生的密码回显 -->
-        <password-dialog
-          :show="showAddPasswordDialog"
-          :new-password="addPassword"
-          @update:show="showAddPasswordDialog = $event"
-          title="添加成功！"
-        />
-
-        <!-- 批量添加学生弹窗 -->
-        <batch-add-dialog
-          :show="showBatchAddDialog"
-          @update:show="showBatchAddDialog = $event"
-          @submit="handleBatchAdd"
-        />
+        <div class="pagination">
+          <el-pagination
+            background
+            layout="total, prev, pager, next"
+            :total="total"
+            :page-size="pageSize"
+            v-model:current-page="pageNum"
+            @current-change="handlePageChange"
+          />
+        </div>
       </div>
+      <div v-else>
+        <Error />
+      </div>
+      <!-- 添加学生弹窗 -->
+      <add-student-dialog
+        :show="showAddStudentDialog"
+        title="添加学生"
+        field1-name="学号"
+        field2-name="姓名"
+        field1="studentAccount"
+        field2="studentName"
+        @update:show="showAddStudentDialog = $event"
+        @submit="handleAddStudent"
+      />
+
+      <!-- 重置密码回显 -->
+      <password-dialog
+        :show="showPasswordDialog"
+        :new-password="newPassword"
+        @update:show="showPasswordDialog = $event"
+        :account-info="selectedStudent"
+        title="重置密码成功！"
+      />
+      <!-- 添加学生的密码回显 -->
+      <password-dialog
+        :show="showAddPasswordDialog"
+        :new-password="addPassword"
+        @update:show="showAddPasswordDialog = $event"
+        title="添加成功！"
+      />
+
+      <!-- 批量添加学生弹窗 -->
+      <batch-add-dialog
+        :show="showBatchAddDialog"
+        @update:show="showBatchAddDialog = $event"
+        @submit="handleBatchAdd"
+      />
     </div>
   </div>
 </template>
