@@ -1,141 +1,139 @@
 <template>
-  <div>
-    <div class="app-container">
-      <div class="app-container-inner">
-        <div v-if="adminStore.systemChoose != ''">
-          <div class="header">
-            <h2>管理工单</h2>
-          </div>
-          <div class="middle">
-            <!-- 搜索 -->
-            <div class="search">
-              <div class="search-type">
-                <el-select v-model="searchType" placeholder="选择查询条件">
-                  <el-option label="工单号" value="workOrderId"></el-option>
-                  <el-option label="工单标题" value="workOrderTitle"></el-option>
-                  <el-option label="发起人姓名" value="studentName"></el-option>
-                  <el-option label="工单审批状态" value="workOrderStatus"></el-option>
-                </el-select>
-              </div>
-              <el-input
-                v-model="searchInfo"
-                class="search-input"
-                :placeholder="searchMap[searchType]"
-              />
-              <el-button type="primary" @click="onSubmit" :icon="Search" class="search-button">
-                查询
-              </el-button>
+  <div class="app-container">
+    <div class="app-container-inner">
+      <div v-if="adminStore.systemChoose != ''">
+        <div class="header">
+          <h2>管理工单</h2>
+        </div>
+        <div class="middle">
+          <!-- 搜索 -->
+          <div class="search">
+            <div class="search-type">
+              <el-select v-model="searchType" placeholder="选择查询条件">
+                <el-option label="工单号" value="workOrderId"></el-option>
+                <el-option label="工单标题" value="workOrderTitle"></el-option>
+                <el-option label="发起人姓名" value="studentName"></el-option>
+                <el-option label="工单审批状态" value="workOrderStatus"></el-option>
+              </el-select>
             </div>
-          </div>
-          <!-- 表格部分 -->
-          <div class="table">
-            <el-table :data="ticketList" border style="width: 100%">
-              <el-table-column prop="workOrderId" label="工单号" width="180" align="center" />
-              <el-table-column prop="workOrderTitle" label="标题" width="180" align="center" />
-              <el-table-column prop="studentName" label="发起人" width="180" align="center" />
-              <el-table-column prop="createTime" label="发起时间" width="180" align="center" />
-              <el-table-column label="工单审批状态" width="180" align="center">
-                <template #default="{ row }">
-                  {{ statusMapNum2Str[row.workOrderStatus] }}
-                </template>
-              </el-table-column>
-              <el-table-column label="操作" align="center">
-                <template #default="{ row }">
-                  <el-button type="primary" @click="viewTicket(row)"
-                    >{{
-                      row.workOrderStatus === 21 ||
-                      row.workOrderStatus === 22 ||
-                      row.workOrderStatus === 1
-                        ? '查看'
-                        : '审批'
-                    }}
-                  </el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-          <div class="pagination">
-            <el-pagination
-              background
-              layout="prev, pager, next"
-              :total="total"
-              :page-size="pageSize"
-              :current-page="currentPage"
-              @current-change="handlePageChange"
+            <el-input
+              v-model="searchInfo"
+              class="search-input"
+              :placeholder="searchMap[searchType]"
             />
+            <el-button type="primary" @click="onSubmit" :icon="Search" class="search-button">
+              查询
+            </el-button>
           </div>
         </div>
-        <div v-else>
-          <Error />
+        <!-- 表格部分 -->
+        <div class="table">
+          <el-table :data="ticketList" border style="width: 100%">
+            <el-table-column prop="workOrderId" label="工单号" width="180" align="center" />
+            <el-table-column prop="workOrderTitle" label="标题" width="180" align="center" />
+            <el-table-column prop="studentName" label="发起人" width="180" align="center" />
+            <el-table-column prop="createTime" label="发起时间" width="180" align="center" />
+            <el-table-column label="工单审批状态" width="180" align="center">
+              <template #default="{ row }">
+                {{ statusMapNum2Str[row.workOrderStatus] }}
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" align="center">
+              <template #default="{ row }">
+                <el-button type="primary" @click="viewTicket(row)"
+                  >{{
+                    row.workOrderStatus === 21 ||
+                    row.workOrderStatus === 22 ||
+                    row.workOrderStatus === 1
+                      ? '查看'
+                      : '审批'
+                  }}
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+        <div class="pagination">
+          <el-pagination
+            background
+            layout="prev, pager, next"
+            :total="total"
+            :page-size="pageSize"
+            :current-page="currentPage"
+            @current-change="handlePageChange"
+          />
         </div>
       </div>
-      <!-- 弹出窗口 -->
-      <el-dialog title="工单详情" v-model="isDialogVisible" width="600px">
-        <div>
-          <div class="form-item">
-            <label>工单标题:</label>
-            <el-input v-model="currentTicket.workOrderTitle" readonly />
-          </div>
-          <div class="form-item">
-            <label>审批类型:</label>
-            <el-input v-model="currentTicket.auditType" readonly />
-          </div>
-          <div class="form-item">
-            <div
-              v-if="
-                currentTicket.workOrderStatus == 11 ||
-                currentTicket.workOrderStatus == 21 ||
-                currentTicket.workOrderStatus == 22
-              "
+      <div v-else>
+        <Error />
+      </div>
+    </div>
+    <!-- 弹出窗口 -->
+    <el-dialog title="工单详情" v-model="isDialogVisible" width="600px">
+      <div>
+        <div class="form-item">
+          <label>工单标题:</label>
+          <el-input v-model="currentTicket.workOrderTitle" readonly />
+        </div>
+        <div class="form-item">
+          <label>审批类型:</label>
+          <el-input v-model="currentTicket.auditType" readonly />
+        </div>
+        <div class="form-item">
+          <div
+            v-if="
+              currentTicket.workOrderStatus == 11 ||
+              currentTicket.workOrderStatus == 21 ||
+              currentTicket.workOrderStatus == 22
+            "
+          >
+            <label>文件内容:</label>
+            <el-link
+              type="primary"
+              :href="currentTicket.fileURL"
+              target="_blank"
+              style="margin-left: 230px"
+              >点击下载</el-link
             >
-              <label>文件内容:</label>
-              <el-link
-                type="primary"
-                :href="currentTicket.fileURL"
-                target="_blank"
-                style="margin-left: 230px"
-                >点击下载</el-link
-              >
-            </div>
-          </div>
-          <div class="form-item">
-            <label>文件概述:</label>
-            <el-input v-model="currentTicket.fileAbstract" readonly />
-          </div>
-          <div class="form-item">
-            <label>拷贝原因:</label>
-            <el-input v-model="currentTicket.copyReason" readonly />
-          </div>
-          <div class="form-item">
-            <label>发起人:</label>
-            <el-input v-model="currentTicket.studentName" readonly />
-          </div>
-          <div class="form-item">
-            <label>提交时间:</label>
-            <el-input v-model="currentTicket.createTime" readonly />
-          </div>
-          <div class="form-item">
-            <label>备注:</label>
-            <el-input
-              v-model="currentTicket.remark"
-              type="textarea"
-              :readonly="
-                !(
-                  currentTicket.workOrderStatus == 1 ||
-                  currentTicket.workOrderStatus == 2 ||
-                  currentTicket.workOrderStatus == 3 ||
-                  currentTicket.workOrderStatus == 11
-                )
-              "
-            />
-          </div>
-          <div v-if="currentTicket?.workOrderStatus == 3 || currentTicket?.workOrderStatus == 11">
-            <el-button type="primary" @click="approveTicket(21)">审批通过</el-button>
-            <el-button type="danger" @click="approveTicket(22)">审批驳回</el-button>
           </div>
         </div>
-      </el-dialog>
-    </div>
+        <div class="form-item">
+          <label>文件概述:</label>
+          <el-input v-model="currentTicket.fileAbstract" readonly />
+        </div>
+        <div class="form-item">
+          <label>拷贝原因:</label>
+          <el-input v-model="currentTicket.copyReason" readonly />
+        </div>
+        <div class="form-item">
+          <label>发起人:</label>
+          <el-input v-model="currentTicket.studentName" readonly />
+        </div>
+        <div class="form-item">
+          <label>提交时间:</label>
+          <el-input v-model="currentTicket.createTime" readonly />
+        </div>
+        <div class="form-item">
+          <label>备注:</label>
+          <el-input
+            v-model="currentTicket.remark"
+            type="textarea"
+            :readonly="
+              !(
+                currentTicket.workOrderStatus == 1 ||
+                currentTicket.workOrderStatus == 2 ||
+                currentTicket.workOrderStatus == 3 ||
+                currentTicket.workOrderStatus == 11
+              )
+            "
+          />
+        </div>
+        <div v-if="currentTicket?.workOrderStatus == 3 || currentTicket?.workOrderStatus == 11">
+          <el-button type="primary" @click="approveTicket(21)">审批通过</el-button>
+          <el-button type="danger" @click="approveTicket(22)">审批驳回</el-button>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -266,6 +264,7 @@
 </script>
 
 <style scoped lang="scss">
+  @import './index';
   .middle {
     margin-top: 20px;
     display: flex;

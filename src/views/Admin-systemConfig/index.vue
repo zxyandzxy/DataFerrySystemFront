@@ -1,104 +1,102 @@
 <template>
-  <div>
-    <div class="app-container">
-      <div class="app-container-inner">
-        <div v-if="adminStore.systemChoose != ''">
-          <h2>审批模式</h2>
-          <el-card :shadow="false" class="card-content">
-            <div class="card-inner">
-              <p
-                >当前审批模式:
-                {{ systemConfigStore.currentConfig?.auditType == 0 ? '即时审批' : '定期审批' }}</p
-              >
-              <p
-                >超前审批状态:
-                {{ systemConfigStore.currentConfig?.advanceApproval == 0 ? '未开启' : '已开启' }}</p
-              >
-              <p v-if="systemConfigStore.currentConfig?.advanceApproval == 1" class="salt">
-                盐值
-                <el-tooltip content="盐值是用于加密的字符串">
-                  <el-icon style="margin-left: 5px; margin-right: 5px"><QuestionFilled /></el-icon>
-                </el-tooltip>
-                : {{ systemConfigStore.currentConfig?.saltValue }}
-              </p>
-              <el-button type="primary" @click="editMode">编辑</el-button>
-            </div>
-          </el-card>
-        </div>
-        <div v-else>
-          <Error />
-        </div>
-        <!-- 审批模式编辑窗口 -->
-        <el-dialog
-          title="编辑审批模式"
-          v-model="showModal"
-          width="30%"
-          :close-on-click-modal="false"
-          :before-close="handleChangeClose"
-        >
-          <el-form :model="form" label-width="140px">
-            <el-form-item label="当前审批状态">
-              {{ systemConfigStore.currentConfig?.auditType == 0 ? '即时审批' : '定期审批' }}
-            </el-form-item>
-            <el-form-item label="切换审批模式">
-              <el-select placeholder="请选择" v-model="form.auditType" style="width: 200px">
-                <el-option
-                  label="定期审批"
-                  value="1"
-                  v-if="systemConfigStore.currentConfig.auditType != 1"
-                ></el-option>
-                <el-option
-                  label="即时审批"
-                  value="0"
-                  v-if="systemConfigStore.currentConfig.auditType != 0"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item v-if="form.auditType == 0" label="是否开启超前审批">
-              <el-radio-group v-model="form.advancedApproval">
-                <el-radio :label="1">是</el-radio>
-                <el-radio :label="0">否</el-radio>
-              </el-radio-group>
-            </el-form-item>
-            <el-form-item v-if="form.advancedApproval == 1" label="盐值">
-              <el-input v-model="form.saltValue" style="width: 200px">
-                <template #suffix>
-                  <el-tooltip content="盐值是用于加密的随机字符串">
-                    <el-icon><QuestionFilled /></el-icon>
-                  </el-tooltip>
-                </template>
-              </el-input>
-            </el-form-item>
-          </el-form>
-          <div slot="footer" style="text-align: right">
-            <el-button @click="showModal = false">取消</el-button>
-            <el-button type="primary" @click="saveChanges">确定</el-button>
+  <div class="app-container">
+    <div class="app-container-inner">
+      <div v-if="adminStore.systemChoose != ''">
+        <h2>审批模式</h2>
+        <el-card :shadow="false" class="card-content">
+          <div class="card-inner">
+            <p
+              >当前审批模式:
+              {{ systemConfigStore.currentConfig?.auditType == 0 ? '即时审批' : '定期审批' }}</p
+            >
+            <p
+              >超前审批状态:
+              {{ systemConfigStore.currentConfig?.advanceApproval == 0 ? '未开启' : '已开启' }}</p
+            >
+            <p v-if="systemConfigStore.currentConfig?.advanceApproval == 1" class="salt">
+              盐值
+              <el-tooltip content="盐值是用于加密的字符串">
+                <el-icon style="margin-left: 5px; margin-right: 5px"><QuestionFilled /></el-icon>
+              </el-tooltip>
+              : {{ systemConfigStore.currentConfig?.saltValue }}
+            </p>
+            <el-button type="primary" @click="editMode">编辑</el-button>
           </div>
-        </el-dialog>
-
-        <!-- 身份验证窗口 -->
-        <el-dialog
-          title="身份验证"
-          v-model="authDialogVisible"
-          width="30%"
-          :before-close="handleAuthClose"
-        >
-          <el-form :model="authForm" ref="authFormRef" :rules="authRules" label-width="80px">
-            <el-form-item prop="password" label="密码">
-              <el-input type="password" v-model="authForm.password"></el-input>
-            </el-form-item>
-            <el-form-item prop="confirmPassword" label="重复密码">
-              <el-input type="password" v-model="authForm.confirmPassword"></el-input>
-            </el-form-item>
-          </el-form>
-          <template #footer>
-            <span class="dialog-footer">
-              <el-button @click="authDialogVisible = false">取消</el-button>
-              <el-button type="primary" @click="submitAuth">确认</el-button>
-            </span>
-          </template>
-        </el-dialog>
+        </el-card>
       </div>
+      <div v-else>
+        <Error />
+      </div>
+      <!-- 审批模式编辑窗口 -->
+      <el-dialog
+        title="编辑审批模式"
+        v-model="showModal"
+        width="30%"
+        :close-on-click-modal="false"
+        :before-close="handleChangeClose"
+      >
+        <el-form :model="form" label-width="140px">
+          <el-form-item label="当前审批状态">
+            {{ systemConfigStore.currentConfig?.auditType == 0 ? '即时审批' : '定期审批' }}
+          </el-form-item>
+          <el-form-item label="切换审批模式">
+            <el-select placeholder="请选择" v-model="form.auditType" style="width: 200px">
+              <el-option
+                label="定期审批"
+                value="1"
+                v-if="systemConfigStore.currentConfig.auditType != 1"
+              ></el-option>
+              <el-option
+                label="即时审批"
+                value="0"
+                v-if="systemConfigStore.currentConfig.auditType != 0"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item v-if="form.auditType == 0" label="是否开启超前审批">
+            <el-radio-group v-model="form.advancedApproval">
+              <el-radio :label="1">是</el-radio>
+              <el-radio :label="0">否</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item v-if="form.advancedApproval == 1" label="盐值">
+            <el-input v-model="form.saltValue" style="width: 200px">
+              <template #suffix>
+                <el-tooltip content="盐值是用于加密的随机字符串">
+                  <el-icon><QuestionFilled /></el-icon>
+                </el-tooltip>
+              </template>
+            </el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" style="text-align: right">
+          <el-button @click="showModal = false">取消</el-button>
+          <el-button type="primary" @click="saveChanges">确定</el-button>
+        </div>
+      </el-dialog>
+
+      <!-- 身份验证窗口 -->
+      <el-dialog
+        title="身份验证"
+        v-model="authDialogVisible"
+        width="30%"
+        :before-close="handleAuthClose"
+      >
+        <el-form :model="authForm" ref="authFormRef" :rules="authRules" label-width="80px">
+          <el-form-item prop="password" label="密码">
+            <el-input type="password" v-model="authForm.password"></el-input>
+          </el-form-item>
+          <el-form-item prop="confirmPassword" label="重复密码">
+            <el-input type="password" v-model="authForm.confirmPassword"></el-input>
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="authDialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="submitAuth">确认</el-button>
+          </span>
+        </template>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -215,6 +213,7 @@
 </script>
 
 <style scoped lang="scss">
+  @import './index';
   .card-content {
     border: none;
     text-align: center;

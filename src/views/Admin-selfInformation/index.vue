@@ -1,78 +1,76 @@
 <template>
-  <div>
-    <div class="app-container">
-      <div class="app-container-inner">
-        <div v-if="manageAdminStore.systemChoose != ''">
-          <div class="profile-container">
-            <div class="section">
-              <div class="section-title">账户信息</div>
-              <div class="section-content">
-                <el-form :model="currentAdmin" label-width="80px">
-                  <el-form-item label="账号">
-                    <el-input v-model="currentAdmin.adminAccount" disabled />
-                  </el-form-item>
-                  <el-form-item label="姓名">
-                    <el-input v-model="currentAdmin.adminName" disabled />
-                  </el-form-item>
-                </el-form>
-              </div>
+  <div class="app-container">
+    <div class="app-container-inner">
+      <div v-if="manageAdminStore.systemChoose != ''">
+        <div class="profile-container">
+          <div class="section">
+            <div class="section-title">账户信息</div>
+            <div class="section-content">
+              <el-form :model="currentAdmin" label-width="80px">
+                <el-form-item label="账号">
+                  <el-input v-model="currentAdmin.adminAccount" disabled />
+                </el-form-item>
+                <el-form-item label="姓名">
+                  <el-input v-model="currentAdmin.adminName" disabled />
+                </el-form-item>
+              </el-form>
             </div>
-            <div class="section">
-              <div class="section-title">联系方式</div>
-              <div class="section-content">
-                <el-form :model="contactForm" label-width="80px">
-                  <el-form-item label="手机号">
-                    <el-input v-model="contactForm.telephone" :disabled="!editMode" />
-                  </el-form-item>
-                  <el-form-item label="微信号">
-                    <el-input v-model="contactForm.wechat" :disabled="!editMode" />
-                  </el-form-item>
-                </el-form>
-                <div class="edit-buttons">
-                  <el-button type="primary" @click="toggleEditMode">
-                    {{ editMode ? '保存' : '编辑' }}
-                  </el-button>
-                  <el-button v-if="editMode" @click="resetForm">取消</el-button>
-                  <el-button type="warning" @click="openPasswordDialog">修改密码</el-button>
-                </div>
+          </div>
+          <div class="section">
+            <div class="section-title">联系方式</div>
+            <div class="section-content">
+              <el-form :model="contactForm" label-width="80px">
+                <el-form-item label="手机号">
+                  <el-input v-model="contactForm.telephone" :disabled="!editMode" />
+                </el-form-item>
+                <el-form-item label="微信号">
+                  <el-input v-model="contactForm.wechat" :disabled="!editMode" />
+                </el-form-item>
+              </el-form>
+              <div class="edit-buttons">
+                <el-button type="primary" @click="toggleEditMode">
+                  {{ editMode ? '保存' : '编辑' }}
+                </el-button>
+                <el-button v-if="editMode" @click="resetForm">取消</el-button>
+                <el-button type="warning" @click="openPasswordDialog">修改密码</el-button>
               </div>
             </div>
           </div>
         </div>
-        <div v-else><Error /></div>
-        <el-dialog title="修改密码" v-model="passwordDialogVisible" @close="resetPasswordForm">
-          <el-form :model="passwordForm" label-width="100px">
-            <el-form-item label="旧密码">
-              <el-input
-                v-model="passwordForm.oldPassword"
-                type="password"
-                show-password
-                autocomplete="off"
-              />
-            </el-form-item>
-            <el-form-item label="新密码">
-              <el-input
-                v-model="passwordForm.newPassword"
-                type="password"
-                show-password
-                autocomplete="off"
-              />
-            </el-form-item>
-            <el-form-item label="确认新密码">
-              <el-input
-                v-model="passwordForm.confirmPassword"
-                type="password"
-                show-password
-                autocomplete="off"
-              />
-            </el-form-item>
-          </el-form>
-          <div class="dialog-footer" slot="footer">
-            <el-button @click="passwordDialogVisible = false">取消</el-button>
-            <el-button type="primary" @click="changePassword">确认</el-button>
-          </div>
-        </el-dialog>
       </div>
+      <div v-else><Error /></div>
+      <el-dialog title="修改密码" v-model="passwordDialogVisible" @close="resetPasswordForm">
+        <el-form :model="passwordForm" label-width="100px">
+          <el-form-item label="旧密码">
+            <el-input
+              v-model="passwordForm.oldPassword"
+              type="password"
+              show-password
+              autocomplete="off"
+            />
+          </el-form-item>
+          <el-form-item label="新密码">
+            <el-input
+              v-model="passwordForm.newPassword"
+              type="password"
+              show-password
+              autocomplete="off"
+            />
+          </el-form-item>
+          <el-form-item label="确认新密码">
+            <el-input
+              v-model="passwordForm.confirmPassword"
+              type="password"
+              show-password
+              autocomplete="off"
+            />
+          </el-form-item>
+        </el-form>
+        <div class="dialog-footer" slot="footer">
+          <el-button @click="passwordDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="changePassword">确认</el-button>
+        </div>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -196,6 +194,7 @@
 </script>
 
 <style scoped lang="scss">
+  @import './index';
   .profile-container {
     max-width: 800px;
     margin: 0 auto;

@@ -1,25 +1,42 @@
 import service from './request'
 
 // 获取所有学生空间情况 API
-export const getAllStudentsSpaceAPI = (pageNum: number, pageSize: number) => {
+export const getAllStudentsSpaceAPI = (
+  pageNum: number,
+  pageSize: number,
+  studentAccount: string,
+  studentName: string,
+) => {
   return service
     .get('/manager/get_students_space', {
       params: {
         pageNum, // 分页参数
         pageSize, // 每页显示条数
+        studentAccount,
+        studentName,
       },
     })
     .then((response) => response.data.data)
 }
 
 // 查看学生文件 API
-export const viewStudentFilesAPI = (studentId: string, pageNum: number, pageSize: number) => {
+export const viewStudentFilesAPI = (
+  studentId: string,
+  pageNum: number,
+  pageSize: number,
+  fileName: string,
+  dateStart: number,
+  dateEnd: number,
+) => {
   return service
     .get('/manager/view_files', {
       params: {
         studentId, // 学生ID为必需参数
         pageNum,
         pageSize,
+        fileName,
+        dateStart,
+        dateEnd,
       },
     })
     .then((response) => response.data.data)
