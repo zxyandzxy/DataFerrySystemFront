@@ -9,7 +9,7 @@ export function getAuditTypeAPI() {
 }
 
 // 获取工单列表
-export function getWorkOrderListAPI(pageNum, pageSize, studentAccount) {
+export function getWorkOrderListAPI(pageNum, pageSize, studentAccount, workOrderTitle, fileType) {
   return request({
     url: '/student/get_list',
     method: 'GET',
@@ -17,6 +17,8 @@ export function getWorkOrderListAPI(pageNum, pageSize, studentAccount) {
       pageNum,
       pageSize,
       studentAccount,
+      workOrderTitle,
+      fileType,
     },
   })
 }
