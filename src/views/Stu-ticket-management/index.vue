@@ -2,8 +2,25 @@
   <div class="app-container">
     <div class="app-container-inner">
       <div v-if="stuStore.systemChoose != ''">
-        <div style="display: flex; align-items: center">
+        <div>
           <h2 style="margin-left: 5%">工单列表</h2>
+          <el-input
+            v-model="content"
+            style="max-width: 600px; margin-left: 5%"
+            placeholder="工单名称支持模糊搜索，文件类型不支持"
+            clearable
+            size="large"
+          >
+            <template #prepend>
+              <el-select v-model="select" placeholder="类型" style="width: 115px" size="large">
+                <el-option label="工单名称" value="1" />
+                <el-option label="文件类型" value="2" />
+              </el-select>
+            </template>
+            <template #append>
+              <el-button :icon="Search" @click="searchWithContent" />
+            </template>
+          </el-input>
           <el-button
             @click="showCreateWorkOrder"
             size="large"
@@ -15,7 +32,7 @@
             新建工单
           </el-button>
         </div>
-        <el-table :data="tableData" style="width: 90%; margin-left: 3%">
+        <el-table :data="tableData" style="width: 90%; margin-left: 3%" border>
           <el-table-column fixed prop="workOrderId" label="工单号" width="150" />
           <el-table-column prop="workOrderTitle" label="工单标题" width="150" />
           <el-table-column prop="fileType" label="文件类型" width="150" />
@@ -91,9 +108,9 @@
                 <el-input v-model="workOrderForm.copyReason" type="textarea" />
               </el-form-item>
               <el-form-item label="文件解压密码" prop="unzipPassword">
-                <el-input v-model="workOrderForm.unzipPassword" />
+                <el-input disabled v-model="workOrderForm.unzipPassword" />
                 <el-button @click="createUnzipPassword" size="large" type="primary" link
-                  >系统生成</el-button
+                  >系统生成(请点击此按钮)</el-button
                 >
               </el-form-item>
             </el-form>
@@ -175,11 +192,7 @@
             <el-step title="创建中" :icon="Postcard" />
             <el-step title="审核中" :icon="FolderChecked" />
             <el-step title="可拷贝" :icon="SuccessFilled" />
-            <el-step
-              :status="workOrderDetailForm.workOrderStatus == 21 ? 'success' : 'error'"
-              title="审核成功/失败"
-              :icon="Lock"
-            />
+            <el-step :status="getFinishWorkOrdersStatus" title="审核成功/失败" :icon="Lock" />
           </el-steps>
           <div v-if="workOrderDetailForm.workOrderStatus == 1">
             <h3>基本信息</h3>
@@ -212,9 +225,9 @@
                   <el-input v-model="workOrderDetailForm.copyReason" type="textarea" />
                 </el-form-item>
                 <el-form-item label="文件解压密码" prop="unzipPassword">
-                  <el-input v-model="workOrderDetailForm.unzipPassword" />
+                  <el-input disabled v-model="workOrderDetailForm.unzipPassword" />
                   <el-button @click="createUnzipPassword" size="large" type="primary" link
-                    >系统生成(建议使用)</el-button
+                    >系统生成(请点击此按钮)</el-button
                   >
                 </el-form-item>
               </el-form>
@@ -471,6 +484,7 @@
   } from '@/api/stuWorkOrderApproval'
   import { useStuStore } from '@/store/modules/student'
   import Error from '@/views/error/404.vue'
+  import { Search } from '@element-plus/icons-vue'
 
   const { toClipboard } = useClipboard()
   const stuStore = useStuStore()
@@ -507,7 +521,6 @@
     copyReason: '',
     unzipPassword: '',
   })
-  // console.log(workOrderForm, 121211211122121)
 
   const workOrderDetailForm = ref({
     workOrderId: '',
@@ -548,6 +561,81 @@
   const total = ref(0)
   //const tableData = ref([])
   const pageSize = ref(10)
+  const handleCurrentChange = (val) => {
+    currentPage.value = val
+    getWorkOrderList()
+  }
+
+  // 搜索操作
+  const content = ref('')
+  const select = ref('')
+  const searchWithContent = async () => {
+    if (select.value == '1') {
+      // 按工单名搜索
+      let res = await getWorkOrderListAPI(
+        currentPage.value,
+        pageSize.value,
+        stuStore.stuId,
+        content.value,
+        -1,
+      )
+      res = res.data
+      if (res.code === 200) {
+        total.value = res.data.total
+        for (let i = 0; i < res.data.items.length; i++) {
+          res.data.items[i].workOrderStatus = num2LabelMap.get(res.data.items[i].workOrderStatus)
+          res.data.items[i].fileType = fileType2LabelMap.get(res.data.items[i].fileType)
+        }
+        tableData.value = res.data.items
+      } else {
+        ElNotification({
+          message: res.msg,
+          type: 'error',
+          duration: 2000,
+        })
+      }
+    } else if (select.value == '2') {
+      // 按文件类型搜索
+      const lowerContent = content.value.toLowerCase()
+      let fileTypeNum
+      if (lowerContent == 'docx' || lowerContent == 'doc') {
+        fileTypeNum = 0
+      } else if (lowerContent == 'pdf') {
+        fileTypeNum = 1
+      } else if (lowerContent == 'pptx' || lowerContent == 'ppt') {
+        fileTypeNum = 2
+      } else if (lowerContent == 'zip') {
+        fileTypeNum = 3
+      } else {
+        fileTypeNum = 4
+      }
+      let res = await getWorkOrderListAPI(
+        currentPage.value,
+        pageSize.value,
+        stuStore.stuId,
+        '',
+        fileTypeNum,
+      )
+      res = res.data
+      if (res.code === 200) {
+        total.value = res.data.total
+        for (let i = 0; i < res.data.items.length; i++) {
+          res.data.items[i].workOrderStatus = num2LabelMap.get(res.data.items[i].workOrderStatus)
+          res.data.items[i].fileType = fileType2LabelMap.get(res.data.items[i].fileType)
+        }
+        tableData.value = res.data.items
+      } else {
+        ElNotification({
+          message: res.msg,
+          type: 'error',
+          duration: 2000,
+        })
+      }
+    } else {
+      // 查询所有
+      getWorkOrderList()
+    }
+  }
 
   // 新建工单
   const createWorkOrderVisible = ref(false)
@@ -651,6 +739,17 @@
   // 查看工单
   const active = ref(0) // 流程组件的控制
   const viewWorkOrderVisible = ref(false)
+  const getFinishWorkOrdersStatus = () => {
+    let status
+    if (workOrderDetailForm.workOrderStatus === 21) {
+      status = 'success'
+    } else if (workOrderDetailForm.workOrderStatus === 22) {
+      status = 'error'
+    } else {
+      status = 'process'
+    }
+    return status
+  }
   const changeToAdvancedReview = () => {
     advancedReviewForm.value.workOrderId = workOrderDetailForm.value.workOrderId
     advancedReviewVisible.value = true
@@ -725,15 +824,7 @@
       })
     }
   }
-  // 工单状态转步骤标签信息
-  const getProgressStatus = () => {
-    if (workOrderDetailForm.value.workOrderStatus == 21) {
-      return 'success'
-    } else if (workOrderDetailForm.value.workOrderStatus == 22) {
-      return 'error'
-    }
-    return 'process'
-  }
+
   // 进入工单详情页
   const viewWorkOrder = async (index) => {
     workOrderDetailForm.value.workOrderStatus = label2NumMap.get(
@@ -743,19 +834,19 @@
     // 测试用，后续删
     viewWorkOrderVisible.value = true
     if (workOrderDetailForm.value.workOrderStatus === 1) {
-      active.value = 0
+      active.value = 1
       // 创建表单页面
     } else if (workOrderDetailForm.value.workOrderStatus === 3) {
-      active.value = 1
+      active.value = 2
       // 审批表单页面
     } else if (workOrderDetailForm.value.workOrderStatus === 11) {
-      active.value = 2
+      active.value = 3
       // 可拷贝页面
     } else if (
       workOrderDetailForm.value.workOrderStatus === 21 ||
       workOrderDetailForm.value.workOrderStatus === 22
     ) {
-      active.value = 3
+      active.value = 4
       // 审批结果
     }
     let res = await getWorkOrderDetailAPI(tableData.value[index].workOrderId, stuStore.stuId)
@@ -914,12 +1005,11 @@
   ])
 
   const getWorkOrderList = async () => {
-    let res = await getWorkOrderListAPI(currentPage.value, pageSize.value, stuStore.stuId)
+    let res = await getWorkOrderListAPI(currentPage.value, pageSize.value, stuStore.stuId, '', -1)
     res = res.data
 
     if (res.code === 200) {
       total.value = res.data.total
-
       for (let i = 0; i < res.data.items.length; i++) {
         res.data.items[i].workOrderStatus = num2LabelMap.get(res.data.items[i].workOrderStatus)
         res.data.items[i].fileType = fileType2LabelMap.get(res.data.items[i].fileType)

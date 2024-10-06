@@ -1,7 +1,7 @@
 import request from './request'
 
 // 文件查看
-export function viewFileAPI(pageNum, pageSize, student_id) {
+export function viewFileAPI(pageNum, pageSize, student_id, fileType, fileName) {
   return request({
     url: '/student/view_files',
     method: 'GET',
@@ -9,6 +9,8 @@ export function viewFileAPI(pageNum, pageSize, student_id) {
       pageNum,
       pageSize,
       student_id,
+      fileType,
+      fileName,
     },
   })
 }
