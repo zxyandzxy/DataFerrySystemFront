@@ -25,8 +25,8 @@ export const viewStudentFilesAPI = (
   pageNum: number,
   pageSize: number,
   fileName: string,
-  dateStart: number,
-  dateEnd: number,
+  dateStart: string,
+  dateEnd: string,
 ) => {
   return service
     .get('/manager/view_files', {

@@ -89,10 +89,14 @@
 
   // 获取日志列表数据
   const getLogList = async () => {
+    let startDateParam
+    let endDateParam
+    if (dateRange.value != null && dateRange.value[0] != null && dateRange.value[1] != null) {
+      startDateParam = new Date(dateRange.value[0]).getTime() // 开始时间转换为时间戳
+      endDateParam = new Date(dateRange.value[1]).getTime() // 结束时间转换为时间戳
+    }
     const params = {
       studentAccount: searchStudentAccount.value,
-      startDate: dateRange.value[0] ? new Date(dateRange.value[0]).getTime() : null, // 开始时间戳
-      endDate: dateRange.value[1] ? new Date(dateRange.value[1]).getTime() : null, // 结束时间戳
       isWorkOrderIdNull: isWorkOrderIdNull.value, // 工单ID不为空
       existText: existText.value, // 备注包含“上传文件”
       isAccountNull: isAccountNull.value, // 管理员账号和学生账号不为空
@@ -105,8 +109,8 @@
         params.pageNum,
         params.pageSize,
         params.studentAccount,
-        params.startDate,
-        params.endDate,
+        startDateParam !== undefined ? Math.floor(startDateParam / 1000) + '' : '',
+        endDateParam !== undefined ? Math.floor(endDateParam / 1000) + '' : '',
         params.isWorkOrderIdNull, // 新增的布尔参数
         params.existText, // 新增的布尔参数
         params.isAccountNull, // 新增的布尔参数

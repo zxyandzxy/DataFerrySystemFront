@@ -194,8 +194,8 @@
     const searchParams = {
       pageNum: currentPage.value,
       pageSize: pageSize,
-      studentAccount: searchType.value === 'studentAccount' ? searchInfo.value : undefined,
-      studentName: searchType.value === 'studentName' ? searchInfo.value : undefined,
+      studentAccount: searchType.value === 'studentAccount' ? searchInfo.value : '',
+      studentName: searchType.value === 'studentName' ? searchInfo.value : '',
     }
     try {
       const response = await getAllStudentsSpaceAPI(
@@ -237,10 +237,11 @@
         currentStudentAccount.value,
         pageNum,
         filePageSize,
-        searchFileName.value,
-        startDateParam,
-        endDateParam,
+        searchFileName.value !== undefined ? searchFileName.value : null,
+        startDateParam !== undefined ? Math.floor(startDateParam / 1000) + '' : '',
+        endDateParam !== undefined ? Math.floor(endDateParam / 1000) + '' : '',
       )
+
       currentFiles.value = response.array // 获取学生文件列表
       totalFiles.value = response.total // 总文件数
     } catch (error) {}
@@ -260,9 +261,11 @@
   // 删除文件
   const deleteFile = async (file) => {
     try {
-      await deleteStudentFilesAPI(currentStudentAccount.value, file.uploadId)
+      let res = await deleteStudentFilesAPI(currentStudentAccount.value, file.uploadId)
       await getStudentFiles(currentFilePage.value) // 重新获取文件列表
-      ElMessage.success(`文件 ${file.fileName} 删除成功`)
+      if (res.data.code == 200) {
+        ElMessage.success(`文件 ${file.fileName} 删除成功`)
+      }
     } catch (error) {
       return
     }

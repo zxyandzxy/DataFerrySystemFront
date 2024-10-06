@@ -6,9 +6,9 @@ export const getLogListAPI = (
   studentAccount: string,
   dateStart: number,
   dateEnd: number,
-  isWorkOrderIdNull: boolean,
-  existText: boolean,
-  isAccountNull: boolean,
+  existWorkOrderId: boolean,
+  existUploadId: boolean,
+  existAccount: boolean,
 ) => {
   return service
     .get('/log/get_logs', {
@@ -18,9 +18,9 @@ export const getLogListAPI = (
         studentAccount, // 学生账号搜索
         dateStart, // 开始日期
         dateEnd, // 结束日期
-        isWorkOrderIdNull, // 工单ID不为空
-        existText, // 备注包含‘上传文件’
-        isAccountNull, // 管理员账号和学生账号不为空
+        existWorkOrderId, // 工单ID不为空
+        existUploadId, // 备注包含‘上传文件’
+        existAccount, // 管理员账号和学生账号不为空
       },
     })
     .then((response) => response.data.data)
