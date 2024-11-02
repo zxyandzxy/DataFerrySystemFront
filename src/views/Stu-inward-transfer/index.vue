@@ -51,7 +51,7 @@
 </template>
 <script setup lang="ts">
   import { onMounted, ref } from 'vue'
-  import { viewFileAPI } from '@/api/studentFileProcessing'
+  import { viewFileAPI, downLoadFileAPI } from '@/api/studentFileProcessing'
   import { useStuStore } from '@/store/modules/student'
   import { ElNotification } from 'element-plus'
   import Error from '@/views/error/404.vue'
@@ -200,13 +200,7 @@
     getTableData()
   }
   const download = (index) => {
-    const url = tableData.value[index].downPath // 文件的下载 URL
-    const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', '')
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    downLoadFileAPI(tableData.value[index].upload_id, stuStore.stuId)
   }
 </script>
 

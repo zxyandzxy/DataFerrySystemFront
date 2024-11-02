@@ -87,7 +87,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       // 代理跨域（模拟示例） https://segmentfault.com/a/1190000043775780
       proxy: {
         '/api': {
-          target: 'http://127.0.0.1:8080',
+          target: 'http://192.168.100.2:8080',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
         },

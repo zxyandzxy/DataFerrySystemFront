@@ -1,5 +1,17 @@
 import request from './request'
 
+// 下载文件
+export function downLoadFileAPI(upload_id, student_id) {
+  return request({
+    url: '/student/download_file',
+    method: 'GET',
+    params: {
+      upload_id: upload_id,
+      student_account: student_id,
+    },
+  })
+}
+
 // 文件查看
 export function viewFileAPI(pageNum, pageSize, student_id, fileType, fileName) {
   return request({
