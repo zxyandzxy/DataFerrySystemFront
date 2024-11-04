@@ -122,7 +122,7 @@
               cancel-button-text="取消"
               :icon="InfoFilled"
               icon-color="#626AEF"
-              title="退出后此次不会生成工单，确定退出吗？"
+              title="退出后此次不会生成工单，确定退出吗？（点击右侧保存后工单就会产生，此时点击退出工单也不会删除）"
               @confirm="createWorkOrderVisible = false"
             >
               <template #reference>
@@ -198,7 +198,7 @@
             <h3>基本信息</h3>
             <el-divider />
             <div>
-              <el-form :model="workOrderForm" :rules="workOrderRules" label-width="auto">
+              <el-form :model="workOrderDetailForm" :rules="workOrderRules" label-width="auto">
                 <el-form-item label="当前审批类型" prop="auditType">
                   <el-input disabled v-model="workOrderDetailForm.auditType" />
                 </el-form-item>
@@ -252,7 +252,7 @@
                 cancel-button-text="取消"
                 :icon="InfoFilled"
                 icon-color="#626AEF"
-                title="退出后此次不会生成工单，确定退出吗？"
+                title="退出后此次不会进行任何操作，确定退出吗？"
                 @confirm="viewWorkOrderVisible = false"
               >
                 <template #reference>
@@ -471,7 +471,7 @@
     SuccessFilled,
     Lock,
   } from '@element-plus/icons-vue'
-  import { ref, onMounted, reactive } from 'vue'
+  import { ref, onMounted } from 'vue'
   import {
     getWorkOrderListAPI,
     getAuditTypeAPI,
@@ -577,7 +577,7 @@
         pageSize.value,
         stuStore.stuId,
         content.value,
-        -1,
+        null,
       )
       res = res.data
       if (res.code === 200) {
@@ -679,7 +679,7 @@
         message: '创建成功',
         type: 'success',
       })
-      workOrderForm.value.workOrderId = res.data.workOrderId
+      workOrderForm.value.workOrderId = res.data
       isCreateWorkOrder.value = true
     } else {
       ElMessage({
@@ -1005,7 +1005,7 @@
   ])
 
   const getWorkOrderList = async () => {
-    let res = await getWorkOrderListAPI(currentPage.value, pageSize.value, stuStore.stuId, '', -1)
+    let res = await getWorkOrderListAPI(currentPage.value, pageSize.value, stuStore.stuId, '', null)
     res = res.data
 
     if (res.code === 200) {
