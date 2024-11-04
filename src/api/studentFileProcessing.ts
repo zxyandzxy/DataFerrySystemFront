@@ -9,6 +9,7 @@ export function downLoadFileAPI(upload_id, student_id) {
       upload_id: upload_id,
       student_account: student_id,
     },
+    responseType: 'blob',
   })
 }
 
