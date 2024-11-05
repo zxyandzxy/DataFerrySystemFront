@@ -82,6 +82,8 @@
         <div class="form-item">
           <div
             v-if="
+              currentTicket.workOrderStatus == 2 ||
+              currentTicket.workOrderStatus == 3 ||
               currentTicket.workOrderStatus == 11 ||
               currentTicket.workOrderStatus == 21 ||
               currentTicket.workOrderStatus == 22
