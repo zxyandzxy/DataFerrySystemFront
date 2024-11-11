@@ -79,11 +79,15 @@ export function advanceApprovalVerificationAPI(
   })
 }
 // 拷贝文件
-export function copyFileAPI(data) {
+export function copyFileAPI(workOrderId, studentAccount, password) {
   return request({
     url: '/student/copy_file',
     method: 'GET',
-    data,
+    params: {
+      workOrderId,
+      studentAccount,
+      password,
+    },
   })
 }
 // 创建工单后上传文件

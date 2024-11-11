@@ -201,10 +201,7 @@
   }
   const download = async (index) => {
     const response = await downLoadFileAPI(tableData.value[index].uploadId, stuStore.stuId)
-    console.log('response', response)
     const url = window.URL.createObjectURL(new Blob([response.data]))
-    console.log('response.data', response.data)
-    console.log('url', url)
     const link = document.createElement('a')
     link.href = url
     link.setAttribute('download', tableData.value[index].fileName) // 替换为实际的文件名

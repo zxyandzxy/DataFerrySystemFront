@@ -37,7 +37,7 @@
           <el-icon class="el-icon--upload"><upload-filled /></el-icon>
           <div class="el-upload__text"> 将文件拖入此处 或者 <em>点击此处上传文件</em> </div>
           <template #tip>
-            <div class="el-upload__tip"> 请注意自己的可用空间大小 </div>
+            <div class="el-upload__tip"> 请注意上传的文件大小，过大的上传文件将被管理员删除 </div>
           </template>
         </el-upload>
         <el-button
@@ -48,7 +48,7 @@
           bg
           @click="uploadFile"
         >
-          上传（可联系管理员扩容）
+          上传(请使用英文命名文件，否则将无法在内网机器中下载)
         </el-button>
       </div>
       <div v-else>

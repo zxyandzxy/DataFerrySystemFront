@@ -45,7 +45,6 @@
                       disabled
                       style="margin-right: 5%"
                     />
-                    <el-icon @click="copyFileDownPath"><DocumentCopy /></el-icon>
                   </div>
                 </el-form-item>
                 <el-form-item label="校验码">
@@ -56,7 +55,6 @@
                       disabled
                       style="margin-right: 5%"
                     />
-                    <el-icon @click="copyFileValid"><DocumentCopy /></el-icon>
                   </div>
                 </el-form-item>
                 <el-form-item label="文件解压密码">
@@ -71,6 +69,9 @@
                   </div>
                 </el-form-item>
               </el-form>
+              <el-button style="color: blue; margin-left: 50%" text bg @click="downloadZipFile">
+                下载文件
+              </el-button>
             </div>
           </el-col>
         </el-row>
@@ -82,68 +83,37 @@
   </div>
 </template>
 <script setup lang="ts">
-  import { reactive, ref } from 'vue'
+  import { ref } from 'vue'
   import { ElMessage } from 'element-plus'
   import { copyFileAPI } from '@/api/stuWorkOrderApproval'
+  import { downloadZipFileAPI } from '@/api/studentFileProcessing'
   import useClipboard from 'vue-clipboard3'
   import { useCopyMachineStore } from '@/store/modules/copyMachine'
   import Error from '@/views/error/404.vue'
   const copyMachineStore = useCopyMachineStore()
   const { toClipboard } = useClipboard()
-  const ticketForm = reactive({
+  const ticketForm = ref({
     workOrderId: '',
     studentId: '',
     password: '',
   })
-  const fileForm = reactive({
+  const fileForm = ref({
     fileDownloadLink: '',
     checkCode: '',
     unzipPassword: '',
   })
 
-  const copyFileDownPath = async () => {
-    try {
-      await toClipboard(fileForm.fileDownloadLink)
-      ElMessage({
-        message: '复制文件校验码成功.',
-        type: 'success',
-        plain: true,
-      })
-    } catch (e) {
-      ElMessage({
-        message: '复制文件校验码失败.',
-        type: 'error',
-        plain: true,
-      })
-    }
-  }
-  const copyFileValid = async () => {
-    try {
-      await toClipboard(fileForm.checkCode)
-      ElMessage({
-        message: '复制文件校验码成功.',
-        type: 'success',
-        plain: true,
-      })
-    } catch (e) {
-      ElMessage({
-        message: '复制文件校验码失败.',
-        type: 'error',
-        plain: true,
-      })
-    }
-  }
   const copyFilePassword = async () => {
     try {
-      await toClipboard(fileForm.unzipPassword)
+      await toClipboard(fileForm.value.unzipPassword)
       ElMessage({
-        message: '复制文件校验码成功.',
+        message: '复制文件解压密码成功.',
         type: 'success',
         plain: true,
       })
     } catch (e) {
       ElMessage({
-        message: '复制文件校验码失败.',
+        message: '复制文件解压密码失败.',
         type: 'error',
         plain: true,
       })
@@ -151,14 +121,18 @@
   }
   const isValid = ref(false)
 
-  const validate = () => {
-    let res = copyFileAPI(ticketForm)
+  const validate = async () => {
+    let res = await copyFileAPI(
+      ticketForm.value.workOrderId,
+      ticketForm.value.studentId,
+      ticketForm.value.password,
+    )
     res = res.data
     if (res.code == 200) {
       isValid.value = true
-      fileForm.fileDownloadLink = res.data.fileDownloadLink
-      fileForm.checkCode = res.data.checkCode
-      fileForm.unzipPassword = res.data.unzipPassword
+      fileForm.value.fileDownloadLink = res.data.fileDownloadLink
+      fileForm.value.checkCode = res.data.checkCode
+      fileForm.value.unzipPassword = res.data.unzipPassword
     } else {
       isValid.value = false
       ElMessage({
@@ -167,6 +141,17 @@
         plain: true,
       })
     }
+  }
+
+  const downloadZipFile = async () => {
+    const response = await downloadZipFileAPI(ticketForm.value.workOrderId)
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', 'file.zip') // 替换为实际的文件名
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 </script>
 

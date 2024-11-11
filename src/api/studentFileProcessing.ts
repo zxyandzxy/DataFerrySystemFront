@@ -1,6 +1,18 @@
 import request from './request'
 
-// 下载文件
+// 拷贝机端下载向外摆渡文件
+export function downloadZipFileAPI(workOrderId) {
+  return request({
+    url: '/student/download_zip_file',
+    method: 'GET',
+    params: {
+      workOrderId,
+    },
+    responseType: 'blob',
+  })
+}
+
+// 下载学生上传的文件
 export function downLoadFileAPI(upload_id, student_id) {
   return request({
     url: '/student/download_file',
