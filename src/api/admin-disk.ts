@@ -27,6 +27,7 @@ export const viewStudentFilesAPI = (
   fileName: string,
   dateStart: string,
   dateEnd: string,
+  fileSizeFlag: boolean,
 ) => {
   return service
     .get('/manager/view_files', {
@@ -37,6 +38,7 @@ export const viewStudentFilesAPI = (
         fileName,
         dateStart,
         dateEnd,
+        fileSizeFlag,
       },
     })
     .then((response) => response.data.data)
@@ -52,4 +54,13 @@ export const deleteStudentFilesAPI = (studentId: string, uploadId: string) => {
       },
     })
     .then((response) => response.data.data)
+}
+
+export const getFileAPI = (upLoadId: string) => {
+  return service.get('/manager/get_file', {
+    params: {
+      upLoadId,
+    },
+    responseType: 'blob', // 确保返回的是文件流
+  })
 }

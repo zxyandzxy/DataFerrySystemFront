@@ -8,6 +8,7 @@ export function getTicketListAPI(params: {
   studentName: string
   workOrderStatus: number
   auditType: number
+  fileSizeFlag: boolean
 }): Promise<any> {
   return service
     .get('/manager/get_list', {
@@ -34,4 +35,13 @@ export const reviewWorkOrderAPI = async (params: {
   remark: string
 }): Promise<any> => {
   return service.put('/manager/work_order_review', params)
+}
+
+export const getWorkOrderFileAPI = (workOrderId: string) => {
+  return service.get('/manager/get_work_order_file', {
+    params: {
+      workOrderId,
+    },
+    responseType: 'blob', // 确保返回的是文件流
+  })
 }

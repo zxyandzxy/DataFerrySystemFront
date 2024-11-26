@@ -54,7 +54,7 @@
       <el-dialog
         title="文件管理"
         v-model="isDialogVisible"
-        width="1000px"
+        width="1400px"
         :before-close="handleDialogClose"
       >
         <!-- 搜索区域 -->
@@ -83,6 +83,15 @@
           <el-button type="primary" @click="onSearchFiles" :icon="Search" class="search-button">
             搜索
           </el-button>
+
+          <el-checkbox
+            v-model="fileSizeFlag"
+            class="file-size-checkbox"
+            style="margin-left: 20px"
+            @change="checkBoxChange"
+          >
+            按照文件从大到小排序
+          </el-checkbox>
         </div>
 
         <div class="table">
@@ -106,7 +115,7 @@
             />
             <el-table-column label="操作" align="center">
               <template #default="{ row }">
-                <el-button type="primary" @click="downloadFile(row)">下载</el-button>
+                <el-button type="primary" @click="downloadFile(row.upLoadId)">下载</el-button>
                 <el-button type="danger" @click="deleteFile(row)">删除</el-button>
               </template>
             </el-table-column>
@@ -138,6 +147,7 @@
   } from '@/api/admin-disk'
   import { useAdminStore } from '../../store/modules/admin'
   import Error from '@/views/error/404.vue'
+  import { getFileAPI } from '../../api/admin-disk'
 
   const adminStore = useAdminStore()
   const studentsSpace = ref([])
@@ -159,6 +169,8 @@
 
   const searchFileName = ref('') // 文件名搜索关键词
   const dateRange = ref([]) // 时间区间选择
+
+  const fileSizeFlag = ref(false) // 控制是否显示文件大小
 
   // 将字节转换为MB
   const formatBytesToMB = (bytes) => {
@@ -185,12 +197,11 @@
 
   // 查询事件
   const onSubmit = async () => {
-    currentPage.value = 1
-    await getAllStudentsSpace(currentPage.value)
+    await getAllStudentsSpace()
   }
 
   // 获取学生空间数据
-  const getAllStudentsSpace = async (pageNum) => {
+  const getAllStudentsSpace = async () => {
     const searchParams = {
       pageNum: currentPage.value,
       pageSize: pageSize,
@@ -215,7 +226,7 @@
   const manageStudent = async (row) => {
     try {
       currentStudentAccount.value = row.studentAccount
-      await getStudentFiles(currentFilePage.value) // 获取文件列表
+      await getStudentFiles() // 获取文件列表
       isDialogVisible.value = true
     } catch (error) {
       return
@@ -224,7 +235,7 @@
 
   // 获取学生文件数据
   // 获取文件列表的函数，加入文件名和时间区间搜索
-  const getStudentFiles = async (pageNum) => {
+  const getStudentFiles = async () => {
     try {
       let startDateParam
       let endDateParam
@@ -235,11 +246,12 @@
       }
       const response = await viewStudentFilesAPI(
         currentStudentAccount.value,
-        pageNum,
+        currentFilePage.value,
         filePageSize,
         searchFileName.value !== undefined ? searchFileName.value : null,
         startDateParam !== undefined ? Math.floor(startDateParam / 1000) + '' : '',
         endDateParam !== undefined ? Math.floor(endDateParam / 1000) + '' : '',
+        fileSizeFlag.value,
       )
 
       currentFiles.value = response.array // 获取学生文件列表
@@ -249,20 +261,26 @@
 
   const onSearchFiles = async () => {
     currentFilePage.value = 1
-    await getStudentFiles(currentFilePage.value) // 按条件搜索文件
+    await getStudentFiles() // 按条件搜索文件
   }
 
   // 下载文件
-  const downloadFile = (file) => {
-    window.open(file.fileURL) // 通过文件的URL下载
-    ElMessage.success(`文件 ${file.fileName} 正在下载`)
+  const downloadFile = async (id: string) => {
+    const response = await getFileAPI(id)
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', 'file.zip') // 替换为实际的文件名
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 
   // 删除文件
   const deleteFile = async (file) => {
     try {
-      let res = await deleteStudentFilesAPI(currentStudentAccount.value, file.uploadId)
-      await getStudentFiles(currentFilePage.value) // 重新获取文件列表
+      let res = await deleteStudentFilesAPI(currentStudentAccount.value, file.upLoadId)
+      await getStudentFiles() // 重新获取文件列表
       if (res.data.code == 200) {
         ElMessage.success(`文件 ${file.fileName} 删除成功`)
       }
@@ -274,12 +292,12 @@
   // 处理分页
   const handlePageChange = async (page) => {
     currentPage.value = page
-    await getAllStudentsSpace(page) // 根据页码获取学生数据
+    await getAllStudentsSpace() // 根据页码获取学生数据
   }
 
   const handleFilePageChange = async (page) => {
     currentFilePage.value = page
-    await getStudentFiles(page) // 根据页码获取学生文件数据
+    await getStudentFiles() // 根据页码获取学生文件数据
   }
 
   const resetSearchInfo = () => {
@@ -293,9 +311,13 @@
     done() // 调用done以关闭弹窗
   }
 
+  const checkBoxChange = async () => {
+    await getStudentFiles()
+  }
+
   // 组件挂载时获取学生数据
   onMounted(async () => {
-    await getAllStudentsSpace(currentPage.value)
+    await getAllStudentsSpace()
   })
 </script>
 

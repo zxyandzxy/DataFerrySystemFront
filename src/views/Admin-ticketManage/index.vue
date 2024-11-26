@@ -24,6 +24,14 @@
             <el-button type="primary" @click="onSubmit" :icon="Search" class="search-button">
               查询
             </el-button>
+            <el-checkbox
+              v-model="fileSizeFlag"
+              class="file-size-checkbox"
+              style="margin-left: 20px"
+              @change="checkBoxChange"
+            >
+              按照文件从大到小排序
+            </el-checkbox>
           </div>
         </div>
         <!-- 表格部分 -->
@@ -32,12 +40,13 @@
             <el-table-column prop="workOrderId" label="工单号" width="180" align="center" />
             <el-table-column prop="workOrderTitle" label="标题" width="180" align="center" />
             <el-table-column prop="studentName" label="发起人" width="180" align="center" />
-            <el-table-column prop="createTime" label="发起时间" width="180" align="center" />
+            <el-table-column prop="createTime" label="发起时间" width="220" align="center" />
             <el-table-column label="工单审批状态" width="180" align="center">
               <template #default="{ row }">
                 {{ statusMapNum2Str[row.workOrderStatus] }}
               </template>
             </el-table-column>
+            <el-table-column prop="fileSize" label="文件大小(MB)" width="180" align="center" />
             <el-table-column label="操作" align="center">
               <template #default="{ row }">
                 <el-button type="primary" @click="viewTicket(row)"
@@ -90,13 +99,13 @@
             "
           >
             <label>文件内容:</label>
-            <el-link
+            <el-button
               type="primary"
-              :href="currentTicket.fileURL"
-              target="_blank"
+              @click="downloadFile(currentTicket.workOrderId)"
               style="margin-left: 230px"
-              >点击下载</el-link
             >
+              点击下载
+            </el-button>
           </div>
         </div>
         <div class="form-item">
@@ -147,6 +156,7 @@
   import {
     getTicketListAPI,
     getWorkOrderDetailAPI,
+    getWorkOrderFileAPI,
     reviewWorkOrderAPI,
   } from '../../api/admin-ticket'
   import Error from '@/views/error/404.vue'
@@ -187,11 +197,10 @@
     审批通过: 21,
     审批驳回: 22,
   }
-  const getTicketList = async () => {
-    console.log(
-      searchType.value === 'workOrderStatus' ? statusMapStr2Num[searchInfo.value] || null : null,
-    )
 
+  const fileSizeFlag = ref(false) // 控制是否显示文件大小
+
+  const getTicketList = async () => {
     // 动态构建 API 查询参数
     const searchParams = {
       pageNum: currentPage.value,
@@ -202,6 +211,7 @@
       workOrderStatus:
         searchType.value === 'workOrderStatus' ? statusMapStr2Num[searchInfo.value] || -1 : null,
       auditType: searchType.value === 'auditType' ? Number(searchInfo.value) || -1 : null,
+      fileSizeFlag: fileSizeFlag.value,
     }
     try {
       const response = await getTicketListAPI(searchParams)
@@ -258,11 +268,24 @@
     }
   }
 
+  const checkBoxChange = async () => {
+    await getTicketList()
+  }
+
+  const downloadFile = async (id: string) => {
+    const response = await getWorkOrderFileAPI(id)
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', 'file.zip') // 替换为实际的文件名
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   onMounted(async () => {
     await getTicketList()
   })
-
-  // const dialogTitle = computed(() => (currentTicket.value ? '工单详情' : '工单查看'))
 </script>
 
 <style scoped lang="scss">
