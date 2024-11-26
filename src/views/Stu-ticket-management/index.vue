@@ -701,14 +701,18 @@
       })
       fromData.append('workOrderId', workOrderForm.value.workOrderId)
       fromData.append('studentAccount', stuStore.stuId)
-      let res = uploadFileAPI(fromData)
+      console.log('11111111111111111111')
+      let res = await uploadFileAPI(fromData)
+      console.log(res)
       res = res.data
       if (res.code == 200) {
-        ElMessage({
+        ElNotification({
           message: res.msg,
           type: 'success',
+          duration: 2000,
         })
         createWorkOrderVisible.value = false
+        await getWorkOrderList()
       }
     }
   }
@@ -803,6 +807,7 @@
         type: 'success',
         duration: 0,
       })
+      advancedReviewVisible.value = false
     }
   }
 

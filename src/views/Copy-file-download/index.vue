@@ -130,7 +130,7 @@
     res = res.data
     if (res.code == 200) {
       isValid.value = true
-      fileForm.value.fileDownloadLink = res.data.fileDownloadLink
+      fileForm.value.fileDownloadLink = '文件已下载，请在浏览器查看'
       fileForm.value.checkCode = res.data.checkCode
       fileForm.value.unzipPassword = res.data.unzipPassword
     } else {

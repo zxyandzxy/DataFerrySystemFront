@@ -53,6 +53,10 @@ export function resetStudentPasswordAPI(studentAccount: string): Promise<string>
 }
 
 // 下载批量添加模板文件
-export function downloadBatchFileAPI(): Promise<string> {
-  return service.get(`/manager/get_batch_file`).then((response) => response.data.data.file)
+export function downloadBatchFileAPI() {
+  return service({
+    url: '/manager/get_batch_file',
+    method: 'GET',
+    responseType: 'blob',
+  })
 }

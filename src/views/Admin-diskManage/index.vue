@@ -115,7 +115,7 @@
             />
             <el-table-column label="操作" align="center">
               <template #default="{ row }">
-                <el-button type="primary" @click="downloadFile(row.upLoadId)">下载</el-button>
+                <el-button type="primary" @click="downloadFile(row)">下载</el-button>
                 <el-button type="danger" @click="deleteFile(row)">删除</el-button>
               </template>
             </el-table-column>
@@ -265,12 +265,12 @@
   }
 
   // 下载文件
-  const downloadFile = async (id: string) => {
-    const response = await getFileAPI(id)
+  const downloadFile = async (file) => {
+    const response = await getFileAPI(file.upLoadId)
     const url = window.URL.createObjectURL(new Blob([response.data]))
     const link = document.createElement('a')
     link.href = url
-    link.setAttribute('download', 'file.zip') // 替换为实际的文件名
+    link.setAttribute('download', file.fileName) // 替换为实际的文件名
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -284,6 +284,7 @@
       if (res.data.code == 200) {
         ElMessage.success(`文件 ${file.fileName} 删除成功`)
       }
+      await getAllStudentsSpace()
     } catch (error) {
       return
     }

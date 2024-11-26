@@ -65,12 +65,12 @@ const customHeaders = computed(() => ({
 // 下载模板的逻辑
 const downloadTemplate = async () => {
   try {
-    const fileUrl = await downloadBatchFileAPI()
-
+    const response = await downloadBatchFileAPI()
+    const url = window.URL.createObjectURL(new Blob([response.data]))
     const link = document.createElement('a')
-    link.href = fileUrl
-    link.download = '批量添加模板.xlsx'
-    document.body.appendChild(link)
+    link.href = url
+    link.setAttribute('download','批量添加模板.xlsx')// 替换为实际的文件名
+    document.body.appendchild(link)
     link.click()
     document.body.removeChild(link)
   } catch (error) {

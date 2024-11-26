@@ -218,6 +218,11 @@
       // console.log(response)
 
       ticketList.value = response.items
+      // 将 ticketList 中的每个工单的 fileSize 除以 100000 转化为 MB
+      ticketList.value.forEach((ticket: any) => {
+        ticket.fileSize = (ticket.fileSize / 100000).toFixed(2)
+      })
+      // console.log(ticketList.value)
       total.value = response.total
     } catch (error) {
       ElMessage.error('获取工单列表失败')
@@ -236,6 +241,7 @@
       const response = await getWorkOrderDetailAPI(ticket.workOrderId)
       currentTicket.value = response
       currentTicket.value.workOrderId = ticket.workOrderId
+      currentTicket.value.auditType = currentTicket.value.auditType == 0 ? '定期审批' : '即时审批'
       isDialogVisible.value = true
     } catch (error) {
       ElMessage.error('获取工单详情失败')

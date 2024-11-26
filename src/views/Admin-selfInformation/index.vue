@@ -80,7 +80,7 @@
   import { useAdminStore } from '@/store/modules/admin'
   import { adminGetInfoAPI, updateAdminAPI, updateAdminPasswordAPI } from '../../api/admin-teacher'
   import { Admin } from '../../admin-interface/teacher'
-  import { ElMessage } from 'element-plus'
+  import { ElMessage, ElNotification } from 'element-plus'
   import { useRouter } from 'vue-router' // 导入 useRouter
   import Error from '@/views/error/404.vue'
 
@@ -176,17 +176,26 @@
     }
     try {
       // 调用更新密码 API
-      await updateAdminPasswordAPI(
+      let res = await updateAdminPasswordAPI(
         currentAdmin.value.adminAccount,
         passwordForm.oldPassword,
         passwordForm.newPassword,
         passwordForm.confirmPassword,
       )
-      passwordDialogVisible.value = false
-      ElMessage.success('修改密码成功,请重新登录')
-      resetPasswordForm() // 成功修改密码后重置表单
-      manageAdminStore.clearAdminInfo()
-      router.push('/login')
+      res = res.data
+      if (res.code == 200) {
+        passwordDialogVisible.value = false
+        ElMessage.success('修改密码成功,请重新登录')
+        resetPasswordForm() // 成功修改密码后重置表单
+        manageAdminStore.clearAdminInfo()
+        router.push('/login')
+      } else {
+        ElNotification({
+          message: res.msg,
+          type: 'error',
+          duration: 2000,
+        })
+      }
     } catch (error) {
       return
     }
