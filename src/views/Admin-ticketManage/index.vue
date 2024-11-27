@@ -220,7 +220,7 @@
       ticketList.value = response.items
       // 将 ticketList 中的每个工单的 fileSize 除以 100000 转化为 MB
       ticketList.value.forEach((ticket: any) => {
-        ticket.fileSize = (ticket.fileSize / 100000).toFixed(2)
+        ticket.fileSize = (ticket.fileSize / 1000000).toFixed(2)
       })
       // console.log(ticketList.value)
       total.value = response.total

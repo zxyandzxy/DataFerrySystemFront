@@ -8,12 +8,9 @@
       drag
       action="#" 
       :auto-upload="false"
-      :on-success="handleUploadSuccess"
-      :on-error="handleUploadError"
-      v-model::file-list="fileList"
+      v-model:file-list="fileList"
       :limit="1"
       :show-file-list="true"
-      accept=".xlsx"
     >
       <el-icon size="35"><UploadFilled /></el-icon>
       <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -47,7 +44,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { downloadBatchFileAPI, batchAddStudentAPI } from '../api/admin-student'
+import { downloadBatchFileAPI } from '../api/admin-student'
 
 const props = defineProps({
   show: Boolean,
@@ -75,26 +72,6 @@ const downloadTemplate = async () => {
   }
 }
 
-// 处理上传成功的回调函数
-const handleUploadSuccess = (response, file, fileList) => {
-  // 检查响应的状态码
-  if (response.code === 200) {
-    uploadResult.value = {
-      password: response.data.password,
-      existStu: response.data.existStu,
-    }
-    resultDialogVisible.value = true
-  } else {
-    ElMessage.error('上传失败: ' + response.msg)
-  }
-}
-
-// 处理上传失败的回调函数
-const handleUploadError = (error, file, fileList) => {
-  ElMessage.error('上传失败')
-  console.error('上传失败的文件:', file)
-}
-
 // 关闭对话框
 const closeDialog = () => {
   emit('update:show', false)
@@ -103,29 +80,9 @@ const closeDialog = () => {
 
 // 提交文件
 const submitFiles = async () => {
-  if (fileList.value.length === 0) {
+  if (fileList.value.length == 0) {
     ElMessage.error('请先上传文件')
     return
-  }
-  // 封装为FromData对象
-  const fromData = new FormData()
-  fileList.value.forEach((val) => {
-    fromData.append('file', val.raw)
-  })
-  let res = await batchAddStudentAPI(fromData)
-  res = res.data
-  if (res.code === 200) {
-    ElMessage({
-      message: res.msg,
-      type: 'success',
-      plain: true,
-    })
-  } else {
-    ElMessage({
-      message: res.msg,
-      type: 'error',
-      plain: true,
-    })
   }
   emit('submit', fileList.value)
   closeDialog()

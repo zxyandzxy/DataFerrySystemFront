@@ -69,7 +69,7 @@
                   </div>
                 </el-form-item>
               </el-form>
-              <el-button style="color: blue; margin-left: 50%" text bg @click="downloadZipFile">
+              <el-button style="color: blue; margin-left: 30%" text bg @click="downloadZipFile">
                 下载文件
               </el-button>
             </div>

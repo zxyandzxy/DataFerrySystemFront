@@ -121,6 +121,7 @@
     fetchStudentsAPI,
     removeStudentAPI,
     resetStudentPasswordAPI,
+    batchAddStudentAPI,
   } from '../../../api/admin-student'
   import { useAdminStore } from '../../../store/modules/admin'
   import Error from '@/views/error/404.vue'
@@ -269,9 +270,31 @@
     showBatchAddDialog.value = true
   }
 
-  const handleBatchAdd = (files) => {
+  const handleBatchAdd = async (files) => {
     // console.log('批量添加的文件:', files)
     // 处理批量添加的逻辑
+    // 封装为FromData对象
+    const fromData = new FormData()
+    files.forEach((val) => {
+      fromData.append('file', val.raw)
+    })
+    let res = await batchAddStudentAPI(fromData)
+    console.log('11111111', res)
+    res = res.data
+    console.log('22222222', res)
+    if (res.code === 200) {
+      ElMessage({
+        message: res.msg,
+        type: 'success',
+        plain: true,
+      })
+    } else {
+      ElMessage({
+        message: res.msg,
+        type: 'error',
+        plain: true,
+      })
+    }
   }
 </script>
 
