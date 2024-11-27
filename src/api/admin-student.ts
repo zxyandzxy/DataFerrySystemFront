@@ -60,3 +60,15 @@ export function downloadBatchFileAPI() {
     responseType: 'blob',
   })
 }
+
+// 批量添加学生账户
+export function batchAddStudentAPI(data) {
+  return service({
+    url: '/manager/batch_create_student_account',
+    method: 'POST',
+    data,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+}

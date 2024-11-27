@@ -6,13 +6,14 @@
     <el-upload
       class="upload-demo"
       drag
-      action="http://localhost:8080/manager/batch_create_student_account" 
+      action="#" 
+      :auto-upload="false"
       :on-success="handleUploadSuccess"
       :on-error="handleUploadError"
-      :file-list="fileList"
+      v-model::file-list="fileList"
+      :limit="1"
+      :show-file-list="true"
       accept=".xlsx"
-      multiple
-      :headers="customHeaders"
     >
       <el-icon size="35"><UploadFilled /></el-icon>
       <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -44,10 +45,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { downloadBatchFileAPI } from '../api/admin-student'
-import { useAdminStore } from '../store/modules/admin'
+import { downloadBatchFileAPI, batchAddStudentAPI } from '../api/admin-student'
 
 const props = defineProps({
   show: Boolean,
@@ -57,11 +57,7 @@ const emit = defineEmits(['update:show', 'submit'])
 const fileList = ref([])
 const resultDialogVisible = ref(false)
 const uploadResult = ref<{ password: string, existStu: string[] } | null>(null)
-const adminStore=useAdminStore()
 
-const customHeaders = computed(() => ({
-  Authorization: `${adminStore.token}`
-}))
 // 下载模板的逻辑
 const downloadTemplate = async () => {
   try {
@@ -70,9 +66,10 @@ const downloadTemplate = async () => {
     const link = document.createElement('a')
     link.href = url
     link.setAttribute('download','批量添加模板.xlsx')// 替换为实际的文件名
-    document.body.appendchild(link)
+    document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+
   } catch (error) {
     console.error('Error downloading the template:', error)
   }
@@ -105,10 +102,30 @@ const closeDialog = () => {
 }
 
 // 提交文件
-const submitFiles = () => {
+const submitFiles = async () => {
   if (fileList.value.length === 0) {
     ElMessage.error('请先上传文件')
     return
+  }
+  // 封装为FromData对象
+  const fromData = new FormData()
+  fileList.value.forEach((val) => {
+    fromData.append('file', val.raw)
+  })
+  let res = await batchAddStudentAPI(fromData)
+  res = res.data
+  if (res.code === 200) {
+    ElMessage({
+      message: res.msg,
+      type: 'success',
+      plain: true,
+    })
+  } else {
+    ElMessage({
+      message: res.msg,
+      type: 'error',
+      plain: true,
+    })
   }
   emit('submit', fileList.value)
   closeDialog()
