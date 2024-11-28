@@ -1,3 +1,4 @@
+<!-- eslint-disable prettier/prettier -->
 <template>
   <div class="app-container">
     <div class="app-container-inner">
@@ -71,6 +72,7 @@
       <div v-else>
         <Error />
       </div>
+
       <!-- 添加学生弹窗 -->
       <add-student-dialog
         :show="showAddStudentDialog"
@@ -100,11 +102,46 @@
       />
 
       <!-- 批量添加学生弹窗 -->
-      <batch-add-dialog
-        :show="showBatchAddDialog"
-        @update:show="showBatchAddDialog = $event"
-        @submit="handleBatchAdd"
-      />
+      <el-dialog v-model="showBatchAddDialog" title="批量添加" width="500" @close="closeBatchDialog">
+        <div>
+          <el-link type="primary" @click="downloadTemplate">下载批量添加模板</el-link>
+        </div>
+        <el-upload
+          class="upload-demo"
+          drag
+          action="#"
+          :auto-upload="false"
+          v-model:file-list="fileList"
+          :limit="1"
+          :show-file-list="true"
+        >
+          <el-icon size="35"><UploadFilled /></el-icon>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+          <div class="el-upload__tip" slot="tip">请上传 .xlsx 文件</div>
+        </el-upload>
+        <template #footer>
+          <div class="dialog-footer">
+            <el-button @click="closeBatchDialog">取消</el-button>
+            <el-button type="primary" @click="submitBatchFiles">确定</el-button>
+          </div>
+        </template>
+        <!-- 显示上传结果 -->
+        <el-dialog v-model="resultDialogVisible" title="上传结果" width="400">
+          <div v-if="uploadResult">
+            <p><strong>初始化密码:</strong> {{ uploadResult.password }}</p>
+            <p v-if="uploadResult.existStu.length > 0">
+              <strong>已存在的学生学号:</strong>
+              <ul>
+                <li v-for="student in uploadResult.existStu" :key="student">{{ student }}</li>
+              </ul>
+            </p>
+            <p v-else>所有学生账户都已成功创建。</p>
+          </div>
+          <template #footer>
+            <el-button @click="resultDialogVisible = false">关闭</el-button>
+          </template>
+        </el-dialog>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -122,6 +159,7 @@
     removeStudentAPI,
     resetStudentPasswordAPI,
     batchAddStudentAPI,
+    downloadBatchFileAPI
   } from '../../../api/admin-student'
   import { useAdminStore } from '../../../store/modules/admin'
   import Error from '@/views/error/404.vue'
@@ -269,19 +307,17 @@
   const openBatchAddDialog = () => {
     showBatchAddDialog.value = true
   }
-
-  const handleBatchAdd = async (files) => {
+  const fileList = ref([])
+  const submitBatchFiles = async () => {
     // console.log('批量添加的文件:', files)
     // 处理批量添加的逻辑
     // 封装为FromData对象
     const fromData = new FormData()
-    files.forEach((val) => {
+    fileList.value.forEach((val) => {
       fromData.append('file', val.raw)
     })
     let res = await batchAddStudentAPI(fromData)
-    console.log('11111111', res)
     res = res.data
-    console.log('22222222', res)
     if (res.code === 200) {
       ElMessage({
         message: res.msg,
@@ -295,6 +331,36 @@
         plain: true,
       })
     }
+  }
+
+  const resultDialogVisible = ref(false)
+  const uploadResult = ref<{ password: string, existStu: string[] } | null>(null)
+
+  // 下载模板的逻辑
+  const downloadTemplate = async () => {
+    try {
+      const response = await downloadBatchFileAPI()
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download','批量添加模板.xlsx')// 替换为实际的文件名
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+    } catch (error) {
+      console.error('Error downloading the template:', error)
+    }
+  }
+
+  // 关闭对话框
+  const closeBatchDialog = () => {
+    showBatchAddDialog.value=false
+    resetForm()
+  }
+  // 重置表单
+  const resetForm = () => {
+    fileList.value = []
   }
 </script>
 
