@@ -311,6 +311,14 @@
     // console.log('批量添加的文件:', files)
     // 处理批量添加的逻辑
     // 封装为FromData对象
+    if (fileList.value.length === 0) {
+      ElMessage({
+          message: "请先上传文件",
+          type: 'error',
+          plain: true,
+        })
+      return
+    }
     const fromData = new FormData()
     fileList.value.forEach((val) => {
       fromData.append('file', val.raw)
@@ -323,6 +331,9 @@
         type: 'success',
         plain: true,
       })
+      resultDialogVisible.value = true
+      uploadResult.value.password = res.data.password
+      uploadResult.value.existStu = res.data.existStu
     } else {
       ElMessage({
         message: res.msg,
