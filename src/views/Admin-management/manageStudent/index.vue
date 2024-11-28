@@ -152,7 +152,6 @@
   import { ElMessageBox, ElMessage } from 'element-plus'
   import PasswordDialog from '@/admin-components/PasswordDialog.vue'
   import AddStudentDialog from '@/admin-components/AddStudentDialog.vue'
-  import BatchAddDialog from '@/admin-components/BatchAddDialog.vue'
   import {
     addStudentAPI,
     fetchStudentsAPI,
