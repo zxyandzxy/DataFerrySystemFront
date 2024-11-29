@@ -102,7 +102,12 @@
       />
 
       <!-- 批量添加学生弹窗 -->
-      <el-dialog v-model="showBatchAddDialog" title="批量添加" width="500" @close="closeBatchDialog">
+      <el-dialog
+        v-model="showBatchAddDialog"
+        title="批量添加"
+        width="500"
+        @close="closeBatchDialog"
+      >
         <div>
           <el-link type="primary" @click="downloadTemplate">下载批量添加模板</el-link>
         </div>
@@ -127,16 +132,12 @@
         </template>
         <!-- 显示上传结果 -->
         <el-dialog v-model="resultDialogVisible" title="上传结果" width="400">
-          <div v-if="uploadResult">
-            <p><strong>初始化密码:</strong> {{ uploadResult.password }}</p>
-            <p v-if="uploadResult.existStu.length > 0">
-              <strong>已存在的学生学号:</strong>
-              <ul>
-                <li v-for="student in uploadResult.existStu" :key="student">{{ student }}</li>
-              </ul>
-            </p>
-            <p v-else>所有学生账户都已成功创建。</p>
-          </div>
+          <p><strong>初始化密码:</strong> {{ uploadResult.password }}</p>
+          <p>
+            <strong>已存在的学生学号:</strong>
+            <span>{{ uploadResult.existStu }}</span>
+          </p>
+          <p>所有学生账户都已成功创建。</p>
           <template #footer>
             <el-button @click="resultDialogVisible = false">关闭</el-button>
           </template>
@@ -158,7 +159,7 @@
     removeStudentAPI,
     resetStudentPasswordAPI,
     batchAddStudentAPI,
-    downloadBatchFileAPI
+    downloadBatchFileAPI,
   } from '../../../api/admin-student'
   import { useAdminStore } from '../../../store/modules/admin'
   import Error from '@/views/error/404.vue'
@@ -313,10 +314,10 @@
     // 封装为FromData对象
     if (fileList.value.length === 0) {
       ElMessage({
-          message: "请先上传文件",
-          type: 'error',
-          plain: true,
-        })
+        message: '请先上传文件',
+        type: 'error',
+        plain: true,
+      })
       return
     }
     const fromData = new FormData()
@@ -331,9 +332,9 @@
         type: 'success',
         plain: true,
       })
-      resultDialogVisible.value = true
       uploadResult.value.password = res.data.password
       uploadResult.value.existStu = res.data.existStu
+      await getStudentList()
     } else {
       ElMessage({
         message: res.msg,
@@ -344,7 +345,10 @@
   }
 
   const resultDialogVisible = ref(false)
-  const uploadResult = ref<{ password: string, existStu: string[] } | null>(null)
+  const uploadResult = ref({
+    password: '',
+    existStu: '',
+  })
 
   // 下载模板的逻辑
   const downloadTemplate = async () => {
@@ -353,11 +357,10 @@
       const url = window.URL.createObjectURL(new Blob([response.data]))
       const link = document.createElement('a')
       link.href = url
-      link.setAttribute('download','批量添加模板.xlsx')// 替换为实际的文件名
+      link.setAttribute('download', '批量添加模板.xlsx') // 替换为实际的文件名
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
-
     } catch (error) {
       console.error('Error downloading the template:', error)
     }
@@ -365,7 +368,7 @@
 
   // 关闭对话框
   const closeBatchDialog = () => {
-    showBatchAddDialog.value=false
+    showBatchAddDialog.value = false
     resetForm()
   }
   // 重置表单
