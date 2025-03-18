@@ -101,7 +101,13 @@
             <label>文件内容:</label>
             <el-button
               type="primary"
-              @click="downloadFile(currentTicket.workOrderId)"
+              @click="
+                downloadFile(
+                  currentTicket.workOrderId,
+                  currentTicket.workOrderTitle,
+                  currentTicket.studentName,
+                )
+              "
               style="margin-left: 230px"
             >
               点击下载
@@ -278,12 +284,12 @@
     await getTicketList()
   }
 
-  const downloadFile = async (id: string) => {
+  const downloadFile = async (id: string, workOrderTitle: string, studentName: string) => {
     const response = await getWorkOrderFileAPI(id)
     const url = window.URL.createObjectURL(new Blob([response.data]))
     const link = document.createElement('a')
     link.href = url
-    link.setAttribute('download', 'file.zip') // 替换为实际的文件名
+    link.setAttribute('download', `${workOrderTitle}-${studentName}.zip`) // 替换为实际的文件名
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
