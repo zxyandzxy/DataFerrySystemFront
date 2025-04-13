@@ -146,7 +146,7 @@
                 :auto-upload="false"
               >
                 <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-                <div class="el-upload__text"> 拖拽文件 或 <em> 点击上传 </em> </div>
+                <div class="el-upload__text"> 拖拽文件 或 <em> 点击上传（文件最大20GB） </em> </div>
                 <template #tip>
                   <div class="el-upload__tip">
                     只有文件上传后才能成功提交工单，后台处理文件上传需要一定时间，同学无需等待，提交工单即可。如需更新文件需先删除原来的上传的文件
@@ -276,7 +276,9 @@
                   list-type="text"
                 >
                   <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-                  <div class="el-upload__text"> 拖拽文件 或 <em> 点击上传 </em> </div>
+                  <div class="el-upload__text">
+                    拖拽文件 或 <em> 点击上传（文件最大20GB） </em>
+                  </div>
                   <template #tip>
                     <div class="el-upload__tip">
                       只有文件上传后才能成功提交工单，后台处理文件上传需要一定时间，同学无需等待，提交工单即可
@@ -957,7 +959,7 @@
       })
       fromData.append('workOrderId', workOrderDetailForm.value.workOrderId)
       fromData.append('studentAccount', stuStore.stuId)
-      let res = uploadFileAPI(fromData)
+      let res = await uploadFileAPI(fromData)
       res = res.data
       if (res.code == 200) {
         ElMessage({

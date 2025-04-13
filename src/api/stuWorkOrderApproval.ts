@@ -90,6 +90,19 @@ export function copyFileAPI(workOrderId, studentAccount, password) {
     },
   })
 }
+
+// 拷贝文件列表
+export function copyFileListAPI(studentAccount, password) {
+  return request({
+    url: '/student/copy_file_list',
+    method: 'GET',
+    params: {
+      studentAccount,
+      password,
+    },
+  })
+}
+
 // 创建工单后上传文件
 export function uploadFileAPI(data) {
   return request({

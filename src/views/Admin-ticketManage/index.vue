@@ -286,6 +286,10 @@
 
   const downloadFile = async (id: string, workOrderTitle: string, studentName: string) => {
     const response = await getWorkOrderFileAPI(id)
+    ElMessage({
+      message: '下载文件成功，请在浏览器的下载列表中查看.',
+      type: 'success',
+    })
     const url = window.URL.createObjectURL(new Blob([response.data]))
     const link = document.createElement('a')
     link.href = url

@@ -37,7 +37,7 @@
           <el-icon class="el-icon--upload"><upload-filled /></el-icon>
           <div class="el-upload__text"> 将文件拖入此处 或者 <em>点击此处上传文件</em> </div>
           <template #tip>
-            <div class="el-upload__tip"> 请注意上传的文件大小，过大的上传文件将被管理员删除 </div>
+            <div class="el-upload__tip"> 请注意上传的文件大小，文件上传限制为20GB </div>
           </template>
         </el-upload>
         <el-button

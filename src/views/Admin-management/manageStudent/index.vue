@@ -316,7 +316,6 @@
       ElMessage({
         message: '请先上传文件',
         type: 'error',
-        plain: true,
       })
       return
     }
@@ -330,7 +329,6 @@
       ElMessage({
         message: res.msg,
         type: 'success',
-        plain: true,
       })
       uploadResult.value.password = res.data.password
       uploadResult.value.existStu = res.data.existStu
@@ -339,7 +337,6 @@
       ElMessage({
         message: res.msg,
         type: 'error',
-        plain: true,
       })
     }
   }
@@ -354,6 +351,10 @@
   const downloadTemplate = async () => {
     try {
       const response = await downloadBatchFileAPI()
+      ElMessage({
+        message: '下载文件成功，请在浏览器的下载列表中查看.',
+        type: 'success',
+      })
       const url = window.URL.createObjectURL(new Blob([response.data]))
       const link = document.createElement('a')
       link.href = url
@@ -362,7 +363,7 @@
       link.click()
       document.body.removeChild(link)
     } catch (error) {
-      console.error('Error downloading the template:', error)
+      console.error('下载模版失败，请重试', error)
     }
   }
 

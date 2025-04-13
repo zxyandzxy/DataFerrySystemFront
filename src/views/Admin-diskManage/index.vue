@@ -267,6 +267,10 @@
   // 下载文件
   const downloadFile = async (file) => {
     const response = await getFileAPI(file.upLoadId)
+    ElMessage({
+      message: '下载文件成功，请在浏览器的下载列表中查看.',
+      type: 'success',
+    })
     const url = window.URL.createObjectURL(new Blob([response.data]))
     const link = document.createElement('a')
     link.href = url

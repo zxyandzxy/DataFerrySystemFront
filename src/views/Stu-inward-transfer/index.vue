@@ -53,7 +53,7 @@
   import { onMounted, ref } from 'vue'
   import { viewFileAPI, downLoadFileAPI } from '@/api/studentFileProcessing'
   import { useStuStore } from '@/store/modules/student'
-  import { ElNotification } from 'element-plus'
+  import { ElNotification, ElMessage } from 'element-plus'
   import Error from '@/views/error/404.vue'
   import { Search } from '@element-plus/icons-vue'
   const stuStore = useStuStore()
@@ -201,6 +201,10 @@
   }
   const download = async (index) => {
     const response = await downLoadFileAPI(tableData.value[index].uploadId, stuStore.stuId)
+    ElMessage({
+      message: '下载文件成功，请在浏览器的下载列表中查看.',
+      type: 'success',
+    })
     const url = window.URL.createObjectURL(new Blob([response.data]))
     const link = document.createElement('a')
     link.href = url
