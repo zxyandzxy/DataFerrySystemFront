@@ -191,7 +191,6 @@
           authForm.value.password,
         )
         await systemConfigStore.fetchSystemConfig()
-        ElMessage.success('修改成功')
         // 验证成功后执行保存操作或关闭身份验证对话框
         await saveChanges()
         form.value = {

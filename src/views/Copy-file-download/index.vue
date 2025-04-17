@@ -15,17 +15,19 @@
             v-model="ticketForm.password"
             style="max-width: 600px; margin-left: 2%"
             placeholder="请输入密码"
+            type="password"
+            show-password
           >
             <template #prepend>登录密码</template>
           </el-input>
           <el-button style="color: blue; margin-left: 2%" text bg @click="validate">验证</el-button>
         </div>
         <el-table :data="workOrderList" style="width: 100%; margin-top: 2%" border>
-          <el-table-column prop="workOrderId" label="工单号" width="150" />
-          <el-table-column prop="workOrderTitle" label="工单标题" width="200" />
-          <el-table-column prop="checkCode" label="校验码" width="200" />
-          <el-table-column prop="unzipPassword" label="解压密码" width="200" />
-          <el-table-column fixed="right" label="操作" min-width="120">
+          <el-table-column prop="workOrderId" label="工单号" width="150" align="center"/>
+          <el-table-column prop="workOrderTitle" label="工单标题" width="200" align="center"/>
+          <el-table-column prop="checkCode" label="校验码" width="200" align="center"/>
+          <el-table-column prop="unzipPassword" label="解压密码" width="200" align="center"/>
+          <el-table-column fixed="right" label="操作" min-width="120" align="center">
             <template v-slot="scope">
               <el-button link type="primary" size="small" @click="downloadZipFile(scope.$index)">
                 下载文件
